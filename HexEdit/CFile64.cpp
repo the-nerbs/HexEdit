@@ -949,6 +949,9 @@ BOOL PASCAL CFile64::GetStatus( LPCTSTR filename, CFileStatus& status )
    status.m_size = full_size.QuadPart;
 
    // convert times as appropriate
+   //TODO(runtime error): ATL::CTime will assert that the year is >= 1970, but does so *after* adjusting to local time
+   // since I live in a -X timezone, this means that if it gets 1/1/1970, then adjusts to
+   // 12/31/1969, and then follows up by passing a too-early time to itself and failing.
    status.m_ctime = CTime( find_data.ftCreationTime   );
    status.m_atime = CTime( find_data.ftLastAccessTime );
    status.m_mtime = CTime( find_data.ftLastWriteTime  );
