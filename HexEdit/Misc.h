@@ -92,39 +92,6 @@ unsigned __int64 mpz_get_ui64(mpz_srcptr p);
 void mpz_set_ui64(mpz_ptr p, unsigned __int64 i);
 const char * mpz_set_bytes(mpz_ptr p, FILE_ADDRESS addr, int count);
 
-#ifndef _LONGLONG
-// This is needed since std streams don't support __int64
-inline std::istream &operator>>(std::istream &ss, __int64 &ii)
-{
-	char buf[22];
-	for (char *pp = buf; pp < buf + sizeof(buf) - 1; ++pp)
-	{
-		if (!(ss >> *pp) || !isdigit(*pp))
-		{
-			if (ss && *pp != '\0')
-				ss.putback(*pp);
-			break;
-		}
-	}
-	*pp = '\0';
-	ii = ::strtoi64(buf);
-//    sscanf(buf, "%I64d", &ii);
-	if (!ss && pp > buf)
-		ss.clear(ss.rdstate() & ~std::ios_base::failbit); // We actually read something so clear failbit
-	else if (ss && pp == buf)
-		ss.setstate(std::ios_base::failbit);              // We failed to read so set failbit
-
-	return ss;
-}
-
-inline std::ostream &operator<<(std::ostream &ss, const __int64 &ii)
-{
-	char buf[22];
-	sprintf(buf, "%I64d", ii);
-	return ss << buf;
-}
-#endif // #ifndef _LONGLONG
-
 CStringW MakePlural(const CStringW & ss);
 
 unsigned long str_hash(const char *str);   // hash value from string

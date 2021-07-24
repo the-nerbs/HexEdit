@@ -568,18 +568,18 @@ bool ConvertToFileTime(time_t tt, FILETIME *ft)
 	return retval;
 }
 
-// This is the ptr to (start of) time info from the thread local info structure
-typedef struct {
-        char *wday_abbr[7];
-        char *wday[7];
-        char *month_abbr[12];
-        char *month[12];
-        char *ampm[2];
-        char *ww_sdatefmt;
-        char *ww_ldatefmt;
-        char *ww_timefmt;
-		// ... other fields follow that we are not interested in
-} * plocal_time_info_t;
+//// This is the ptr to (start of) time info from the thread local info structure
+//typedef struct {
+//        char *wday_abbr[7];
+//        char *wday[7];
+//        char *month_abbr[12];
+//        char *month[12];
+//        char *ampm[2];
+//        char *ww_sdatefmt;
+//        char *ww_ldatefmt;
+//        char *ww_timefmt;
+//		// ... other fields follow that we are not interested in
+//} * plocal_time_info_t;
 
 // Creates a date string using the Windows short date format (eg dd/mm/yy) with 
 // the added feature that 2 digit years are avoided (printed as 4 digits).
@@ -588,9 +588,17 @@ CString FormatDate(DATE dd)
 	// First get the short date format from Windows Control Panel Region Settings
 	CString fmt;
 	UDATE ud;                              // unpacked date
-	_locale_t ploc = _get_current_locale();
-	plocal_time_info_t plti = (plocal_time_info_t)ploc->locinfo->lc_time_curr;
-	fmt = CString(plti->ww_sdatefmt);
+
+	// TODO(standardization): can this be done with only standard C/C++ library functions?
+	// I need to see exactly what kind of output this has, especially under locales other than en-US.
+	LCID lcid = GetThreadLocale();
+	int fmtLen = GetLocaleInfo(lcid, LOCALE_SSHORTDATE, NULL, 0);
+	GetLocaleInfo(lcid, LOCALE_SSHORTDATE, fmt.GetBuffer(fmtLen), fmtLen);
+	fmt.ReleaseBuffer();
+
+	//_locale_t ploc = _get_current_locale();
+	//plocal_time_info_t plti = (plocal_time_info_t)ploc->locinfo->lc_time_curr;
+	//fmt = CString(plti->ww_sdatefmt);
 	char buf[80];
 
 	// If format does not have 4 digit year (yyyy) convert 2 digit year to 4 digit year
