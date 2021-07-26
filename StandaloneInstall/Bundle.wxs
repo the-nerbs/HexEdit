@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+  <Bundle Name="HexEdit"
+          Version="$(var.Version)"
+          Manufacturer="Expert Commercial Software Pty Ltd"
+          UpgradeCode="556d37fa-01f9-432f-b6fa-253a52b33737">
+
+    <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+      <bal:WixStandardBootstrapperApplication LicenseFile="$(var.LicensePath)"
+                                              LogoFile="../HexEdit/Graphics/HexEditIcon64.png"
+                                              ShowVersion="yes"
+                                              SuppressOptionsUI="yes" />
+    </BootstrapperApplicationRef>
+
+    <Chain>
+      <!--VC redist from https://aka.ms/vs/16/release/vc_redist.x86.exe -->
+      <ExePackage SourceFile="$(var.SolutionDir)tools\VC_redist.x86.exe"
+                  DisplayName="Microsoft Visual C++ Runtime" />
+
+      <MsiPackage SourceFile="$(var.Install.TargetPath)"
+                  DisplayName="HexEdit Application"
+                  DisplayInternalUI="yes">
+        <MsiProperty Name="RUNFROMBUNDLE" Value="1"/>
+      </MsiPackage>
+        
+    </Chain>
+  </Bundle>
+</Wix>

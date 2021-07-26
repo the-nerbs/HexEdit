@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <VersionMajor>5</VersionMajor>
+    <VersionMinor>0</VersionMinor>
+    <VersionPatch>1</VersionPatch>
+
+    <Version>$(VersionMajor).$(VersionMinor).$(VersionPatch)</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootDir>$(MSBuildThisFileDirectory)</RootDir>
+    <BuildToolsDir>$(RootDir)build\</BuildToolsDir>
+  </PropertyGroup>
+
+  <Import Condition="'$(MSBuildProjectExtension)' == '.wixproj'"
+          Project="$(BuildToolsDir)wix.props" />
+</Project>

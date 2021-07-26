@@ -1,0 +1,32 @@
+<Project>
+
+  <ItemDefinitionGroup>
+    <WixVariable>
+      <Visible>false</Visible>
+    </WixVariable>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <WixVariable Include="Version" Value="$(Version)" />
+    <WixVariable Include="LicensePath" Value="$(RootDir)HexEdit\Install\license.rtf" />
+  </ItemGroup>
+
+  <Target Name="DefineWixVariables"
+          BeforeTargets="BeforeBuild">
+
+    <ItemGroup>
+      <_WixVariablesWithValues Include="@(WixVariable->HasMetadata('Value'))" />
+      <_WixVariablesWithoutValues Include="@(WixVariable)" Exclude="@(_WixVariablesWithValues)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstants);@(_WixVariablesWithoutValues);@(_WixVariablesWithValues->'%(Identity)=%(Value)')</DefineConstants>
+    </PropertyGroup>
+
+    <Message Text="Added to DefineConstants: " />
+    <Message Text="  - %(WixVariable.Identity) = [%(WixVariable.Value)]" />
+    <Message Text="DefineConstants = [$(DefineConstants)]" />
+
+  </Target>
+  
+</Project>

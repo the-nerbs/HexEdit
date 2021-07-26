@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+
+  <String Id="HelpFilesDescription">Help and support files for tutorials etc.</String>
+  <String Id="TemplatesDescription">Installs templates for a few standard file formats.</String>
+  <String Id="ContextMenuDescription">Adds an "Open with [ProductName]" option to the Windows Explorer Shell context menu you see when you right click on a file.</String>
+
+  <!-- Readme dialog -->
+  <String Id="ReadmeDlg_Title">[ProductName] Setup</String>
+  <String Id="ReadmeDlgBannerBitmap">WixUI_Bmp_Banner</String>
+  <String Id="ReadmeDlgTitle">{\WixUI_Font_Title}Important Information</String>
+  <String Id="ReadmeDlgDescription">Please carefully read the following program information.</String>
+
+  <!-- Install options dialog -->
+  <String Id="InstallOptionsDlg_Title">[ProductName] Setup</String>
+  <String Id="InstallOptionsDlgBannerBitmap">WixUI_Bmp_Banner</String>
+  <String Id="InstallOptionsDlgTitle">{\WixUI_Font_Title}Installation Preferences</String>
+  <String Id="InstallOptionsDlgDescription">Please select your installation preferences.</String>
+  
+  <String Id="InstallOptionsDlgShortcuts">Please select the shortcuts you would like:</String>
+  <String Id="InstallOptionsDlgDesktopShortcut">Place a shortcut on your desktop.</String>
+  <String Id="InstallOptionsDlgStartMenuShortcut">Place a shortcut in your start menu.</String>
+  <String Id="InstallOptionsDlgStartMenuUtilitiesShortcut">Place a shortcut in your start menu in a folder named "Utilities".</String>
+  
+  
+  
+</WixLocalization>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <Feature Id="HelpFiles"
+             Title="Help Files"
+             Level="1"
+             Description="!(loc.HelpFilesDescription)">
+      <ComponentGroupRef Id="HelpFiles" />
+    </Feature>
+
+    <ComponentGroup Id="HelpFiles"
+                    Directory="INSTALLFOLDER">
+      <Component Guid="138c1df9-9058-409b-8e8a-c30d3612757d">
+        <File Source="$(var.HexEdit.ProjectDir)HTMLHelp\HexEdit.CHM"
+              KeyPath="yes" />
+      </Component>
+
+      <Component Guid="ff09ecc9-a947-47d0-813f-2b7d65d3836a">
+        <File Source="$(var.HexEdit.ProjectDir)TestData\tutorial.heg"
+              KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

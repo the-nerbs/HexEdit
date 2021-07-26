@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+
+    <Feature Id="HexEditApp"
+             Title="Install"
+             Level="1"
+             Absent="disallow"
+             Display="hidden">
+      <ComponentGroupRef Id="HexEditApp" />
+      <ComponentGroupRef Id="TemplateFiles_INSTALL" />
+    </Feature>
+
+    <ComponentGroup Id="HexEditApp"
+                    Directory="INSTALLFOLDER">
+
+      <!-- main EXE -->
+      <Component Guid="a5a53d74-cc8f-4d31-ab43-87af54cd05bd">
+        <File Id="hexedit.exe"
+              Source="$(var.HexEdit.TargetPath)"
+              KeyPath="yes"
+              Checksum="yes" />
+
+        <RegistryKey Root="HKLM"
+                     Key="Software\ECSoftware\HexEdit">
+          <RegistryValue Name="InstallDir"
+                         Type="string"
+                         Value="[INSTALLFOLDER]" />
+        </RegistryKey>
+      </Component>
+
+      <Component Id="HexEdit.exe.shortcut.desktop"
+                 Guid="851b521f-0bd2-49ed-8fc4-0a8eebbcf0cd">
+        <Condition><![CDATA[ ADD_DESKTOP_SHORTCUT = 1 ]]></Condition>
+        <RegistryValue Root="HKCU"
+                       Key="Software\ECSoftware\HexEdit\InstallInfo"
+                       Name="HexEdit.exe.shortcut.desktop"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"/>
+        
+        <Shortcut Id="hexedit.exe.shortcut"
+                  Name="HexEdit"
+                  Directory="DesktopFolder"
+                  Target="[#hexedit.exe]" />
+      </Component>
+
+      <Component Id="HexEdit.exe.shortcut.start"
+                 Guid="78582c04-d4af-4df7-99d4-8eb6d3a60d9d">
+        <Condition><![CDATA[ ADD_START_MENU_SHORTCUT = 1 ]]></Condition>
+        <RegistryValue Root="HKCU"
+                       Key="Software\ECSoftware\HexEdit\InstallInfo"
+                       Name="HexEdit.exe.shortcut.start"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"/>
+        
+        <Shortcut Id="hexedit.exe.shortcut.start"
+                  Name="HexEdit"
+                  Directory="ProgramMenuFolder"
+                  Target="[#hexedit.exe]" />
+      </Component>
+
+      <Component Id="HexEdit.exe.shortcut.startutils"
+                 Guid="f5a842b0-974d-4c02-8f02-f9dda5367ed5">
+        <Condition><![CDATA[ ADD_START_MENU_UTILITIES_SHORTCUT = 1 ]]></Condition>
+        <RegistryValue Root="HKCU"
+                       Key="Software\ECSoftware\HexEdit\InstallInfo"
+                       Name="HexEdit.exe.shortcut.startutils"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"/>
+        
+        <Shortcut Id="hexedit.exe.shortcut.startutils"
+                  Name="HexEdit"
+                  Directory="START_UTILITIES"
+                  Target="[#hexedit.exe]"
+                  Arguments="/ignoreme" />
+      </Component>
+      
+      <!-- RegHelper exe -->
+      <Component Guid="41ad319d-8116-42bc-9f53-d6de66b78cb9">
+        <File Source="$(var.RegHelper.TargetPath)"
+              KeyPath="yes"
+              Checksum="yes" />
+      </Component>
+      
+      <!-- third-party DLLs -->
+      <Component Guid="00987821-3bc5-41f7-ae16-72573709025f">
+        <File Source="$(var.HexEdit.ProjectDir)DLL\FreeImage.dll"
+              KeyPath="yes"
+              Checksum="yes" />
+      </Component>
+      <Component Guid="3009d244-4923-4d12-8b55-1e2141f41a4c">
+        <File Source="$(var.HexEdit.ProjectDir)DLL\mpir.dll"
+              KeyPath="yes"
+              Checksum="yes" />
+      </Component>
+
+      <!-- graphics files -->
+      <Component Id="Graphics" Guid="579efcdf-ee72-49e6-96fb-638b8f00d68e">
+        <File Source="$(var.HexEdit.ProjectDir)Graphics\Splash.bmp" />
+        <File Source="$(var.HexEdit.ProjectDir)Graphics\About.jpg" />
+        <File Source="$(var.HexEdit.ProjectDir)Graphics\Backgrnd.bmp" />
+        <File Source="$(var.HexEdit.ProjectDir)DefaultToolbarImages.bmp" />
+      </Component>
+      
+      <!-- Test data files -->
+      <Component Id="TestData" Guid="fa7b04b6-0744-4864-adec-c591d8d8e99d">
+        <File Source="$(var.HexEdit.ProjectDir)TestData\_charinc.hem" />
+        <File Source="$(var.HexEdit.ProjectDir)TestData\AllChars.hem" />
+        <File Source="$(var.HexEdit.ProjectDir)TestData\ShaTestVector1GB.hem" />
+      </Component>
+
+      <!-- Tips file -->
+      <Component Id="HexEditTips">
+        <File Source="$(var.HexEdit.ProjectDir)Hexedit.tip"
+              KeyPath="yes"/>
+      </Component>
+
+      <!-- EBCDIC table file -->
+      <Component Id="HexEditEBCIDIC">
+        <File Source="$(var.HexEdit.ProjectDir)Ebcdic.tab"
+              KeyPath="yes"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

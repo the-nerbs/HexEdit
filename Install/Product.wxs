@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="72fc9dea-4803-4d67-9989-3b5c5bdb0a66"
+           Name="HexEdit"
+           Version="$(var.Version)"
+           Language="1033"
+           Manufacturer="Expert Commercial Software Pty Ltd"
+           UpgradeCode="556d37fa-01f9-432f-b6fa-253a52b33737">
+
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             InstallPrivileges="elevated"
+             Comments="Copyright 2016.  All rights reserved."
+             Description="[ProductName] Installation" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <FeatureRef Id="HexEditApp" />
+    <FeatureRef Id="HelpFiles" />
+    <FeatureRef Id="Templates" />
+    <FeatureRef Id="ContextMenu" />
+
+    <UIRef Id="UISequence"/>
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.HexEdit.ProjectDir)Graphics\Banner.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.HexEdit.ProjectDir)Graphics\Installer.bmp"/>
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.LicensePath)"/>
+  </Product>
+
+  <Fragment>
+    <Property Id="ADD_DESKTOP_SHORTCUT" Value="1" Secure="yes" />
+    <Property Id="ADD_START_MENU_SHORTCUT" Value="1" Secure="yes" />
+    <Property Id="ADD_START_MENU_UTILITIES_SHORTCUT" Secure="yes" />
+    <Property Id="RUNFROMBUNDLE" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="HexEdit" />
+      </Directory>
+
+      <Directory Id="AppDataFolder">
+        <Directory Id="APPDATA_ECSOFTWARE" Name="ECSoftware">
+          <Directory Id="APPDATA_HEXEDIT" Name="HexEdit" />
+          <Directory Id="APPDATA_TEMPLATES" Name="Templates" />
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" />
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="START_UTILITIES" Name="Utilities" />
+      </Directory>
+    </Directory>
+
+    <SetProperty Before="AppSearch"
+                 Action="SetDefaultLicenseAccepted"
+                 Id="LicenseAccepted"
+                 Value="1"
+                 Sequence="both">
+      <![CDATA[ RUNFROMBUNDLE=1 ]]>
+    </SetProperty>
+
+    <Feature Id="UninstallCleanup" Display="hidden">
+      <Component Id="UninstallCleanup"
+                 Guid="f20da142-7923-4590-aceb-e094b3a82a7d"
+                 Directory="APPDATA_ECSOFTWARE">
+        <RegistryValue Root="HKCU"
+                       Key="Software\ECSoftware\HexEdit\InstallInfo"
+                       Name="Installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes"/>
+        
+        <RemoveFolder Id="CleanupAppDataECSoftware"
+                      Directory="APPDATA_ECSOFTWARE"
+                      On="uninstall" />
+        
+        <RemoveFolder Id="CleanupAppDataHexEdit"
+                      Directory="APPDATA_HEXEDIT"
+                      On="uninstall" />
+        
+        <RemoveFolder Id="CleanupAppDataTemplates"
+                      Directory="APPDATA_TEMPLATES"
+                      On="uninstall" />
+        
+        <RemoveFolder Id="CleanupStartMenuFolder"
+                      Directory="START_UTILITIES"
+                      On="uninstall" />
+      </Component>
+    </Feature>
+  </Fragment>
+</Wix>
