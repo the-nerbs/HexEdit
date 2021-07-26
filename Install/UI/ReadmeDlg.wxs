@@ -19,7 +19,7 @@
           <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
         </Control>
         <Control Id="ReadmeText" Type="ScrollableText" X="6" Y="52" Width="358" Height="170" Sunken="yes" TabSkip="no">
-          <Text SourceFile="$(var.HexEdit.ProjectDir)Install\readme.rtf" />
+          <Text SourceFile="$(var.ReadmePath)" />
         </Control>
       </Dialog>
     </UI>
