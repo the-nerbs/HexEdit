@@ -2,5 +2,9 @@
 <Project>
   <Import Condition="'$(MSBuildProjectExtension)' == '.wixproj'"
           Project="$(BuildToolsDir)wix.targets" />
-  
+
+  <!--
+  <Import Condition="'$(MSBuildProjectExtension)' == '.vcxproj'"
+          Project="$(BuildToolsDir)cpp.targets" />
+  -->
 </Project>

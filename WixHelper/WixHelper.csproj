@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Target Name="CopyOutputToTools"
+          AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(RootDir)tools" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).exe" DestinationFolder="$(RootDir)tools" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(RootDir)tools" />
+  </Target>
+  
+</Project>

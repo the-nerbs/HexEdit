@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+
+    <ArtifactsDir Condition="'$(ArtifactsDir)' == ''">$([MSBuild]::NormalizeDirectory('$(RootDir)', 'artifacts'))</ArtifactsDir>
+
+    <ArtifactsBinDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'bin'))</ArtifactsBinDir>
+    <ArtifactsObjDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'obj'))</ArtifactsObjDir>
+
+    <ArtifactsPackagesDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'package'))</ArtifactsPackagesDir>
+  </PropertyGroup>
+</Project>

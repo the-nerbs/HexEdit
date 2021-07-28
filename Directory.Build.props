@@ -13,6 +13,17 @@
     <BuildToolsDir>$(RootDir)build\</BuildToolsDir>
   </PropertyGroup>
 
+  <Import Project="$(BuildToolsDir)dir.props"/>
+  
+
   <Import Condition="'$(MSBuildProjectExtension)' == '.wixproj'"
           Project="$(BuildToolsDir)wix.props" />
+
+  <!-- 
+  <Import Condition="'$(MSBuildProjectExtension)' == '.vcxproj'"
+          Project="$(BuildToolsDir)cpp.props" />
+  -->
+
+  <Import Condition="'$(MSBuildProjectExtension)' == '.csproj'"
+          Project="$(BuildToolsDir)csharp.props" />
 </Project>

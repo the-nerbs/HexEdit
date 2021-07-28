@@ -4,17 +4,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HexEdit", "HexEdit\HexEdit.vcxproj", "{C4CC0564-D6ED-4341-8C04-3AA9F8D571F5}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3423EC9A-52E4-4A4D-9753-EDEBC38785EF} = {3423EC9A-52E4-4A4D-9753-EDEBC38785EF}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RegHelper", "RegHelper\RegHelper.vcxproj", "{01264AF0-9956-4647-B202-743CCCACD18C}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cryptlib", "ThirdParty\CryptoPP\cryptlib.vcxproj", "{3423EC9A-52E4-4A4D-9753-EDEBC38785EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Install", "Install", "{E450F13D-5029-45EB-9C33-2066FBD3F275}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Install", "Install\Install.wixproj", "{E8626BA4-65B0-44A6-B2E7-1C88B3413BD5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{94528F84-0E65-465B-9EB9-F79C821F4980} = {94528F84-0E65-465B-9EB9-F79C821F4980}
+	EndProjectSection
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "StandaloneInstall", "StandaloneInstall\StandaloneInstall.wixproj", "{10B34865-3DE3-4A9E-B3AA-9135FC6CF0D5}"
 EndProject
@@ -28,9 +26,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0ADA7014-DE8A-4D9B-AF15-118CC0F6C998}"
 	ProjectSection(SolutionItems) = preProject
+		build\csharp.props = build\csharp.props
+		build\dir.props = build\dir.props
 		build\wix.props = build\wix.props
 		build\wix.targets = build\wix.targets
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixHelper", "WixHelper\WixHelper.csproj", "{94528F84-0E65-465B-9EB9-F79C821F4980}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,10 +48,6 @@ Global
 		{01264AF0-9956-4647-B202-743CCCACD18C}.Debug|Win32.Build.0 = Debug|Win32
 		{01264AF0-9956-4647-B202-743CCCACD18C}.Release|Win32.ActiveCfg = Release|Win32
 		{01264AF0-9956-4647-B202-743CCCACD18C}.Release|Win32.Build.0 = Release|Win32
-		{3423EC9A-52E4-4A4D-9753-EDEBC38785EF}.Debug|Win32.ActiveCfg = Debug|Win32
-		{3423EC9A-52E4-4A4D-9753-EDEBC38785EF}.Debug|Win32.Build.0 = Debug|Win32
-		{3423EC9A-52E4-4A4D-9753-EDEBC38785EF}.Release|Win32.ActiveCfg = Release|Win32
-		{3423EC9A-52E4-4A4D-9753-EDEBC38785EF}.Release|Win32.Build.0 = Release|Win32
 		{E8626BA4-65B0-44A6-B2E7-1C88B3413BD5}.Debug|Win32.ActiveCfg = Debug|x86
 		{E8626BA4-65B0-44A6-B2E7-1C88B3413BD5}.Debug|Win32.Build.0 = Debug|x86
 		{E8626BA4-65B0-44A6-B2E7-1C88B3413BD5}.Release|Win32.ActiveCfg = Release|x86
@@ -58,6 +56,10 @@ Global
 		{10B34865-3DE3-4A9E-B3AA-9135FC6CF0D5}.Debug|Win32.Build.0 = Debug|x86
 		{10B34865-3DE3-4A9E-B3AA-9135FC6CF0D5}.Release|Win32.ActiveCfg = Release|x86
 		{10B34865-3DE3-4A9E-B3AA-9135FC6CF0D5}.Release|Win32.Build.0 = Release|x86
+		{94528F84-0E65-465B-9EB9-F79C821F4980}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{94528F84-0E65-465B-9EB9-F79C821F4980}.Debug|Win32.Build.0 = Debug|Any CPU
+		{94528F84-0E65-465B-9EB9-F79C821F4980}.Release|Win32.ActiveCfg = Release|Any CPU
+		{94528F84-0E65-465B-9EB9-F79C821F4980}.Release|Win32.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +68,7 @@ Global
 		{E8626BA4-65B0-44A6-B2E7-1C88B3413BD5} = {E450F13D-5029-45EB-9C33-2066FBD3F275}
 		{10B34865-3DE3-4A9E-B3AA-9135FC6CF0D5} = {E450F13D-5029-45EB-9C33-2066FBD3F275}
 		{0ADA7014-DE8A-4D9B-AF15-118CC0F6C998} = {EBAE7B09-7555-47BB-87C1-4D912177004D}
+		{94528F84-0E65-465B-9EB9-F79C821F4980} = {E450F13D-5029-45EB-9C33-2066FBD3F275}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A89ABDE-59D7-4A0A-88AE-86AE5CD2B4AA}

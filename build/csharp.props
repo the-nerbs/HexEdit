@@ -1,0 +1,44 @@
+<Project>
+  <PropertyGroup>
+    <!-- Note: this needs to be enabled if you target multiple frameworks -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    
+    <!-- latest language spec, strict conformance -->
+    <LangVersion>latest</LangVersion>
+    <Features>strict</Features>
+
+    <!-- same inputs => same outputs -->
+    <Deterministic>true</Deterministic>
+    <!--<PathMap>$(RootDir)=\build\</PathMap>-->
+
+    <!-- treat all compiler warnings as errors -->
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+
+    <!-- intermediate output path -->
+    <BaseIntermediateOutputPath>$(ArtifactsObjDir)$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+
+    <!-- actual output path -->
+    <BaseOutputPath>$(ArtifactsBinDir)$(MSBuildProjectName)\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+
+    <!-- nuget package output path -->
+    <PackageOutputPath>$(ArtifactsPackagesDir)</PackageOutputPath>
+    
+    <!-- XML doc file (for non-test projects) -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateDocumentationFile Condition="'$(IsTestProject)' == 'true'">false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+</Project>

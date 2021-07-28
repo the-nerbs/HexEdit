@@ -29,5 +29,21 @@
     <Message Text="DefineConstants = [$(DefineConstants)]" />
 
   </Target>
+
+  <Target Name="HeatFilterDirectory"
+          AfterTargets="HarvestDirectory"
+          BeforeTargets="Compile"
+          Condition="'@(HarvestDirectory->HasMetadata('ExtFilter'))' != ''">
+
+    <ItemGroup>
+      <_FilteredHarvestDirectories Include="@(HarvestDirectory->HasMetadata('ExtFilter'))">
+        <HarvestOutput>$([MSBuild]::NormalizePath('$(IntermediateOutputPath)_%(ComponentGroupName)_dir.wxs'))</HarvestOutput>
+      </_FilteredHarvestDirectories>
+    </ItemGroup>
+
+    <Message Text="Applying Heat Filters . . ." />
+    <Exec Command='"$(RootDir)tools\WixHelper.exe" heat-filter "%(_FilteredHarvestDirectories.HarvestOutput)" /ext:"%(_FilteredHarvestDirectories.ExtFilter)"' />
+
+  </Target>
   
 </Project>
