@@ -1336,10 +1336,11 @@ UINT CHexEditDoc::RunCompThread()
 					gota += GetData    (comp_bufa_ + gota, buf_size - gota + (min_match - 4), addra + gota, 4);
 					gotb += GetCompData(comp_bufb_ + gotb, buf_size - gotb + (min_match - 4), addrb + gotb, true);
 
-					const unsigned char * pfound;     // Pointer to the found bytes (in whichever buffer was searched)
-					const unsigned char * pa, * pb;   // if found these point to matching bytes in the respective buffers
-					size_t best, next;                // best (closest) found so far, and next offset to check
-					int offset;                       // 0, 1, 2, or 3 dep on which pattern we match
+					const unsigned char * pfound;       // Pointer to the found bytes (in whichever buffer was searched)
+					const unsigned char * pa = nullptr; // if found these point to matching bytes in the respective buffers
+					const unsigned char * pb = nullptr; //   . . .
+					size_t best, next;                  // best (closest) found so far, and next offset to check
+					int offset;                         // 0, 1, 2, or 3 dep on which pattern we match
 
 					// We gradually move through both buffers searching if the patterns of bytes in one buffer 
 					// matches anything further forward in the other buffer.  Note that Search4() effectively

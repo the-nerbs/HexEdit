@@ -15021,7 +15021,7 @@ template<class T> void DoChecksum(CHexEditView *pv, checksum_type op, LPCSTR des
 	ASSERT(buf != NULL);
 
 	T val;
-	void * hh;
+	void * hh = nullptr;
 	switch (op)
 	{
 	case CHECKSUM_8:

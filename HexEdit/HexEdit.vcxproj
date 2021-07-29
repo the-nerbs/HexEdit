@@ -21,11 +21,13 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <UseDebugLibraries>true</UseDebugLibraries>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>Dynamic</UseOfMfc>
     <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,16 +45,15 @@
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -63,37 +64,28 @@
     </Midl>
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_USE_32BIT_TIME_T;WINVER=0x0601;_WIN32_IE=0x0500;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)HexEdit.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>$(IntDir)vc70.pdb</ProgramDataBaseFileName>
-      <BrowseInformation>false</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ConformanceMode>false</ConformanceMode>
+      <SDLCheck>true</SDLCheck>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_AFXDLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>version.lib;setargv.obj;imagehlp.lib;htmlhelp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)HexEdit.exe</OutputFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <ProgramDatabaseFile>$(IntDir)HexEdit.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PostBuildEvent>
       <Message>Make help ID map files</Message>
@@ -118,35 +110,19 @@
       <TypeLibraryName>.\Debug/HexEdit.tlb</TypeLibraryName>
     </Midl>
     <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0601;WIN32;_DEBUG;_WINDOWS;_SECDLL;_CRT_SECURE_NO_DEPRECATE;_USE_32BIT_TIME_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)HexEdit.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <ProgramDataBaseFileName>$(IntDir)vc70.pdb</ProgramDataBaseFileName>
-      <BrowseInformation>true</BrowseInformation>
-      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
       <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>false</ConformanceMode>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_AFXDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>version.lib;setargv.obj;imagehlp.lib;htmlhelp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)HexEdit.exe</OutputFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(IntDir)HexEdit.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>

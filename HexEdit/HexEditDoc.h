@@ -695,10 +695,10 @@ public:
 	int PreviewProgress();       // 0 to 100 (or -1 if not scanning)
 
 	// These four callback functions are used by FreeImage for displaying bitmaps read from memory
-    static unsigned __stdcall fi_read(void *buffer, unsigned size, unsigned count, fi_handle handle);
-	static unsigned __stdcall fi_write(void *buffer, unsigned size, unsigned count, fi_handle handle);
-	static int      __stdcall fi_seek(fi_handle handle, long offset, int origin);
-	static long     __stdcall fi_tell(fi_handle handle);
+    static unsigned DLL_CALLCONV fi_read(void *buffer, unsigned size, unsigned count, fi_handle handle);
+	static unsigned DLL_CALLCONV fi_write(void *buffer, unsigned size, unsigned count, fi_handle handle);
+	static int      DLL_CALLCONV fi_seek(fi_handle handle, long offset, int origin);
+	static long     DLL_CALLCONV fi_tell(fi_handle handle);
 
 	// Compare stuff (implemented in BGCompare.cpp)
 	enum diff_t { Deletion = -1, Replacement = 0, Insertion = 1, Equal = 9, };

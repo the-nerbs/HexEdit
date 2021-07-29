@@ -333,7 +333,7 @@ void CHexEditDoc::CreatePreviewThread()
 // to FreeImage functions like FreeImage_LoadFromHandle() or FreeImage_GetFileTypeFromHandle().
 
 // fi_read() should behave like fread (returns count if all items were read OK, returns 0 on eof/error)
-unsigned __stdcall CHexEditDoc::fi_read(void *buffer, unsigned size, unsigned count, fi_handle handle)
+unsigned DLL_CALLCONV CHexEditDoc::fi_read(void *buffer, unsigned size, unsigned count, fi_handle handle)
 {
 	CHexEditDoc *pDoc = (CHexEditDoc *)handle;
 
@@ -345,13 +345,13 @@ unsigned __stdcall CHexEditDoc::fi_read(void *buffer, unsigned size, unsigned co
 	return got/size;
 }
 
-unsigned __stdcall CHexEditDoc::fi_write(void *buffer, unsigned size, unsigned count, fi_handle handle)
+unsigned DLL_CALLCONV CHexEditDoc::fi_write(void *buffer, unsigned size, unsigned count, fi_handle handle)
 {
 	ASSERT(0);   // writing should not happen - we are only reading to display the bitmap
 	return 0;
 }
 
-int __stdcall CHexEditDoc::fi_seek(fi_handle handle, long offset, int origin)
+int DLL_CALLCONV CHexEditDoc::fi_seek(fi_handle handle, long offset, int origin)
 {
 	CHexEditDoc *pDoc = (CHexEditDoc *)handle;
 	FILE_ADDRESS addr = 0;
@@ -374,7 +374,7 @@ int __stdcall CHexEditDoc::fi_seek(fi_handle handle, long offset, int origin)
 	return 0L;             // seek succeeded
 }
 
-long __stdcall CHexEditDoc::fi_tell(fi_handle handle)
+long DLL_CALLCONV CHexEditDoc::fi_tell(fi_handle handle)
 {
 	CHexEditDoc *pDoc = (CHexEditDoc *)handle;
 

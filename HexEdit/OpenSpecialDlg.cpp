@@ -102,8 +102,8 @@ void COpenSpecialDlg::Rebuild()
 
 		if (hcurr == 0 || id > psl->id(idx))
 		{
-			HTREEITEM hnew;                     // handle to new tree item
-			HTREEITEM hpos;                     // item to insert after (why the f*** is there no insert before)
+			HTREEITEM hnew = nullptr;           // handle to new tree item
+			HTREEITEM hpos = nullptr;           // item to insert after (why the f*** is there no insert before)
 			int img;                            // image number for new tree item in tree ctl image list
 			CString ss;
 

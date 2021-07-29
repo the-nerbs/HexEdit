@@ -4886,7 +4886,7 @@ void CDataFormatView::OnGridEndLabelEdit(NMHDR *pNotifyStruct, LRESULT* pResult)
 			odt = pcell->GetTime();
 		}
 
-		unsigned char *pdata;           // Points to the actual bytes to change
+		unsigned char* pdata = nullptr; // Points to the actual bytes to change
 		size_t df_size = (size_t)mac_abs(pdoc->df_size_[ii]);
 		ASSERT(pdoc->df_address_[ii] + df_size <= pdoc->length());
 		size_t new_size = df_size;
