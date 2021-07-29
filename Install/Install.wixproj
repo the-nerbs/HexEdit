@@ -11,14 +11,10 @@
     <OutputType>Package</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
     <SuppressIces>ICE38</SuppressIces>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <SuppressValidation>False</SuppressValidation>
     <SuppressIces>ICE38</SuppressIces>
   </PropertyGroup>
@@ -73,7 +69,7 @@
       <PreprocessorVariable>var.TemplatesDir</PreprocessorVariable>
       <Visible>false</Visible>
     </HarvestDirectory>
-    <HarvestDirectory Include="..\Output\$(Configuration)">
+    <HarvestDirectory Include="$(ArtifactsBinDir)HexEdit\$(Configuration)\$(CppPlatform)">
       <ComponentGroupName>ThirdPartyDlls</ComponentGroupName>
       <DirectoryRefId>INSTALLFOLDER</DirectoryRefId>
       <SuppressRootDirectory>true</SuppressRootDirectory>

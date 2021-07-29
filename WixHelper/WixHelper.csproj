@@ -9,9 +9,11 @@
 
   <Target Name="CopyOutputToTools"
           AfterTargets="Build">
-    <Copy SourceFiles="$(TargetDir)$(TargetName).dll" DestinationFolder="$(RootDir)tools" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).exe" DestinationFolder="$(RootDir)tools" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="$(RootDir)tools" />
+    <ItemGroup>
+      <_OutputFilesToCopy Include="$(TargetDir)$(TargetName).*" />
+    </ItemGroup>
+    
+    <Copy SourceFiles="@(_OutputFilesToCopy)" DestinationFolder="$(RootDir)tools" />
   </Target>
   
 </Project>

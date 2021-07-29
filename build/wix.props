@@ -1,4 +1,21 @@
 <Project>
+  <PropertyGroup>
+    <!-- intermediate output path -->
+    <BaseIntermediateOutputPath>$(ArtifactsObjDir)$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
 
+    <!-- actual output path -->
+    <BaseOutputPath>$(ArtifactsBinDir)$(MSBuildProjectName)\</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Configuration Condition="'$(Platform)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x86</Platform>
+
+    <!-- determine the MSVC platform value -->
+    <CppPlatform>$(Platform)</CppPlatform>
+    <CppPlatform Condition="'$(CppPlatform)' == 'x86'">Win32</CppPlatform>
+  </PropertyGroup>
   
 </Project>

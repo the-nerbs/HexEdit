@@ -26,8 +26,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0ADA7014-DE8A-4D9B-AF15-118CC0F6C998}"
 	ProjectSection(SolutionItems) = preProject
+		build\cpp.props = build\cpp.props
+		build\cpp.targets = build\cpp.targets
 		build\csharp.props = build\csharp.props
 		build\dir.props = build\dir.props
+		build\vcpkg.props = build\vcpkg.props
+		build\vcpkg.targets = build\vcpkg.targets
 		build\wix.props = build\wix.props
 		build\wix.targets = build\wix.targets
 	EndProjectSection
