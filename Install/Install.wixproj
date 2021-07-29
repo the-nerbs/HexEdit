@@ -75,6 +75,7 @@
       <SuppressRootDirectory>true</SuppressRootDirectory>
       <PreprocessorVariable>var.HexEdit.TargetDir</PreprocessorVariable>
       <ExtFilter>.dll;.pdb</ExtFilter>
+      <NameFilter>!HexEdit</NameFilter>
       <Visible>false</Visible>
     </HarvestDirectory>
   </ItemGroup>

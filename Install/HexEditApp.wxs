@@ -21,6 +21,9 @@
               Source="$(var.HexEdit.TargetPath)"
               KeyPath="yes"
               Checksum="yes" />
+        <File Id="hexedit.pdb"
+              Source="$(var.HexEdit.TargetDir)$(var.HexEdit.TargetName).pdb"
+              Checksum="yes" />
 
         <RegistryKey Root="HKLM"
                      Key="Software\ECSoftware\HexEdit">

@@ -30,19 +30,38 @@
 
   </Target>
 
+
+  <ItemDefinitionGroup>
+    <_FilteredHarvestDirectoriesWithDups>
+      <ExtFilter></ExtFilter>
+      <NameFilter></NameFilter>
+    </_FilteredHarvestDirectoriesWithDups>
+  </ItemDefinitionGroup>
+
   <Target Name="HeatFilterDirectory"
           AfterTargets="HarvestDirectory"
           BeforeTargets="Compile"
-          Condition="'@(HarvestDirectory->HasMetadata('ExtFilter'))' != ''">
+          Condition="'@(HarvestDirectory)' != ''">
 
     <ItemGroup>
-      <_FilteredHarvestDirectories Include="@(HarvestDirectory->HasMetadata('ExtFilter'))">
+      <_FilteredHarvestDirectoriesWithDups Include="@(HarvestDirectory->HasMetadata('ExtFilter'))" />
+      <_FilteredHarvestDirectoriesWithDups Include="@(HarvestDirectory->HasMetadata('NameFilter'))" />
+    </ItemGroup>
+
+    <RemoveDuplicates Inputs="@(_FilteredHarvestDirectoriesWithDups)">
+      <Output TaskParameter="Filtered" ItemName="_FilteredHarvestDirectories" />
+    </RemoveDuplicates>
+
+    <ItemGroup>
+      <_FilteredHarvestDirectories Update="@(_FilteredHarvestDirectories)">
         <HarvestOutput>$([MSBuild]::NormalizePath('$(IntermediateOutputPath)_%(ComponentGroupName)_dir.wxs'))</HarvestOutput>
+        <ExtensionArg Condition="'%(ExtFilter)' != ''">/ext:"%(ExtFilter)"</ExtensionArg>
+        <NameArg Condition="'%(NameFilter)' != ''">/name:"%(NameFilter)"</NameArg>
       </_FilteredHarvestDirectories>
     </ItemGroup>
 
     <Message Text="Applying Heat Filters . . ." />
-    <Exec Command='"$(RootDir)tools\WixHelper.exe" heat-filter "%(_FilteredHarvestDirectories.HarvestOutput)" /ext:"%(_FilteredHarvestDirectories.ExtFilter)"' />
+    <Exec Command='"$(RootDir)tools\WixHelper.exe" heat-filter "%(_FilteredHarvestDirectories.HarvestOutput)" %(_FilteredHarvestDirectories.ExtensionArg) %(_FilteredHarvestDirectories.NameArg)' />
 
   </Target>
   
