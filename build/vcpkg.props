@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <VCPkgInstallPath Condition="'$(VCPKG_INSTALLATION_ROOT)' == ''">*** Environment variable VCPKG_INSTALLATION_ROOT not defined *** </VCPkgInstallPath>
+    <VCPkgInstallPath Condition="'$(VCPKG_INSTALLATION_ROOT)' != ''">$(VCPKG_INSTALLATION_ROOT)</VCPkgInstallPath>
+
+    <VCPkgMSBuildScriptsDir>$([MSBuild]::NormalizeDirectory('$(VCPkgInstallPath)', 'scripts', 'buildsystems', 'msbuild'))</VCPkgMSBuildScriptsDir>
+
+    <VCPkgLocalAppDataDisabled>true</VCPkgLocalAppDataDisabled>
+  </PropertyGroup>
+
+  <Import Project="$(VCPkgMSBuildScriptsDir)vcpkg.props" />
+</Project>

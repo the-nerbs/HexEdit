@@ -600,7 +600,7 @@ CSize CGridCellBase::GetCellExtent(CDC* pDC)
         }
     }
 
-    return CSize(size.cx + ImageSize.cx, max(size.cy, ImageSize.cy));
+    return CSize(size.cx + ImageSize.cx, std::max(size.cy, ImageSize.cy));
 }
 
 // EFW - Added to print cells so that grids that use different colors are

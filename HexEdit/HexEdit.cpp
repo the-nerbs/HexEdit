@@ -3333,7 +3333,7 @@ void CHexEditApp::get_options(struct OptValues &val)
 	//val.dlg_dock_ = dlg_dock_;
 	val.dlg_move_ = dlg_move_;
 	val.hex_ucase_ = hex_ucase_;
-	val.k_abbrev_ = min(k_abbrev_, 3);  // may need to increase this if we add more options (eg Tera, etc)
+	val.k_abbrev_ = std::min(k_abbrev_, 3);  // may need to increase this if we add more options (eg Tera, etc)
 	val.large_cursor_ = large_cursor_;
 	val.show_other_ = show_other_;
 	val.nice_addr_ = nice_addr_;

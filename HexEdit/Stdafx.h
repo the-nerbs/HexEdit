@@ -39,23 +39,6 @@
 //#include "BCGCB.h"  // For BCG
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
-// The following are already #defined (from SDK's intsafe.h) but are also defined in stdint.h
-// which might be used later.  Undefining them avoids warning C4005: macro redefinition.
-#ifdef INT8_MIN
-#undef INT8_MIN
-#undef INT16_MIN
-#undef INT32_MIN
-#undef INT64_MIN
-#undef INT8_MAX
-#undef INT16_MAX
-#undef INT32_MAX
-#undef INT64_MAX
-#undef UINT8_MAX
-#undef UINT16_MAX
-#undef UINT32_MAX
-#undef UINT64_MAX
-#endif
-
 
 #include <algorithm>  // For min and max templates
 
@@ -64,6 +47,16 @@
 #include <float.h>
 #include <limits.h>
 #include <errno.h>
+
+// undef these macros from the Windows headers before we get to our code.
+#ifdef min
+#undef min
+#endif // min
+
+#ifdef max
+#undef max
+#endif // max
+
 #include "TipDlg.h"
 #include "CoordAp.h"
 #include "HexEdit.h"

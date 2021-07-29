@@ -241,9 +241,9 @@ void CNavManager::Adjust(CHexEditDoc *pdoc, FILE_ADDRESS aa, FILE_ADDRESS diff)
 			continue;
 
 		if (aa < pv->start_addr_)
-			pv->start_addr_ += max(diff, aa + diff - pv->start_addr_);
+			pv->start_addr_ += std::max(diff, aa + diff - pv->start_addr_);
 		if (aa < pv->end_addr_)
-			pv->end_addr_   += max(diff, aa + diff - pv->end_addr_);
+			pv->end_addr_   += std::max(diff, aa + diff - pv->end_addr_);
 	}
 }
 

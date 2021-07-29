@@ -103,13 +103,13 @@ Description:    Like AddCommas() above but adds spaces to a hex number rather
 #pragma warning(disable: 4800)  // avoid performance warning
 #include <boost/crc.hpp>        // For CRCs
 #pragma warning(pop)
-#include <boost/random/mersenne_twister.hpp>
+#include <random>
 
 #include <imagehlp.h>           // For ::MakeSureDirectoryPathExists()
 #include <winioctl.h>           // For DISK_GEOMETRY, IOCTL_DISK_GET_DRIVE_GEOMETRY etc
 #include <direct.h>             // For _getdrive()
 #include <FreeImage.h>
-#include "../ThirdParty/zlib/zlib.h"          // For decompression
+#include <zlib.h>               // For decompression
 
 #include "misc.h"
 #include "ntapi.h"
@@ -118,11 +118,6 @@ Description:    Like AddCommas() above but adds spaces to a hex number rather
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
-#endif
-
-#ifdef min  // avoid corruption of std::min/std::max
-#undef min
-#undef max
 #endif
 
 //-----------------------------------------------------------------------------
@@ -150,7 +145,7 @@ void SaveHist(std::vector<CString> const & hh, LPCSTR name, size_t smax)
 	CString entry;
 	CString fmt = CString(name) + "%d";
 
-	int ii, num = min(hh.size(), smax);
+	int ii, num = std::min(hh.size(), smax);
 
 	// Write th new entries
 	for (ii = 1; ii <= num; ++ii)
@@ -338,8 +333,8 @@ void get_hls(COLORREF rgb, int &hue, int &luminance, int &saturation)
 	int red = GetRValue(rgb);
 	int green = GetGValue(rgb);
 	int blue = GetBValue(rgb);
-	int cmax = max(red, max(green, blue));
-	int cmin = min(red, min(green, blue));
+	int cmax = std::max(red, std::max(green, blue));
+	int cmin = std::min(red, std::min(green, blue));
 
 	// Work out luminance
 	luminance = ((cmax+cmin)*hlsmax + rgbmax)/(2*rgbmax);
@@ -1976,13 +1971,13 @@ CString DeviceName(CString name) // TODO get rid of this (use SpecialList::name(
 }
 
 //-----------------------------------------------------------------------------
-// Just use Boost PRNG now (good and fast)
+// Just use std PRNG now (good and fast)
 
-static boost::mt19937 rng;
+static std::mt19937 rng;
 
 void rand_good_seed(unsigned long seed)
 {
-	rng.seed(boost::mt19937::result_type(seed));
+	rng.seed(std::mt19937::result_type(seed));
 }
 
 unsigned long rand_good()

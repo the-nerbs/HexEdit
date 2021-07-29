@@ -23,11 +23,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#ifdef min  // avoid corruption of std::min/std::max
-#undef min
-#undef max
-#endif
-
 // Start background compare, first killing any existing one
 void CHexEditDoc::OnCompNew()
 {

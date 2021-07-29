@@ -1,0 +1,31 @@
+{
+  "name": "hexedit",
+  "version": "5.0.1",
+  "dependencies": [
+    {
+      "name": "boost-crc",
+      "version>=": "1.75.0"
+    },
+    {
+      "name": "boost-tuple",
+      "version>=": "1.75.0"
+    },
+    {
+      "name": "cryptopp",
+      "version>=": "8.5.0"
+    },
+    {
+      "name": "freeimage",
+      "version>=": "3.18.0#19"
+    },
+    {
+      "name": "mpir",
+      "version>=": "3.0.0#10"
+    },
+    {
+      "name": "zlib",
+      "version>=": "1.2.11"
+    }
+  ],
+  "builtin-baseline": "cdbbbf4e412479c68614266e7d6d979727704ed0"
+}

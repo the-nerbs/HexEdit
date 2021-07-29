@@ -1389,7 +1389,7 @@ CXmlTree::CFrag TParser::parse_all(LPCTSTR outer_name, long &max_align, bool is_
 				ASSERT(curr_pack == 1 || curr_pack == 2 || curr_pack == 4 || curr_pack == 8);
 
 				ASSERT(pack_.size() > 0);
-				long align = min(curr_pack, pack_.back());
+				long align = std::min<long>(curr_pack, pack_.back());
 				if (align > max_align)
 					max_align = align;
 				long pad = align - curr_offset%align;
@@ -1886,7 +1886,7 @@ CXmlTree::CFrag TParser::parse_all(LPCTSTR outer_name, long &max_align, bool is_
 					{
 						// See if we need to add any padding
 						ASSERT(pack_.size() > 0);
-						long align = min(decl_curr_pack, pack_.back());
+						long align = std::min<long>(decl_curr_pack, pack_.back());
 						if (align > max_align)
 							max_align = align;
 						long pad = align - curr_offset%align;
@@ -2012,7 +2012,7 @@ CXmlTree::CFrag TParser::parse_all(LPCTSTR outer_name, long &max_align, bool is_
 
 		// Update padding info
 		curr_offset += pointer_len;
-		long align = min(pointer_len, pack_.back());
+		long align = std::min<long>(pointer_len, pack_.back());
 		if (align > max_align)
 			max_align = align;
 

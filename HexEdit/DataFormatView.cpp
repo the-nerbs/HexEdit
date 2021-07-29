@@ -1236,7 +1236,7 @@ COleDateTime CDataFormatView::GetDate(int ii)
 
 	unsigned char buf[16];                  // Holds actual binary data for field from file
 	FILE_ADDRESS tmp = pdoc->df_size_[ii];  // Create tmp to avoid compiler bug (VC6)
-	size_t df_size = min((size_t)mac_abs(tmp), sizeof(buf));    // No of bytes used for display of data element
+	size_t df_size = std::min((size_t)mac_abs(tmp), sizeof(buf));    // No of bytes used for display of data element
 
 	if (pdoc->df_address_[ii] != -1 &&
 		pdoc->GetData(buf, df_size, pdoc->df_address_[ii]) == df_size)
@@ -1517,10 +1517,10 @@ void CDataFormatView::InitDataCol(int ii, GV_ITEM & item)
 		}
 	}
 
-//    size_t df_size = min((size_t)mac_abs(pdoc->df_size_[ii]), sizeof(buf));  // This causes crash in release build (but worked without the size_t cast)
+//    size_t df_size = std::min((size_t)mac_abs(pdoc->df_size_[ii]), sizeof(buf));  // This causes crash in release build (but worked without the size_t cast)
 
 	FILE_ADDRESS tmp = pdoc->df_size_[ii];  // Create tmp to avoid compiler bug (VC6)
-	size_t df_size = min((size_t)mac_abs(tmp), sizeof(buf));    // No of bytes used for display of data element
+	size_t df_size = std::min((size_t)mac_abs(tmp), sizeof(buf));    // No of bytes used for display of data element
 
 	// Check CHAR and INT types for enum
 	if (df_type >= CHexEditDoc::DF_CHAR && df_type < CHexEditDoc::DF_LAST_INT)
@@ -2542,14 +2542,14 @@ void CDataFormatView::calc_colours(COLORREF &bg1, COLORREF &bg2, COLORREF &bg3)
 	if (theApp.alt_data_bg_cols_ && hue == -1)
 	{
 		// No colour (white/grey/black) so use 2 colours of similar brightness as alternate bg colours
-		bg2 = get_rgb(17, max(min(luminance,95),5), 100);  // yellow
-		bg3 = get_rgb(50, max(min(luminance,95),5), 100);  // cyan
+		bg2 = get_rgb(17, std::max(std::min(luminance,95),5), 100);  // yellow
+		bg3 = get_rgb(50, std::max(std::min(luminance,95),5), 100);  // cyan
 	}
 	else if (theApp.alt_data_bg_cols_)
 	{
 		// Use 2 other background colours of same brightness but diff colour
-		bg2 = get_rgb(hue+33, max(min(luminance,95),5), 100);
-		bg3 = get_rgb(hue+67, max(min(luminance,95),5), 100);
+		bg2 = get_rgb(hue+33, std::max(std::min(luminance,95),5), 100);
+		bg3 = get_rgb(hue+67, std::max(std::min(luminance,95),5), 100);
 	}
 	// Make sure the colours we use aren't the special colour used to flag that a field has been edited
 	ASSERT(bg_edited < RGB(255,255,255));       // Ensure we don't create an invalid colour by incrementing past white

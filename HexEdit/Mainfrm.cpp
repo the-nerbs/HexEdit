@@ -1775,7 +1775,7 @@ void CMainFrame::OnUpdateOccurrences(CCmdUI *pCmdUI)
 			// Work out pane width
 			CClientDC dc(psb);
 			dc.SelectObject(psb->GetFont());
-			pane_width = max(dc.GetTextExtent(ss, ss.GetLength()).cx + 20, 35);
+			pane_width = std::max<int>(dc.GetTextExtent(ss, ss.GetLength()).cx + 20, 35);
 			pCmdUI->SetText(ss);
 			pCmdUI->Enable();
 		}
@@ -1863,7 +1863,7 @@ void CMainFrame::OnUpdateCompares(CCmdUI *pCmdUI)
 			// Work out pane width
 			CClientDC dc(psb);
 			dc.SelectObject(psb->GetFont());
-			pane_width = max(dc.GetTextExtent(ss, ss.GetLength()).cx + 2, 35);
+			pane_width = std::max<int>(dc.GetTextExtent(ss, ss.GetLength()).cx + 2, 35);
 			pCmdUI->SetText(ss);
 			pCmdUI->Enable();
 		}
@@ -2002,7 +2002,7 @@ void CMainFrame::OnUpdateAddrHex(CCmdUI *pCmdUI)
 		// Set pane width
 		CClientDC dc(psb);
 		dc.SelectObject(psb->GetFont());
-		int text_width = max(dc.GetTextExtent(ss, ss.GetLength()).cx + 2, 35);
+		int text_width = std::max<int>(dc.GetTextExtent(ss, ss.GetLength()).cx + 2, 35);
 		if (abs(text_width - AddrHexWidth) > 4)
 		{
 			psb->SetPaneWidth(idx, text_width);
@@ -2064,7 +2064,7 @@ void CMainFrame::OnUpdateAddrDec(CCmdUI *pCmdUI)
 		// Set pane width
 		CClientDC dc(psb);
 		dc.SelectObject(psb->GetFont());
-		int text_width = max(dc.GetTextExtent(ss, ss.GetLength()).cx + 2, 30);
+		int text_width = std::max<int>(dc.GetTextExtent(ss, ss.GetLength()).cx + 2, 30);
 		if (abs(text_width - AddrDecWidth) > 4)
 		{
 			psb->SetPaneWidth(idx, text_width);
@@ -2196,7 +2196,7 @@ void CMainFrame::OnUpdateFileLength(CCmdUI *pCmdUI)
 		// Set pane width
 		CClientDC dc(psb);
 		dc.SelectObject(psb->GetFont());
-		int text_width = max(dc.GetTextExtent(ss, ss.GetLength()).cx, 40);
+		int text_width = std::max<int>(dc.GetTextExtent(ss, ss.GetLength()).cx, 40);
 		if (text_width != FileLengthWidth)
 		{
 			psb->SetPaneWidth(idx, text_width);
@@ -3708,7 +3708,7 @@ FILE_ADDRESS CMainFrame::search_forw(CHexEditDoc *pdoc, FILE_ADDRESS start_addr,
 		return bg_next;
 	}
 
-	size_t buf_len = size_t(min(end_addr-start_addr, FILE_ADDRESS(search_buf_len + length - 1)));
+	size_t buf_len = size_t(std::min(end_addr-start_addr, FILE_ADDRESS(search_buf_len + length - 1)));
 
 //    ASSERT(length > 0 && length <= buf_len);
 
@@ -3925,7 +3925,7 @@ FILE_ADDRESS CMainFrame::search_back(CHexEditDoc *pdoc, FILE_ADDRESS start_addr,
 		return bg_next;
 	}
 
-	size_t buf_len = size_t(min(end_addr-start_addr, FILE_ADDRESS(search_buf_len + length - 1)));
+	size_t buf_len = size_t(std::min(end_addr-start_addr, FILE_ADDRESS(search_buf_len + length - 1)));
 
 //    ASSERT(length > 0 && length <= buf_len);
 

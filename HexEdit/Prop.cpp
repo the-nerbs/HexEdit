@@ -1594,7 +1594,7 @@ void CPropCharPage::Update(CHexEditView *pv, FILE_ADDRESS address /*=-1*/)
 #ifdef SHOW_CODE_PAGE
 	unsigned char cc[MAX_BYTES+1];   // Allow +1 for string terminator when converting MBCS to Unicode
 	size_t got = dynamic_cast<CHexEditDoc *>(pv->GetDocument())->
-		GetData(cc, max(2, page_max_chars[code_page_]), address);       // get enough chars for Unicode (2) and code page (up to MAX_BYTES)
+		GetData(cc, std::max(2, page_max_chars[code_page_]), address);       // get enough chars for Unicode (2) and code page (up to MAX_BYTES)
 	ASSERT(got <= MAX_BYTES);
 #else
 	unsigned char cc[2];

@@ -776,7 +776,7 @@ UINT CHexEditDoc::RunSearchThread()
 			continue;
 		}
 
-		buf_len = (size_t)min(file_len, 32768 + bb.length() - 1);
+		buf_len = (size_t)std::min<FILE_ADDRESS>(file_len, 32768 + bb.length() - 1);
 		ASSERT(search_buf_ == NULL);
 		search_buf_ = new unsigned char[buf_len + 1];
 
@@ -832,7 +832,7 @@ UINT CHexEditDoc::RunSearchThread()
 
 			FILE_ADDRESS addr_buf = start;  // Current location in doc of start of search_buf_
 			// Make sure we get extra bytes past end for length of search string
-			end = min(end + bb.length() - 1, file_len);
+			end = std::min(end + bb.length() - 1, file_len);
 
 			find_done_ = 0.0;               // We haven't searched any of this to_search_ block yet
 
@@ -883,8 +883,8 @@ UINT CHexEditDoc::RunSearchThread()
 					file_len = length_;   // file length may have changed
 
 					// Get a buffer full (plus an extra char for wholeword test at end of buffer)
-					got = GetData(search_buf_, size_t(min(FILE_ADDRESS(buf_len), end - addr_buf)) + 1, addr_buf, 2);
-					ASSERT(got == min(buf_len, end - addr_buf) || got == min(buf_len, end - addr_buf) + 1);
+					got = GetData(search_buf_, size_t(std::min<FILE_ADDRESS>(buf_len, end - addr_buf)) + 1, addr_buf, 2);
+					ASSERT(got == std::min<FILE_ADDRESS>(buf_len, end - addr_buf) || got == std::min<FILE_ADDRESS>(buf_len, end - addr_buf) + 1);
 					//TRACE1("+++ BGSearch: got %d\n", int(got));
 
 					if (wholeword)
@@ -916,7 +916,7 @@ UINT CHexEditDoc::RunSearchThread()
 						}
 
 						// If we read an extra character check if it is alphabetic
-						if (got == min(buf_len, end - addr_buf) + 1)
+						if (got == std::min<FILE_ADDRESS>(buf_len, end - addr_buf) + 1)
 						{
 							if (tt == 3)
 								alpha_after = isalnum(e2a_tab[search_buf_[got-1]]) != 0;
@@ -926,7 +926,7 @@ UINT CHexEditDoc::RunSearchThread()
 					}
 
 					// Remove extra character obtained for wholeword test
-					if (got == min(buf_len, end - addr_buf) + 1)
+					if (got == std::min<FILE_ADDRESS>(buf_len, end - addr_buf) + 1)
 						got--;
 				}
 #ifdef TESTING1

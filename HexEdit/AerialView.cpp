@@ -718,7 +718,7 @@ void CAerialView::OnTimer(UINT nIDEvent)
 		// Check if we are using more than half our allocated time
 		if (t00_.elapsed() * 1000 > timer_msecs_/2)
 		{
-			UINT t = min((UINT)(t00_.elapsed()*1000*2), 5000);
+			UINT t = std::min<UINT>((UINT)(t00_.elapsed()*1000*2), 5000);
 			TRACE("timer increased from %d to %d (occ: %d)\n", timer_msecs_, t, int(search_pair_.size()));
 			// Increase the timer period so we don't slow everything down
 			StopTimer();
@@ -728,7 +728,7 @@ void CAerialView::OnTimer(UINT nIDEvent)
 		else
 		{
 			// Look to see if we can speed up again
-			UINT t = max((UINT)(t00_.elapsed()*1000*3), ::GetCaretBlinkTime()/10);
+			UINT t = std::max((UINT)(t00_.elapsed()*1000*3), ::GetCaretBlinkTime()/10);
 			if (t < timer_msecs_)
 			{
 				TRACE("timer decreased from %d to %d\n", timer_msecs_, t);

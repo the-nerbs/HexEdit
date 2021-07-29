@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- use the vcpkg manifest-->
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+
+    <!-- setup directories -->
+    <IntDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsObjDir)', '$(MSBuildProjectName)', '$(Configuration)', '$(Platform)'))</IntDir>
+    <OutDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsBinDir)', '$(MSBuildProjectName)', '$(Configuration)', '$(Platform)'))</OutDir>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)vcpkg.props"/>
+</Project>

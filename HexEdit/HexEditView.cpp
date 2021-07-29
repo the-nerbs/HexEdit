@@ -33,22 +33,22 @@
 #include "SRecord.h"      // For import/export of Motorola S record files
 #include "IntelHex.h"     // For import/export of Intel Hex files
 #include "CopyCSrc.h"     // For Copy as C Source dialog
-#include "../ThirdParty/zlib/zlib.h"    // For compression
+#include <zlib.h>         // For compression
 
 #pragma warning(push)                      // we need to save an restore warnings because Crypto++ headers muck with some
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1   // allows use of "weak" digests like MD5
-#include "../ThirdParty/CryptoPP/cryptlib.h"
-#include "../ThirdParty/CryptoPP/filters.h"
-#include "../ThirdParty/CryptoPP/files.h"
-#include "../ThirdParty/CryptoPP/md5.h"
-#include "../ThirdParty/CryptoPP/sha.h"
-#include "../ThirdParty/CryptoPP/sha3.h"
+#include <cryptopp/cryptlib.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/files.h>
+#include <cryptopp/md5.h>
+#include <cryptopp/sha.h>
+#include <cryptopp/sha3.h>
 //#define CRYPTOPP_CRC32
 #ifdef CRYPTOPP_CRC32
-#include "../ThirdParty/CryptoPP/crc.h"
+#include <cryptopp/crc.h>
 #endif
-#include "../ThirdParty/CryptoPP/base32.h"
-#include "../ThirdParty/CryptoPP/base64.h"
+#include <cryptopp/base32.h>
+#include <cryptopp/base64.h>
 #pragma warning(pop)
 
 #include "Bin2Src.h"      // For formatted clipboard text
@@ -7377,7 +7377,7 @@ void CHexEditView::OnExportSRecord(UINT nID)
 		for (pp = hl_set_.range_.begin(); pp != hl_set_.range_.end(); ++pp)
 			for (FILE_ADDRESS curr = pp->sfirst; curr < pp->slast; curr += len)
 			{
-				len = int(min(4096, pp->slast - curr));
+				len = int(std::min<FILE_ADDRESS>(4096, pp->slast - curr));
 				VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 				wsr.Put(buf, len, unsigned long(base_address + curr));
@@ -7395,7 +7395,7 @@ void CHexEditView::OnExportSRecord(UINT nID)
 		FILE_ADDRESS curr;
 		for (curr = start; curr < end; curr += len)
 		{
-			len = min(4096, int(end - curr));
+			len = std::min(4096, int(end - curr));
 			VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 			wsr.Put(buf, len);
@@ -7861,7 +7861,7 @@ void CHexEditView::OnExportIntel()
 		FILE_ADDRESS curr;
 		for (curr = start; curr < end; curr += len)
 		{
-			len = min(4096, int(end - curr));
+			len = std::min(4096, int(end - curr));
 			VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 			wih.Put(buf, len);
@@ -8293,7 +8293,7 @@ void CHexEditView::OnExportHexText()
 	for (curr = start_addr; curr < end_addr; curr += len)
 	{
 		// Get the data bytes
-		len = size_t(min(FILE_ADDRESS(theApp.export_line_len_), end_addr - curr));
+		len = size_t(std::min(FILE_ADDRESS(theApp.export_line_len_), end_addr - curr));
 		VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 		// Convert to hex text
@@ -8649,7 +8649,7 @@ bool CHexEditView::copy2cb_text(FILE_ADDRESS start, FILE_ADDRESS end, bool fromC
 	FILE_ADDRESS curr;
 	for (curr = start; curr < end; curr += len)
 	{
-		len = min(clipboard_buf_len, int(end - curr));
+		len = std::min<int>(clipboard_buf_len, int(end - curr));
 		if (fromCompFile)
 			VERIFY(GetDocument()->GetCompData(buf, len, curr) == len);
 		else
@@ -8909,7 +8909,7 @@ bool CHexEditView::is_binary(FILE_ADDRESS start, FILE_ADDRESS end, bool fromComp
 	for (FILE_ADDRESS curr = start; curr < end; curr += len)
 	{
 		// Get the next buffer full from the document
-		len = size_t(min(sizeof(buf), end - curr));
+		len = size_t(std::min<FILE_ADDRESS>(sizeof(buf), end - curr));
 		if (fromCompFile)
 			VERIFY(GetDocument()->GetCompData(buf, len, curr) == len);
 		else
@@ -12791,7 +12791,7 @@ void CHexEditView::OnEditCompare()
 	FILE_ADDRESS show_inc = 0x80000;            // How far between showing addresses
 	FILE_ADDRESS next_show = (orig_addr/show_inc + 1)*show_inc; // Next address to show
 	FILE_ADDRESS slow_show = ((orig_addr+0x800000)/0x800000 + 1)*0x800000;      // When we slow showing
-	FILE_ADDRESS comp_length = min(origd->length() - orig_addr, compd->length() - comp_addr);
+	FILE_ADDRESS comp_length = std::min(origd->length() - orig_addr, compd->length() - comp_addr);
 
 	// Get memory for compare buffers
 	unsigned char *orig_buf = new unsigned char[compare_buf_len];
@@ -12835,7 +12835,7 @@ void CHexEditView::OnEditCompare()
 		orig_got = origd->GetData(orig_buf, compare_buf_len, orig_addr);
 		comp_got = compd->GetData(comp_buf, compare_buf_len, comp_addr);
 
-		size_t comp_len = min(orig_got, comp_got);
+		size_t comp_len = std::min(orig_got, comp_got);
 		if (comp_len == 0)              // EOF of one or both files
 			break;
 
@@ -13226,7 +13226,7 @@ void CHexEditView::DoConversion(convert_type op, LPCSTR desc)
 		::GetTempFileName(temp_dir, _T("_HE"), 0, temp_file);
 
 		// Get data buffer
-		size_t len, buflen = size_t(min(4096, end_addr - start_addr));
+		size_t len, buflen = size_t(std::min<FILE_ADDRESS>(4096, end_addr - start_addr));
 		try
 		{
 			buf = new unsigned char[buflen];
@@ -13245,7 +13245,7 @@ void CHexEditView::DoConversion(convert_type op, LPCSTR desc)
 			for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 			{
 				// Get the next buffer full from the document
-				len = size_t(min(buflen, end_addr - curr));
+				len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 				if (op != unary_at)      // We don't need to get old value if assigning
 					VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
@@ -13522,7 +13522,7 @@ void CHexEditView::DoTransform(CryptoPP::BufferedTransformation *pTrx, int trans
 
 	// Get buffer for reading source blocks
 	unsigned char *inbuf = NULL;
-	size_t inbuflen = size_t(min(32768, end_addr - start_addr));
+	size_t inbuflen = size_t(std::min<FILE_ADDRESS>(32768, end_addr - start_addr));
 	try
 	{
 		inbuf = new unsigned char[inbuflen];
@@ -13538,7 +13538,7 @@ void CHexEditView::DoTransform(CryptoPP::BufferedTransformation *pTrx, int trans
 	for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 	{
 		// Get the next buffer full from the document
-		len = size_t(min(inbuflen, end_addr - curr));
+		len = size_t(std::min<FILE_ADDRESS>(inbuflen, end_addr - curr));
 		VERIFY(GetDocument()->GetData(inbuf, len, curr) == len);
 
 		// Call Crypto++ to transform and output
@@ -13725,7 +13725,7 @@ void CHexEditView::OnEncrypt()
 				for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 				{
 					// Get the next buffer full from the document
-					len = size_t(min(inbuflen, end_addr - curr));
+					len = size_t(std::min<FILE_ADDRESS>(inbuflen, end_addr - curr));
 					VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 					// Encrypt and write it
@@ -14041,7 +14041,7 @@ void CHexEditView::OnDecrypt()
 				for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 				{
 					// Get the next buffer full from the document
-					len = size_t(min(buflen, end_addr - curr));
+					len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 					VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 					size_t outlen = aa->crypto_.decrypt(aa->algorithm_-1, buf, len, curr + len == end_addr);
@@ -14336,7 +14336,7 @@ void CHexEditView::OnCompress()
 		::GetTempFileName(temp_dir, _T("_HE"), 0, temp_file);
 
 		// Get input and output buffers
-		size_t len, inbuflen = size_t(min(32768, end_addr - start_addr)), outbuflen = max(inbuflen/2, 256);
+		size_t len, inbuflen = size_t(std::min<FILE_ADDRESS>(32768, end_addr - start_addr)), outbuflen = std::max<std::size_t>(inbuflen/2, 256);
 
 		// Work out no of input blocks per sync
 		int sync_every = (theApp.GetProfileInt("Options", "ZlibCompressionSync", 0)*1024)/inbuflen;
@@ -14367,7 +14367,7 @@ void CHexEditView::OnCompress()
 					flush = Z_NO_FLUSH;
 
 				// Get the next buffer full from the document
-				len = size_t(min(inbuflen, end_addr - curr));
+				len = size_t(std::min<FILE_ADDRESS>(inbuflen, end_addr - curr));
 				VERIFY(GetDocument()->GetData(in_data, len, curr) == len);
 
 				// Compress this buffer
@@ -14486,7 +14486,7 @@ void CHexEditView::OnCompress()
 			// Remove uncompressed data from the document
 			GetDocument()->Change(mod_delforw, start_addr, got, NULL, 0, this);
 
-			size_t outbuflen = max(got/2, 256);
+			size_t outbuflen = std::max<std::size_t>(got/2, 256);
 			out_data = new unsigned char[outbuflen];
 			FILE_ADDRESS curr = start_addr;
 
@@ -14612,7 +14612,7 @@ void CHexEditView::OnDecompress()
 		::GetTempFileName(temp_dir, _T("_HE"), 0, temp_file);
 
 		// Get input and output buffers
-		size_t len, outbuflen = size_t(min(32768, end_addr - start_addr)), inbuflen = max(outbuflen/4, 256);
+		size_t len, outbuflen = size_t(std::min<FILE_ADDRESS>(32768, end_addr - start_addr)), inbuflen = std::max<std::size_t>(outbuflen/4, 256);
 		FILE_ADDRESS total_out = 0;
 		int err = Z_OK;
 		try
@@ -14635,7 +14635,7 @@ void CHexEditView::OnDecompress()
 			for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 			{
 				// Get the next buffer full from the document
-				len = size_t(min(inbuflen, end_addr - curr));
+				len = size_t(std::min<FILE_ADDRESS>(inbuflen, end_addr - curr));
 				VERIFY(GetDocument()->GetData(in_data, len, curr) == len);
 
 				zs.next_in = in_data;
@@ -14783,7 +14783,7 @@ void CHexEditView::OnDecompress()
 			// Remove input (compressed) block from the document
 			GetDocument()->Change(mod_delforw, start_addr, got, NULL, 0, this);
 
-			size_t outbuflen = max(4*got, 256);
+			size_t outbuflen = std::max<std::size_t>(4*got, 256);
 			out_data = new unsigned char[outbuflen];
 			FILE_ADDRESS curr = start_addr;   // Current output address
 
@@ -15007,7 +15007,7 @@ template<class T> void DoChecksum(CHexEditView *pv, checksum_type op, LPCSTR des
 	ASSERT(start_addr < pv->GetDocument()->length());
 
 	// Get a buffer - fairly large for efficiency
-	size_t len, buflen = size_t(min(4096, end_addr - start_addr));
+	size_t len, buflen = size_t(std::min<FILE_ADDRESS>(4096, end_addr - start_addr));
 	try
 	{
 		buf = new unsigned char[buflen];
@@ -15079,7 +15079,7 @@ template<class T> void DoChecksum(CHexEditView *pv, checksum_type op, LPCSTR des
 	for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 	{
 		// Get the next buffer full from the document
-		len = size_t(min(buflen, end_addr - curr));
+		len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 		VERIFY(pv->GetDocument()->GetData(buf, len, curr) == len);
 
 		switch (op)
@@ -15385,7 +15385,7 @@ void CHexEditView::DoDigest(CryptoPP::HashTransformation * digest, int mac_id)
 	ASSERT(start_addr < GetDocument()->length());
 
 	// Get a buffer - fairly large for efficiency
-	size_t len, buflen = size_t(min(4096, end_addr - start_addr));
+	size_t len, buflen = size_t(std::min<FILE_ADDRESS>(4096, end_addr - start_addr));
 	try
 	{
 		buf = new unsigned char[buflen];
@@ -15402,7 +15402,7 @@ void CHexEditView::DoDigest(CryptoPP::HashTransformation * digest, int mac_id)
 	for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 	{
 		// Get the next buffer full from the document
-		len = size_t(min(buflen, end_addr - curr));
+		len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 		VERIFY(GetDocument()->GetData(buf, len, curr) == len);
 
 		digest->Update(buf, len);  // update digest
@@ -15722,7 +15722,7 @@ template<class T> void OnOperateBinary(CHexEditView *pv, binop_type op, LPCSTR d
 		::GetTempFileName(temp_dir, _T("_HE"), 0, temp_file);
 
 		// Get data buffer
-		size_t len, buflen = size_t(min(4096, end_addr - start_addr));
+		size_t len, buflen = size_t(std::min<FILE_ADDRESS>(4096, end_addr - start_addr));
 		try
 		{
 			buf = new unsigned char[buflen];
@@ -15741,7 +15741,7 @@ template<class T> void OnOperateBinary(CHexEditView *pv, binop_type op, LPCSTR d
 			for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 			{
 				// Get the next buffer full from the document
-				len = size_t(min(buflen, end_addr - curr));
+				len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 				VERIFY(pv->GetDocument()->GetData(buf, len, curr) == len);
 
 				ProcBinary(pv, val, (T *)buf, len/sizeof(T), op, div0);
@@ -16433,7 +16433,7 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 		::GetTempFileName(temp_dir, _T("_HE"), 0, temp_file);
 
 		// Get data buffer
-		size_t len, buflen = size_t(min(4096, end_addr - start_addr));
+		size_t len, buflen = size_t(std::min<FILE_ADDRESS>(4096, end_addr - start_addr));
 
 #ifdef USE_SSE2
 		// Need 16 byte alignment for SSE2 instructions
@@ -16458,7 +16458,7 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 			for (FILE_ADDRESS curr = start_addr; curr < end_addr; curr += len)
 			{
 				// Get the next buffer full from the document
-				len = size_t(min(buflen, end_addr - curr));
+				len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 				if (op != unary_at)      // We don't need to get old value if assigning
 					VERIFY(pv->GetDocument()->GetData(buf, len, curr) == len);
 

@@ -1041,8 +1041,8 @@ void CCompareView::OnDraw(CDC* pDC)
 		if (!pDC->IsPrinting() && start_addr < end_addr &&
 			end_addr > line*phev_->rowsize_ - offset && start_addr < (line+1)*phev_->rowsize_ - offset)
 		{
-			FILE_ADDRESS start = max(start_addr, line*phev_->rowsize_ - offset);
-			FILE_ADDRESS   end = min(end_addr, (line+1)*phev_->rowsize_ - offset);
+			FILE_ADDRESS start = std::max(start_addr, line*phev_->rowsize_ - offset);
+			FILE_ADDRESS   end = std::min(end_addr, (line+1)*phev_->rowsize_ - offset);
 //            ASSERT(end > start);
 
 			ASSERT(phev_->display_.hex_area || phev_->display_.char_area);
@@ -1102,8 +1102,8 @@ void CCompareView::OnDraw(CDC* pDC)
 				 start_addr < (line+1)*phev_->rowsize_ - offset)
 		{
 			// Draw "shadow" cursor in the other area
-			FILE_ADDRESS start = max(start_addr, line*phev_->rowsize_ - offset);
-			FILE_ADDRESS   end = min(end_addr, (line+1)*phev_->rowsize_ - offset);
+			FILE_ADDRESS start = std::max(start_addr, line*phev_->rowsize_ - offset);
+			FILE_ADDRESS   end = std::min(end_addr, (line+1)*phev_->rowsize_ - offset);
 
 			CRect rev(norm_rect);
 			if (phev_->display_.edit_char)
@@ -1140,8 +1140,8 @@ void CCompareView::OnDraw(CDC* pDC)
 			if (!phev_->display_.vert_display && phev_->display_.hex_area)
 			{
 				// Get rect for hex area or stacked mode
-				FILE_ADDRESS start = max(start_addr, line*phev_->rowsize_ - offset);
-				FILE_ADDRESS end = min(end_addr, (line+1)*phev_->rowsize_ - offset);
+				FILE_ADDRESS start = std::max(start_addr, line*phev_->rowsize_ - offset);
+				FILE_ADDRESS end = std::min(end_addr, (line+1)*phev_->rowsize_ - offset);
 
 				CRect rev(norm_rect);
 				rev.right = rev.left + hex_pos(int(end - (line*phev_->rowsize_ - offset))) + 2*phev_->text_width_;
@@ -1161,8 +1161,8 @@ void CCompareView::OnDraw(CDC* pDC)
 			if (phev_->display_.vert_display || phev_->display_.char_area)
 			{
 				// Get rect for char area
-				FILE_ADDRESS start = max(start_addr, line*phev_->rowsize_ - offset);
-				FILE_ADDRESS   end = min(end_addr, (line+1)*phev_->rowsize_ - offset);
+				FILE_ADDRESS start = std::max(start_addr, line*phev_->rowsize_ - offset);
+				FILE_ADDRESS   end = std::min(end_addr, (line+1)*phev_->rowsize_ - offset);
 
 				CRect rev(norm_rect);
 				rev.right = rev.left + char_pos(int(end - (line*phev_->rowsize_ - offset))) + phev_->text_width_w_;
@@ -1531,8 +1531,8 @@ void CCompareView::draw_backgrounds(CDC* pDC,
 									COLORREF colour, bool merge /*=true*/, int draw_height /*=-1*/)
 {
 	ASSERT(addr.size() == len.size());                                 // arrays should be equal size
-	FILE_ADDRESS first_addr = max(0, first_virt);                      // First address to actually display
-	FILE_ADDRESS last_addr  = min(GetDocument()->CompLength(), last_virt); // One past last address actually displayed
+	FILE_ADDRESS first_addr = std::max<FILE_ADDRESS>(0, first_virt);            // First address to actually display
+	FILE_ADDRESS last_addr  = std::min(GetDocument()->CompLength(), last_virt); // One past last address actually displayed
 
 	int ii;
 	if (!ScrollUp())
@@ -1551,8 +1551,8 @@ void CCompareView::draw_backgrounds(CDC* pDC,
 
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 					line_height, char_width, char_width_w, colour,
-					max(addr[ii], first_addr), 
-					min(addr[ii] + len[ii], last_addr),
+					std::max(addr[ii], first_addr), 
+					std::min(addr[ii] + len[ii], last_addr),
 					merge, draw_height);
 		}
 	}
@@ -1571,8 +1571,8 @@ void CCompareView::draw_backgrounds(CDC* pDC,
 
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 					line_height, char_width, char_width_w, colour,
-					max(addr[ii], first_addr), 
-					min(addr[ii] + len[ii], last_addr),
+					std::max(addr[ii], first_addr), 
+					std::min(addr[ii] + len[ii], last_addr),
 					merge, draw_height);
 		}
 	}

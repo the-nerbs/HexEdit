@@ -17,12 +17,6 @@
 #include "Mainfrm.h"
 #include "HexFileList.h"
 
-// Hide macros so that we can use std::min, std::max
-#ifdef max
-#undef max
-#undef min
-#endif
-
 
 void CHexEditDoc::CheckSaveTemplate()
 {

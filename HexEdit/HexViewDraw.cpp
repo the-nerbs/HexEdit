@@ -219,8 +219,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 		// Draw just the lines on this page
 		first_line = curpage_ * FILE_ADDRESS(lines_per_page_);
 		last_line = first_line + lines_per_page_;
-		first_addr = max(0, first_line*rowsize_ - offset_);
-		last_addr = min(pDoc->length(), last_line*rowsize_ - offset_);
+		first_addr = std::max<FILE_ADDRESS>(0, first_line*rowsize_ - offset_);
+		last_addr = std::min<FILE_ADDRESS>(pDoc->length(), last_line*rowsize_ - offset_);
 
 		line_inc = 1L;
 		rect_inc = CSize(0, line_height);
@@ -679,8 +679,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 				// Draw colour behind the bytes to indicate there is a problem with this sector
 				draw_bg(pDC, doc_rect, neg_x, neg_y,
 						line_height, char_width, char_width_w, sector_bg_col_,
-						max(sector, first_addr),
-						min(sector + seclen, last_addr));
+						std::max(sector, first_addr),
+						std::min(sector + seclen, last_addr));
 				prev_bad = true;
 			}
 			else if (!prev_bad && sector >= first_addr && sector < last_addr)
@@ -1048,8 +1048,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 					break;
 				draw_bg(pDC, doc_rect, neg_x, neg_y,
 						line_height, char_width, char_width_w, hi_col_,
-						max(pr->sfirst, first_addr), 
-						min(pr->slast, last_addr));
+						std::max(pr->sfirst, first_addr), 
+						std::min(pr->slast, last_addr));
 			}
 		}
 		else
@@ -1065,8 +1065,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 					break;
 				draw_bg(pDC, doc_rect, neg_x, neg_y,
 						line_height, char_width, char_width_w, hi_col_,
-						max(pr->sfirst, first_addr), 
-						min(pr->slast, last_addr));
+						std::max(pr->sfirst, first_addr), 
+						std::min(pr->slast, last_addr));
 			}
 		}
 	}
@@ -1086,8 +1086,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 			{
 				draw_bg(pDC, doc_rect, neg_x, neg_y,
 						line_height, char_width, char_width_w, search_col_,
-						max(*pp, first_addr), 
-						min(*pp + search_length_, last_addr));
+						std::max(*pp, first_addr), 
+						std::min(*pp + search_length_, last_addr));
 			}
 		}
 	}
@@ -1099,8 +1099,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 		{
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 					line_height, char_width, char_width_w, search_col_,
-					max(pp->first, first_addr), 
-					min(pp->second, last_addr));
+					std::max(pp->first, first_addr), 
+					std::min(pp->second, last_addr));
 		}
 
 		// Draw template field backgrounds bottom up
@@ -1109,8 +1109,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 		{
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 				line_height, char_width, char_width_w, pdffd->get<2>(),
-				max(pdffd->get<0>(), first_addr), 
-				min(pdffd->get<1>(), last_addr));
+				std::max(pdffd->get<0>(), first_addr), 
+				std::min(pdffd->get<1>(), last_addr));
 		}
 	}
 	else
@@ -1121,8 +1121,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 		{
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 					line_height, char_width, char_width_w, search_col_,
-					max(pp->first, first_addr), 
-					min(pp->second, last_addr));
+					std::max(pp->first, first_addr), 
+					std::min(pp->second, last_addr));
 		}
 
 		// Draw template field backgrounds from top down
@@ -1131,8 +1131,8 @@ void CHexEditView::OnDraw(CDC* pDC)
 		{
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 				line_height, char_width, char_width_w, pdffd->get<2>(),
-				max(pdffd->get<0>(), first_addr), 
-				min(pdffd->get<1>(), last_addr));
+				std::max(pdffd->get<0>(), first_addr), 
+				std::min(pdffd->get<1>(), last_addr));
 		}
 	}
 
@@ -1774,8 +1774,8 @@ end_of_background_drawing:
 		if (!pDC->IsPrinting() && start_addr < end_addr &&
 			end_addr > line*rowsize_ - offset_ && start_addr < (line+1)*rowsize_ - offset_)
 		{
-			FILE_ADDRESS start = max(start_addr, line*rowsize_ - offset_);
-			FILE_ADDRESS   end = min(end_addr, (line+1)*rowsize_ - offset_);
+			FILE_ADDRESS start = std::max(start_addr, line*rowsize_ - offset_);
+			FILE_ADDRESS   end = std::min(end_addr, (line+1)*rowsize_ - offset_);
 //            ASSERT(end > start);
 
 			ASSERT(display_.hex_area || display_.char_area);
@@ -1835,8 +1835,8 @@ end_of_background_drawing:
 				 start_addr < (line+1)*rowsize_ - offset_)
 		{
 			// Draw "shadow" cursor in the other area
-			FILE_ADDRESS start = max(start_addr, line*rowsize_ - offset_);
-			FILE_ADDRESS   end = min(end_addr, (line+1)*rowsize_ - offset_);
+			FILE_ADDRESS start = std::max(start_addr, line*rowsize_ - offset_);
+			FILE_ADDRESS   end = std::min(end_addr, (line+1)*rowsize_ - offset_);
 
 			CRect rev(norm_rect);
 			if (display_.edit_char)
@@ -1873,8 +1873,8 @@ end_of_background_drawing:
 			if (!display_.vert_display && display_.hex_area)
 			{
 				// Get rect for hex area
-				FILE_ADDRESS start = max(start_addr, line*rowsize_ - offset_);
-				FILE_ADDRESS end = min(end_addr, (line+1)*rowsize_ - offset_);
+				FILE_ADDRESS start = std::max(start_addr, line*rowsize_ - offset_);
+				FILE_ADDRESS end = std::min(end_addr, (line+1)*rowsize_ - offset_);
 
 				CRect rev(norm_rect);
 				rev.right = rev.left + hex_pos(int(end - (line*rowsize_ - offset_))) + 2*text_width_;
@@ -1894,8 +1894,8 @@ end_of_background_drawing:
 			if (display_.vert_display || display_.char_area)
 			{
 				// Get rect for char area or stacked mode
-				FILE_ADDRESS start = max(start_addr, line*rowsize_ - offset_);
-				FILE_ADDRESS   end = min(end_addr, (line+1)*rowsize_ - offset_);
+				FILE_ADDRESS start = std::max(start_addr, line*rowsize_ - offset_);
+				FILE_ADDRESS   end = std::min(end_addr, (line+1)*rowsize_ - offset_);
 
 				CRect rev(norm_rect);
 				rev.right = rev.left + char_pos(int(end - (line*rowsize_ - offset_))) + text_width_w_;
@@ -2477,8 +2477,8 @@ void CHexEditView::draw_backgrounds(CDC* pDC,
 									COLORREF colour, bool merge /*=true*/, int draw_height /*=-1*/)
 {
 	ASSERT(addr.size() == len.size());                                 // arrays should be equal size
-	FILE_ADDRESS first_addr = max(0, first_virt);                      // First address to actually display
-	FILE_ADDRESS last_addr  = min(GetDocument()->length(), last_virt); // One past last address actually displayed
+	FILE_ADDRESS first_addr = std::max<FILE_ADDRESS>(0, first_virt);        // First address to actually display
+	FILE_ADDRESS last_addr  = std::min(GetDocument()->length(), last_virt); // One past last address actually displayed
 
 	int ii;
 	if (!ScrollUp())
@@ -2497,8 +2497,8 @@ void CHexEditView::draw_backgrounds(CDC* pDC,
 
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 					line_height, char_width, char_width_w, colour,
-					max(addr[ii], first_addr), 
-					min(addr[ii] + len[ii], last_addr),
+					std::max(addr[ii], first_addr), 
+					std::min(addr[ii] + len[ii], last_addr),
 					merge, draw_height);
 		}
 	}
@@ -2517,8 +2517,8 @@ void CHexEditView::draw_backgrounds(CDC* pDC,
 
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
 					line_height, char_width, char_width_w, colour,
-					max(addr[ii], first_addr), 
-					min(addr[ii] + len[ii], last_addr),
+					std::max(addr[ii], first_addr), 
+					std::min(addr[ii] + len[ii], last_addr),
 					merge, draw_height);
 		}
 	}

@@ -54,12 +54,8 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\..\ThirdParty\include;$(IncludePath)</IncludePath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)\..\ThirdParty\include;$(IncludePath)</IncludePath>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
@@ -93,7 +89,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;setargv.obj;imagehlp.lib;htmlhelp.lib;Winmm.lib;..\ThirdParty\lib\FreeImage.lib;..\ThirdParty\lib\mpir.lib;..\ThirdParty\CryptoPP\Win32\Output\Release\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;setargv.obj;imagehlp.lib;htmlhelp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)HexEdit.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>$(IntDir)HexEdit.pdb</ProgramDatabaseFile>
@@ -149,7 +145,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>version.lib;setargv.obj;imagehlp.lib;htmlhelp.lib;Winmm.lib;..\ThirdParty\lib\FreeImage.lib;..\ThirdParty\lib\mpir.lib;..\ThirdParty\CryptoPP\Win32\Output\Debug\cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>version.lib;setargv.obj;imagehlp.lib;htmlhelp.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)HexEdit.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -292,104 +288,14 @@
     <ClCompile Include="GridCtrl_src\InPlaceEdit.cpp" />
     <ClCompile Include="GridCtrl_src\TitleTip.cpp" />
     <ClCompile Include="TreeColumn_src\TreeColumn.cpp" />
-    <ClCompile Include="..\ThirdParty\zlib\adler32.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\compress.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\crc32.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\deflate.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\gzclose.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\gzlib.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\gzread.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\gzwrite.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\infback.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\inffast.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\inflate.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\inftrees.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\trees.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\uncompr.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\ThirdParty\zlib\zutil.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Install\Templates\BinaryFileFormat.dtd" />
-    <None Include="Install\Templates\default.xml" />
-    <None Include="Install\Templates\_common_types.xml" />
-    <None Include="Install\Templates\_standard_types.xml" />
-    <None Include="Install\Templates\_windows_constants.txt" />
-    <None Include="Install\Templates\_windows_types.xml" />
+    <None Include="..\Templates\BinaryFileFormat.dtd" />
+    <None Include="..\Templates\default.xml" />
+    <None Include="..\Templates\_common_types.xml" />
+    <None Include="..\Templates\_standard_types.xml" />
+    <None Include="..\Templates\_windows_constants.txt" />
+    <None Include="..\Templates\_windows_types.xml" />
     <None Include="PreBuild.bat" />
     <None Include="resource.hm" />
     <None Include="RES\back.bmp" />
@@ -517,13 +423,6 @@
     <ResourceCompile Include="HexEdit.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\ThirdParty\CryptoPP\base32.h" />
-    <ClInclude Include="..\ThirdParty\CryptoPP\base64.h" />
-    <ClInclude Include="..\ThirdParty\CryptoPP\crc.h" />
-    <ClInclude Include="..\ThirdParty\CryptoPP\cryptlib.h" />
-    <ClInclude Include="..\ThirdParty\CryptoPP\md5.h" />
-    <ClInclude Include="..\ThirdParty\CryptoPP\sha.h" />
-    <ClInclude Include="..\ThirdParty\CryptoPP\sha3.h" />
     <ClInclude Include="AerialView.h" />
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="BCGMisc.h" />
@@ -571,9 +470,6 @@
     <ClInclude Include="HexEditView.h" />
     <ClInclude Include="HexFileList.h" />
     <ClInclude Include="HexPrintDialog.h" />
-    <ClInclude Include="..\ThirdParty\include\FreeImage.h" />
-    <ClInclude Include="..\ThirdParty\include\mpir.h" />
-    <ClInclude Include="..\ThirdParty\include\mpirxx.h" />
     <ClInclude Include="IntelHex.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Misc.h" />
@@ -634,17 +530,6 @@
     <ClInclude Include="GridCtrl_src\MemDC.h" />
     <ClInclude Include="GridCtrl_src\TitleTip.h" />
     <ClInclude Include="TreeColumn_src\TreeColumn.h" />
-    <ClInclude Include="..\ThirdParty\zlib\crc32.h" />
-    <ClInclude Include="..\ThirdParty\zlib\deflate.h" />
-    <ClInclude Include="..\ThirdParty\zlib\gzguts.h" />
-    <ClInclude Include="..\ThirdParty\zlib\inffast.h" />
-    <ClInclude Include="..\ThirdParty\zlib\inffixed.h" />
-    <ClInclude Include="..\ThirdParty\zlib\inflate.h" />
-    <ClInclude Include="..\ThirdParty\zlib\inftrees.h" />
-    <ClInclude Include="..\ThirdParty\zlib\trees.h" />
-    <ClInclude Include="..\ThirdParty\zlib\zconf.h" />
-    <ClInclude Include="..\ThirdParty\zlib\zlib.h" />
-    <ClInclude Include="..\ThirdParty\zlib\zutil.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

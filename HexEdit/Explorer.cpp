@@ -659,7 +659,7 @@ void CHistoryShellList::OnContextMenu(CWnd * pWnd, CPoint point)
 				// Set to default column width
 				CString ss;
 				AfxExtractSubString(ss, defaultWidths, item-1, '|');
-				int width = max(strtol(ss, NULL, 10), 20);
+				int width = std::max<int>(strtol(ss, NULL, 10), 20);
 				SetColumnWidth(item-1, width);
 			}
 			else
@@ -2240,7 +2240,7 @@ void CExplorerWnd::OnDestroy()
 	//}
 	//theApp.WriteProfileString("File-Settings", "ExplorerHistory", hist);
 	std::vector<CString> sv;
-	int count = min(ctl_name_.GetCount(), theApp.max_expl_dir_hist_);
+	int count = std::min(ctl_name_.GetCount(), theApp.max_expl_dir_hist_);
 	for (int ii = 0; ii < count; ++ii)
 	{
 		CString ss;
@@ -2268,7 +2268,7 @@ void CExplorerWnd::OnDestroy()
 	//theApp.WriteProfileString("File-Settings", "ExplorerFilterHistory", hist);
 
 	sv.clear();
-	count = min(ctl_filter_.GetCount(), theApp.max_expl_filt_hist_);
+	count = std::min(ctl_filter_.GetCount(), theApp.max_expl_filt_hist_);
 	for (int ii = 0; ii < count; ++ii)
 	{
 		CString ss;

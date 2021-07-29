@@ -227,7 +227,7 @@ void CGridTreeCellBase::TreeGetBoxRelCoords(CRect* apRect)      // returns: rela
 
     // Make the height and width the same and make sure it is always odd and at least 9 pixels
     int hw = iDefTreeIndent - TREE_BOX_MARGIN - 1;
-    hw = max((hw/2)*2 + 1, 9);
+    hw = std::max((hw/2)*2 + 1, 9);
 
     apRect->left = iMargin + (iDefTreeIndent * ( ucLevel - 1) ) + TREE_BOX_MARGIN;
     apRect->right = apRect->left + hw;

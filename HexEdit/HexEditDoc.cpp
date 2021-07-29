@@ -33,11 +33,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#ifdef max
-#undef max
-#undef min
-#endif
-
 extern CHexEditApp theApp;
 
 // I can't work out how to get constants into a header file

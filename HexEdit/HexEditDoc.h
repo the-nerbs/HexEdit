@@ -305,7 +305,7 @@ struct doc_undo
 		else if (p != NULL)
 		{
 			ASSERT(len < 0x100000000);
-			ptr = new unsigned char[max(theApp.undo_limit_, int(len))];
+			ptr = new unsigned char[std::max(theApp.undo_limit_, int(len))];
 			memcpy(ptr, p, size_t(len));
 		}
 		else
@@ -329,7 +329,7 @@ struct doc_undo
 		else if (from.ptr != NULL)
 		{
 			ASSERT(len < 0x100000000);
-			ptr = new unsigned char[max(theApp.undo_limit_, int(len))];
+			ptr = new unsigned char[std::max(theApp.undo_limit_, int(len))];
 			memcpy(ptr, from.ptr, size_t(len));
 		}
 		else
@@ -356,7 +356,7 @@ struct doc_undo
 			else if (from.ptr != NULL)
 			{
 				ASSERT(len < 0x100000000);
-				ptr = new unsigned char[max(theApp.undo_limit_, int(len))];
+				ptr = new unsigned char[std::max(theApp.undo_limit_, int(len))];
 				memcpy(ptr, from.ptr, size_t(len));
 			}
 			else

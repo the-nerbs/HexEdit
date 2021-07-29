@@ -223,8 +223,8 @@ unsigned char *boyer::findforw(unsigned char *pp, size_t len, BOOL icase, int tt
 			if (e2u_tab[pp[spos]] != e2u_tab[pattern_[patpos]])
 			{
 				// Match failed so skip forward to start another
-				spos += max(pattern_len_ - patpos, 
-					min(fskip_[e2u_tab[pp[spos]]], fskip_[e2l_tab[pp[spos]]]));
+				spos += std::max(pattern_len_ - patpos, 
+					std::min(fskip_[e2u_tab[pp[spos]]], fskip_[e2l_tab[pp[spos]]]));
 				patpos = pattern_len_ - 1;
 			}
 			else
@@ -273,8 +273,8 @@ unsigned char *boyer::findforw(unsigned char *pp, size_t len, BOOL icase, int tt
 			if (toupper(pp[spos]) != toupper(pattern_[patpos]))
 			{
 				// Match failed so skip forward to start another
-				spos += max(pattern_len_ - patpos, 
-					min(fskip_[toupper(pp[spos])], fskip_[tolower(pp[spos])]));
+				spos += std::max(pattern_len_ - patpos, 
+					std::min(fskip_[toupper(pp[spos])], fskip_[tolower(pp[spos])]));
 				patpos = pattern_len_ - 1;
 			}
 			else
@@ -321,7 +321,7 @@ unsigned char *boyer::findforw(unsigned char *pp, size_t len, BOOL icase, int tt
 			if (pp[spos] != pattern_[patpos])
 			{
 				// Match failed so skip forward to start another
-				spos += max(pattern_len_ - patpos, fskip_[pp[spos]]);
+				spos += std::max(pattern_len_ - patpos, fskip_[pp[spos]]);
 				patpos = pattern_len_ - 1;
 			}
 			else
@@ -387,8 +387,8 @@ unsigned char *boyer::findback(unsigned char *pp, size_t len, BOOL icase, int tt
 			if (e2u_tab[pp[spos]] != e2u_tab[pattern_[patpos]])
 			{
 				// Match failed so skip back to start another comparison
-				spos -= max(patpos + 1, 
-					min(bskip_[e2u_tab[pp[spos]]], bskip_[e2l_tab[pp[spos]]]));
+				spos -= std::max(patpos + 1, 
+					std::min(bskip_[e2u_tab[pp[spos]]], bskip_[e2l_tab[pp[spos]]]));
 				patpos = 0;
 			}
 			else
@@ -436,8 +436,8 @@ unsigned char *boyer::findback(unsigned char *pp, size_t len, BOOL icase, int tt
 			if (toupper(pp[spos]) != toupper(pattern_[patpos]))
 			{
 				// Match failed so skip back to start another comparison
-				spos -= max(patpos + 1, 
-					min(bskip_[toupper(pp[spos])], bskip_[tolower(pp[spos])]));
+				spos -= std::max(patpos + 1, 
+					std::min(bskip_[toupper(pp[spos])], bskip_[tolower(pp[spos])]));
 				patpos = 0;
 			}
 			else
@@ -483,7 +483,7 @@ unsigned char *boyer::findback(unsigned char *pp, size_t len, BOOL icase, int tt
 			if (pp[spos] != pattern_[patpos])
 			{
 				// Match failed so skip back to start another comparison
-				spos -= max(patpos + 1, bskip_[pp[spos]]);
+				spos -= std::max(patpos + 1, bskip_[pp[spos]]);
 				patpos = 0;
 			}
 			else

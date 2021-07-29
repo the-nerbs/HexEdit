@@ -658,6 +658,6 @@ double CPrevwView::zoom_fit()
 	double bmwidth  = pDoc->preview_width_;
 	double bmheight = pDoc->preview_height_;
 
-	return max(bmwidth/rct.Width(), bmheight/rct.Height());
+	return std::max(bmwidth/rct.Width(), bmheight/rct.Height());
 }
 

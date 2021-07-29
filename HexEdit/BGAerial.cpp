@@ -406,7 +406,7 @@ UINT CHexEditDoc::RunAerialThread()
 		TRACE("+++ BGAerial: using bitmap at %p\n", file_dib);
 
 		// Get the file buffer
-		size_t buf_len = (size_t)min(file_len, 65536);
+		size_t buf_len = (size_t)std::min<FILE_ADDRESS>(file_len, 65536);
 		ASSERT(aerial_buf_ == NULL);
 		aerial_buf_ = new unsigned char[buf_len];
 

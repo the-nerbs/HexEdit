@@ -98,7 +98,7 @@ size_t CHexEditDoc::GetData(unsigned char *buf, size_t len, FILE_ADDRESS address
 	size_t tocopy;                      // How much to copy in this block
 	for (left = len; left > 0 && pl != loc_.end(); left -= tocopy, buf += tocopy)
 	{
-		tocopy = size_t(min(FILE_ADDRESS(left), FILE_ADDRESS(pl->dlen&doc_loc::mask) - start));
+		tocopy = size_t(std::min(FILE_ADDRESS(left), FILE_ADDRESS(pl->dlen&doc_loc::mask) - start));
 		ASSERT(tocopy < 0x10000000);
 		if ((pl->dlen >> 62) == 1)
 		{
@@ -1036,7 +1036,7 @@ void CHexEditDoc::WriteInPlace()
 				UINT tocopy;                      // How much to copy in this block
 				for (FILE_ADDRESS left = FILE_ADDRESS(pl->dlen&doc_loc::mask); left > 0; left -= tocopy)
 				{
-					tocopy = size_t(min(left, FILE_ADDRESS(copy_buf_len)));
+					tocopy = size_t(std::min(left, FILE_ADDRESS(copy_buf_len)));
 					UINT actual = data_file_[idx]->Read((void *)buf, tocopy);
 					ASSERT(actual == tocopy);
 					pfile1_->Write(buf, tocopy);
@@ -1138,7 +1138,7 @@ BOOL CHexEditDoc::WriteData(const CString filename, FILE_ADDRESS start, FILE_ADD
 		FILE_ADDRESS address;
 		for (address = start; address < end; address += FILE_ADDRESS(got))
 		{
-			got = GetData(buf, size_t(min(end-address, FILE_ADDRESS(copy_buf_len))), address);
+			got = GetData(buf, size_t(std::min(end-address, FILE_ADDRESS(copy_buf_len))), address);
 			ASSERT(got > 0);
 
 			ff.Write(buf, got);
@@ -1403,7 +1403,7 @@ void CHexEditDoc::rebuild_change_tracking()
 
 			// Next orig file record found
 			diff = pl->fileaddr - last_fileaddr;
-			repl = min(diff, nf_bytes);
+			repl = std::min(diff, nf_bytes);
 			if (repl > 0)
 			{
 				replace_addr_.push_back(pos);
@@ -1432,7 +1432,7 @@ void CHexEditDoc::rebuild_change_tracking()
 			// Record of the first memory block insertion with no orig file
 			// (If no orig file we treat the first memory record as the base for comparison)
 			diff = (pl->memaddr - undo_[0].ptr) - last_fileaddr;
-			repl = min(diff, nf_bytes);
+			repl = std::min(diff, nf_bytes);
 
 			if (repl > 0)
 			{
@@ -1462,7 +1462,7 @@ void CHexEditDoc::rebuild_change_tracking()
 			// Record of the first temp file block insertion with no orig file
 			// (If no orig file we treat the first temp file record as the base for comparison)
 			diff = pl->fileaddr - last_fileaddr;
-			repl = min(diff, nf_bytes);
+			repl = std::min(diff, nf_bytes);
 			if (repl > 0)
 			{
 				replace_addr_.push_back(pos);
@@ -1494,7 +1494,7 @@ void CHexEditDoc::rebuild_change_tracking()
 	}
 	// Handle any unfinished business
 	diff = orig_length - last_fileaddr;
-	repl = min(diff, nf_bytes);
+	repl = std::min(diff, nf_bytes);
 	if (repl > 0)
 	{
 		replace_addr_.push_back(pos);

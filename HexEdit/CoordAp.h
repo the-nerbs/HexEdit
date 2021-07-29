@@ -156,11 +156,11 @@ public:
 		BOOL retval = r1.left < r2.right && r2.left < r1.right && r1.top < r2.bottom && r2.top < r1.bottom;
 		if (retval)
 		{
-			left = max(r1.left, r2.left);
-			right = min(r1.right, r2.right);
+			left = std::max(r1.left, r2.left);
+			right = std::min(r1.right, r2.right);
 			ASSERT(left <= right);
-			top = max(r1.top, r2.top);
-			bottom = min(r1.bottom, r2.bottom);
+			top = std::max(r1.top, r2.top);
+			bottom = std::min(r1.bottom, r2.bottom);
 			ASSERT(top <= bottom);
 		}
 		else
@@ -188,10 +188,10 @@ public:
 			*this = r1;
 		else
 		{
-			left = min(r1.left, r2.left);
-			right = max(r1.right, r2.right);
-			top = min(r1.top, r2.top);
-			bottom = max(r1.bottom, r2.bottom);
+			left = std::min(r1.left, r2.left);
+			right = std::max(r1.right, r2.right);
+			top = std::min(r1.top, r2.top);
+			bottom = std::max(r1.bottom, r2.bottom);
 		}
 		ASSERT(!IsRectEmpty());
 		return TRUE;
