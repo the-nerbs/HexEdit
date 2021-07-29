@@ -9,6 +9,7 @@
              Display="hidden">
       <ComponentGroupRef Id="HexEditApp" />
       <ComponentGroupRef Id="TemplateFiles_INSTALL" />
+      <ComponentGroupRef Id="ThirdPartyDlls" />
     </Feature>
 
     <ComponentGroup Id="HexEditApp"
@@ -81,18 +82,6 @@
       <!-- RegHelper exe -->
       <Component Guid="41ad319d-8116-42bc-9f53-d6de66b78cb9">
         <File Source="$(var.RegHelper.TargetPath)"
-              KeyPath="yes"
-              Checksum="yes" />
-      </Component>
-      
-      <!-- third-party DLLs -->
-      <Component Guid="00987821-3bc5-41f7-ae16-72573709025f">
-        <File Source="$(var.HexEdit.ProjectDir)DLL\FreeImage.dll"
-              KeyPath="yes"
-              Checksum="yes" />
-      </Component>
-      <Component Guid="3009d244-4923-4d12-8b55-1e2141f41a4c">
-        <File Source="$(var.HexEdit.ProjectDir)DLL\mpir.dll"
               KeyPath="yes"
               Checksum="yes" />
       </Component>
