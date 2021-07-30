@@ -29,6 +29,8 @@
 #include "HelpID.hm"            // User defined help IDs
 #include "GRIDCTRL_SRC\InPlaceEdit.h"
 #include <HtmlHelp.h>
+#include <FreeImage.h>
+
 #pragma warning(push)
 #pragma warning(disable:4005)
 #include <afxhh.h>
@@ -1029,12 +1031,39 @@ BOOL CMainFrame::OnEraseMDIClientBackground(CDC* pDC)
 
 	// Create background brush using top left pixel of bitmap
 	{
-		RGBQUAD px = { 192, 192, 192, 0};  // default to grey in case GetPixelColor fails
-		int height = FreeImage_GetHeight(m_dib);
-		VERIFY(FreeImage_GetPixelColor(m_dib, 0, height - 1, &px));  // get colour from top-left pixel (may fail if not 24 bit colours)
+		RGBQUAD px = { 192, 192, 192, 0};
+		if (!FreeImage_GetBackgroundColor(m_dib, &px))
+		{
+			// get colour from top-left pixel
+			bool gotColor = false;
+			const int height = FreeImage_GetHeight(m_dib);
+
+			if (FreeImage_GetColorType(m_dib) == FIC_PALETTE)
+			{
+				// indexed color scheme
+				BYTE index = 0;
+				gotColor = !!FreeImage_GetPixelIndex(m_dib, 0, height - 1, &index);
+				if (gotColor)
+				{
+					px = FreeImage_GetPalette(m_dib)[index];
+				}
+			}
+			else
+			{
+				// may fail if not 24 bit colours
+				gotColor = !!FreeImage_GetPixelColor(m_dib, 0, height - 1, &px);
+			}
+
+			// default to grey in case GetPixelColor fails
+			if (!gotColor)
+			{
+				px = { 192, 192, 192, 0 };
+			}
+		}
+
 		backBrush.CreateSolidBrush(RGB(px.rgbRed, px.rgbGreen, px.rgbBlue));
 		backBrush.UnrealizeObject();
-	} // dcTmp destroyed here
+	}
 
 	pDC->FillRect(rct, &backBrush);
 	::StretchDIBits(pDC->GetSafeHdc(),

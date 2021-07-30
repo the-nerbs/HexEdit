@@ -60,6 +60,8 @@
 #include "Splasher.h"       // For splash window
 #include "UpdateChecker.h"  // For checking for updates
 
+#include <FreeImage.h>
+
 // The following is not in a public header
 extern BOOL AFXAPI AfxFullPath(LPTSTR lpszPathOut, LPCTSTR lpszFileIn);
 
@@ -396,12 +398,20 @@ CHexEditApp theApp;
 
 UINT CHexEditApp::wm_hexedit = ::RegisterWindowMessage("HexEditOpenMessage");
 
+
+static void freeImageOutput(FREE_IMAGE_FORMAT fif, const char* msg)
+{
+	TRACE("### [FreeImage] [Format=%d] %s\r\n", (int)fif, msg);
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // CHexEditApp initialization
 
 
 BOOL CHexEditApp::InitInstance()
 {
+	FreeImage_SetOutputMessage(freeImageOutput);
+
 #if _MFC_VER >= 0x0A00
 		CString appid;
 		appid.LoadStringA(AFX_IDS_APP_ID);
