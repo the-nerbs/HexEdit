@@ -127,7 +127,6 @@ class CFile64
 #endif // WFC_STL
       virtual DWORD                 Read( void * buffer, DWORD number_of_bytes_to_read );
       virtual DWORD                 Read( CByteArray& buffer, DWORD number_of_bytes_to_read );
-      virtual DWORD                 ReadHuge( void * buffer, DWORD number_of_bytes_to_read );
       virtual LONGLONG              Seek( LONGLONG offset, UINT from );
       virtual void                  SeekToBegin( void );
       virtual LONGLONG              SeekToEnd( void );
@@ -136,8 +135,7 @@ class CFile64
       virtual void                  SetLength( LONGLONG length );
       virtual void                  UnlockRange( LONGLONG position, LONGLONG number_of_bytes_to_unlock );
       virtual void                  Write( const void * buffer, DWORD number_of_bytes_to_write );
-      virtual void                  WriteHuge( const void * buffer, DWORD number_of_bytes_to_write );
-
+      
 #if defined( _DEBUG ) && ! defined( WFC_NO_DUMPING )
 
       virtual void                  Dump( CDumpContext& dump_context ) const;

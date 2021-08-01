@@ -1,4 +1,4 @@
-// CFile64.cpp - Implements CFile64 nd CFileNC classes
+// CFile64.cpp - Implements CFile64 and CFileNC classes
 //
 // Copyright (c) 2015 by Andrew W. Phillips based on original class by Sam Blackburn
 //
@@ -8,6 +8,15 @@
 //
 // CFile64 is similar to MFC's CFile class but supports file sizes more than 32 bits
 // CFileNC is a non-cached variation suitable for working with raw disk files
+// 
+// The repo's history does not cover these class's creation. There are, however,
+// some bits in the internet archive you can take a look at:
+// https://web.archive.org/web/20000229074131/http://ourworld.compuserve.com/homepages/sam_blackburn/wfc.htm
+// https://web.archive.org/web/20000903182751fw_/http://ourworld.compuserve.com/homepages/Sam_Blackburn/CFile64.htm
+//
+// The CFile64 class appears to have been a part of WFC, but was made for HexEdit.
+//
+// TODO: MFC's CFile supports 64-bit stream positions nowadays. Can CFile64 be removed? What about CFileNC...
 
 #include "stdafx.h"
 #include "CFile64.h"
@@ -204,14 +213,19 @@ static inline UINT __GetFileTitle(LPCTSTR lpszPathName, LPTSTR lpszTitle, UINT n
    return( ( lpszTitle == NULL ) ? _tcslen( lpszTemp ) + 1 : 0 );
 }
 
-CFile64::CFile64()
+CFile64::CFile64() :
+	m_SecurityAttributes_p{ nullptr },
+	m_SecurityDescriptor_p{ nullptr },
+	m_FileHandle{ INVALID_HANDLE_VALUE },
+	m_PathName{},
+	m_FileName{},
+	m_FileTitle{},
+	m_CloseOnDelete{ FALSE },
+	m_SectorSize{ 0 },
+	m_Length{ 0 },
+	m_hFile{ static_cast<UINT>(hFileNull) }
 {
 //   WFCLTRACEINIT( TEXT( "CFile64::CFile64()" ) );
-   m_hFile = (UINT) hFileNull;
-   m_FileHandle           = INVALID_HANDLE_VALUE;
-   m_SecurityAttributes_p = (SECURITY_ATTRIBUTES *) NULL;
-   m_SecurityDescriptor_p = (SECURITY_DESCRIPTOR *) NULL;
-
    m_Initialize();
 }
 
@@ -1316,11 +1330,6 @@ DWORD CFile64::Read( void * buffer, DWORD number_of_bytes_to_read )
    return( number_of_bytes_read );
 }
 
-DWORD CFile64::ReadHuge( void * buffer, DWORD number_of_bytes_to_read )
-{
-   return( Read( buffer, number_of_bytes_to_read ) );
-}
-
 void PASCAL CFile64::Rename( LPCTSTR old_name, LPCTSTR new_name )
 {
    if ( ::MoveFile( (LPTSTR) old_name, (LPTSTR) new_name ) == FALSE )
@@ -1496,11 +1505,6 @@ void CFile64::Write( const void * buffer, DWORD number_of_bytes_to_write )
       ::AfxThrowFileException( CFileException::diskFull, -1, m_FileName );
    }
 #endif // WFC_STL
-}
-
-void CFile64::WriteHuge( const void * buffer, DWORD number_of_bytes_to_write )
-{
-   Write( buffer, number_of_bytes_to_write );
 }
 
 // Operators

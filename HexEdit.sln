@@ -40,6 +40,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{0ADA7014
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixHelper", "WixHelper\WixHelper.csproj", "{94528F84-0E65-465B-9EB9-F79C821F4980}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{8605453C-E351-4A8C-AD1D-05676C0415F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -66,6 +68,10 @@ Global
 		{94528F84-0E65-465B-9EB9-F79C821F4980}.Debug|Win32.Build.0 = Debug|Any CPU
 		{94528F84-0E65-465B-9EB9-F79C821F4980}.Release|Win32.ActiveCfg = Release|Any CPU
 		{94528F84-0E65-465B-9EB9-F79C821F4980}.Release|Win32.Build.0 = Release|Any CPU
+		{8605453C-E351-4A8C-AD1D-05676C0415F7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8605453C-E351-4A8C-AD1D-05676C0415F7}.Debug|Win32.Build.0 = Debug|Win32
+		{8605453C-E351-4A8C-AD1D-05676C0415F7}.Release|Win32.ActiveCfg = Release|Win32
+		{8605453C-E351-4A8C-AD1D-05676C0415F7}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

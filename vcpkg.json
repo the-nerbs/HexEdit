@@ -11,6 +11,10 @@
       "version>=": "1.75.0"
     },
     {
+      "name": "catch2",
+      "version>=": "2.13.6"
+    },
+    {
       "name": "cryptopp",
       "version>=": "8.5.0"
     },
