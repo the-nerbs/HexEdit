@@ -3827,7 +3827,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\idr_main.ico"
+IDR_MAINFRAME           ICON                    "res\\hexedit2.ico"
 IDR_MAINFRAME2          ICON                    "res\\ico00001.ico"
 IDI_UP                  ICON                    "res\\up.ico"
 IDI_DOWN                ICON                    "res\\down.ico"
