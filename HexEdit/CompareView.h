@@ -142,13 +142,13 @@ private:
 				 int line_height, int char_width, int char_width_w,
 				 COLORREF clr, FILE_ADDRESS start_addr, FILE_ADDRESS end_addr,
 				 bool merge = true, int draw_height = -1);
-	void draw_deletions(CDC* pDC, const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+	void draw_deletions(CDC* pDC, const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 						FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 						const CRectAp &doc_rect, bool neg_x, bool neg_y,
 						int line_height, int char_width, int char_width_w,
 						COLORREF colour);
 	void draw_backgrounds(CDC* pDC,
-						const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+						const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 						FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 						const CRectAp &doc_rect, bool neg_x, bool neg_y,
 						int line_height, int char_width, int char_width_w,

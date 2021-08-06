@@ -333,7 +333,7 @@ void CAerialView::OnDraw(CDC* pDC)
 		}
 		get_colours(phev_->GetHighlightCol(), dummy, clr_hl);
 	}
-	std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp; // iter into search_pair_
+	std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp; // iter into search_pair_
 	if (disp_.draw_bdr_search)
 	{
 		psp = search_pair_.begin();
@@ -463,7 +463,7 @@ void CAerialView::OnDraw(CDC* pDC)
 	}
 	if (disp_.draw_ants_search && theApp.pboyer_ != NULL)
 	{
-		std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp; // iter into search_pair_
+		std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp; // iter into search_pair_
 		for (psp = search_pair_.begin(); psp != search_pair_.end(); ++psp)
 			draw_ants(&(bufDC.GetDC()), psp->first, psp->second, phev_->GetSearchCol());
 	}
@@ -700,7 +700,7 @@ void CAerialView::OnTimer(UINT nIDEvent)
 		}
 		if (disp_.draw_ants_search && theApp.pboyer_ != NULL && search_pair_.size() < 4096)  // if we have 1000's of ants marching everthing stops
 		{
-			std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp;
+			std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp;
 			for (psp = search_pair_.begin(); psp != search_pair_.end(); ++psp)
 				invalidate_addr_range(psp->first, psp->second);
 		}
@@ -1038,7 +1038,7 @@ void CAerialView::update_display()
 
 		std::vector<FILE_ADDRESS>::const_iterator pp = sf.begin();
 		std::vector<FILE_ADDRESS>::const_iterator pend = sf.end();
-		pair<FILE_ADDRESS, FILE_ADDRESS> good_pair;
+		std::pair<FILE_ADDRESS, FILE_ADDRESS> good_pair;
 		if (pp != pend)
 		{
 			good_pair.first = *pp;
@@ -1575,7 +1575,7 @@ void CAerialView::go_border_elt(CPoint pt)
 
 	if (disp_.draw_bdr_search && abs_x >= 5 && abs_x <= 9)
 	{
-		std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp; // iter into search_pair_
+		std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator psp; // iter into search_pair_
 		for (psp = search_pair_.begin(); psp != search_pair_.end(); ++psp)
 		{
 			if (psp->second/bpe > row_start)

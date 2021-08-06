@@ -1960,7 +1960,7 @@ void CHexEditView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 		// Remove undo info (as opposed to actually undoing everything as below)
 		num_entered_ = num_del_ = num_bs_ = 0;  // Changes now gone from doc undo
 		CRemoveHint *prh = dynamic_cast<CRemoveHint *>(pHint);
-		std::vector <view_undo, allocator<view_undo> >::iterator pu;
+		std::vector<view_undo>::iterator pu;
 		for (pu = undo_.end(); pu != undo_.begin(); pu--)
 			if ((pu-1)->utype == undo_change)
 			{
@@ -2247,18 +2247,18 @@ void CHexEditView::OnUpdate(CView* pSender, LPARAM lHint, CObject* pHint)
 			get_search_in_range(GetScroll());
 
 			// Invalidate any areas where new search string was found
-			std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp, pend;
+			std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp, pend;
 			for (pp = search_pair_.begin(), pend = search_pair_.end(); pp != pend; ++pp)
 				invalidate_addr_range(pp->first, pp->second);
 		}
 		else
 		{
 			// Remove all displayed search strings (but save a copy in tmp for invalidating)
-			std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> > tmp;
+			std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> > tmp;
 			tmp.swap(search_pair_);    // Save search_pair_ in tmp (and make it empty)
 
 			// Invalidate any areas where search string is currently displayed
-			std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp, pend;
+			std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp, pend;
 			for (pp = tmp.begin(), pend = tmp.end(); pp != pend; ++pp)
 				invalidate_addr_range(pp->first, pp->second);
 		}
@@ -3209,7 +3209,7 @@ void CHexEditView::get_search_in_range(CPointAp &pos)
 		search_length_ = theApp.pboyer_->length();
 		std::vector<FILE_ADDRESS>::const_iterator pp = sf.begin();
 		std::vector<FILE_ADDRESS>::const_iterator pend = sf.end();
-		pair<FILE_ADDRESS, FILE_ADDRESS> good_pair;
+		std::pair<FILE_ADDRESS, FILE_ADDRESS> good_pair;
 
 		if (pp != pend)
 		{

@@ -4799,7 +4799,7 @@ static void AFXAPI DDX_CBData(CDataExchange* pDX, int nIDC, int& data)
 static const int MAX_BYTES = 16;                 // Max bytes to get from files for multibyte char processing (10 is probably enough)
 //static vector<int> page_number;                  // The code page number for all installed code pages
 //static vector<CString> page_name;                // Corresponding name of the code page
-static vector<pair<int, CString> > page_info;    // Code page number and description
+static std::vector<std::pair<int, CString> > page_info;    // Code page number and description
 
 static BOOL CALLBACK CodePageCallback(LPTSTR ss)
 {
@@ -4811,14 +4811,14 @@ static BOOL CALLBACK CodePageCallback(LPTSTR ss)
 		// Save what we need
 		//page_number.push_back(cpie.CodePage);
 		//page_name.push_back(CString(cpie.CodePageName));
-		page_info.push_back(make_pair<int, CString>(int(cpie.CodePage), CString(cpie.CodePageName)));
+		page_info.push_back({ int(cpie.CodePage), CString(cpie.CodePageName) });
 		ASSERT(cpie.MaxCharSize <= MAX_BYTES);
 	}
 
 	return TRUE;
 }
 
-static bool page_comp(pair<int,CString> p1, pair<int,CString> p2) { return p1.first < p2.first; }
+static bool page_comp(std::pair<int,CString> p1, std::pair<int,CString> p2) { return p1.first < p2.first; }
 
 CWindowPage::CWindowPage() : COptPage(CWindowPage::IDD)
 {

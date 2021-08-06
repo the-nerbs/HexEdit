@@ -230,7 +230,7 @@ private:
 	// We cache the search occurrences that are currently drawn in the window.
 	// This speeds up redraws espe the marching ants when there are millions of
 	// occurrences since we don't have to rescan CHexEditDoc::found_.
-	std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> > search_pair_;  // Areas that need to be drawn to indicate found occurrences
+	std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> > search_pair_;  // Areas that need to be drawn to indicate found occurrences
 
 	// Scrollbars
 	int sbfact_;        // This is a scaling factor for the scrollbar as for large files 32-bit ints are not enough

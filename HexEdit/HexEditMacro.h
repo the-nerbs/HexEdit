@@ -405,7 +405,7 @@ union copy_cchar                // see km_copy_cchar
 	};
 };
 
-#pragma pack(1)                 // Make sure macros fit into as little memory as possible
+#pragma pack(push, 1)           // Make sure macros fit into as little memory as possible
 struct key_macro                // Stores one keystroke of the macro
 {
 //    km_type ktype;              // Type of keystroke
@@ -539,4 +539,4 @@ struct key_macro                // Stores one keystroke of the macro
 	bool operator==(const key_macro &) const { return false; }
 	bool operator<(const key_macro &) const { return false; }
 };
-#pragma pack()
+#pragma pack(pop)

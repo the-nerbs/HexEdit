@@ -984,7 +984,7 @@ void CHexEditView::OnDraw(CDC* pDC)
 		// Draw deletions unless hidden
 		if (!display_.hide_delete)
 		{
-			pair<vector<FILE_ADDRESS> *, vector<FILE_ADDRESS> *> alp = GetDocument()->Deletions();
+			std::pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> alp = GetDocument()->Deletions();
 			draw_deletions(pDC, *alp.first, *alp.second,
 						   first_virt, last_virt, doc_rect, neg_x, neg_y,
 						   line_height, char_width, char_width_w, trk_col_);
@@ -993,7 +993,7 @@ void CHexEditView::OnDraw(CDC* pDC)
 		// Draw insertions unless hidden
 		if (!display_.hide_insert)
 		{
-			pair<vector<FILE_ADDRESS> *, vector<FILE_ADDRESS> *> alp = GetDocument()->Insertions();
+			std::pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> alp = GetDocument()->Insertions();
 			draw_backgrounds(pDC, *alp.first, *alp.second,
 							 first_virt, last_virt, doc_rect, neg_x, neg_y,
 							 line_height, char_width, char_width_w, trk_bg_col_);
@@ -1002,7 +1002,7 @@ void CHexEditView::OnDraw(CDC* pDC)
 		// Draw replacements unless hidden
 		if (!display_.hide_replace)
 		{
-			pair<vector<FILE_ADDRESS> *, vector<FILE_ADDRESS> *> alp = GetDocument()->Replacements();
+			std::pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> alp = GetDocument()->Replacements();
 			draw_backgrounds(pDC, *alp.first, *alp.second,
 							 first_virt, last_virt, doc_rect, neg_x, neg_y,
 							 line_height, char_width, char_width_w,	trk_col_,
@@ -1015,7 +1015,7 @@ void CHexEditView::OnDraw(CDC* pDC)
 		CSingleLock sl(&(GetDocument()->docdata_), TRUE); // Protect shared data access to the returned vectors
 
 		// xxx just draw revision 0 for now (other revisions are for self-coompare)
-		pair<const vector<FILE_ADDRESS> *, const vector<FILE_ADDRESS> *> alp = GetDocument()->OrigDeletions();
+		std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> alp = GetDocument()->OrigDeletions();
 		draw_deletions(pDC, *alp.first, *alp.second,
 						first_virt, last_virt, doc_rect, neg_x, neg_y,
 						line_height, char_width, char_width_w, comp_col_);
@@ -1094,7 +1094,7 @@ void CHexEditView::OnDraw(CDC* pDC)
 	else if (ScrollUp())
 	{
 		// Draw search string occurrences bottom up
-		std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::reverse_iterator pp, pend;
+		std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::reverse_iterator pp, pend;
 		for (pp = search_pair_.rbegin(), pend = search_pair_.rend(); pp != pend; ++pp)
 		{
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
@@ -1116,7 +1116,7 @@ void CHexEditView::OnDraw(CDC* pDC)
 	else
 	{
 		// Draw search string occurrences from top down
-		std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp, pend;
+		std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp, pend;
 		for (pp = search_pair_.begin(), pend = search_pair_.end(); pp != pend; ++pp)
 		{
 			draw_bg(pDC, doc_rect, neg_x, neg_y,
@@ -2404,7 +2404,7 @@ void CHexEditView::draw_bg(CDC* pDC, const CRectAp &doc_rect, bool neg_x, bool n
 // xxx can we pass first_addr/last_addr instead of first_virt/last_virt
 // xxx comments
 
-void CHexEditView::draw_deletions(CDC* pDC, const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+void CHexEditView::draw_deletions(CDC* pDC, const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 								  FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 								  const CRectAp &doc_rect, bool neg_x, bool neg_y,
 								  int line_height, int char_width, int char_width_w,
@@ -2470,7 +2470,7 @@ void CHexEditView::draw_deletions(CDC* pDC, const vector<FILE_ADDRESS> & addr, c
 }
 
 void CHexEditView::draw_backgrounds(CDC* pDC,
-									const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+									const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 									FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 									const CRectAp &doc_rect, bool neg_x, bool neg_y,
 									int line_height, int char_width, int char_width_w,

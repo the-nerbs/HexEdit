@@ -1516,9 +1516,9 @@ void CPropCharPage::DoDataExchange(CDataExchange* pDX)
 
 #ifdef SHOW_CODE_PAGE
 static const int MAX_BYTES = 16;                 // Max bytes to get from files for multibyte char processing (10 is probably enough)
-static vector<int> page_number;                  // The code page number for all installed code pages
-static vector<CString> page_name;                // Corresponding name of the code page
-static vector<int> page_max_chars;               // Length of longest character of the code page (in bytes).
+static std::vector<int> page_number;             // The code page number for all installed code pages
+static std::vector<CString> page_name;           // Corresponding name of the code page
+static std::vector<int> page_max_chars;          // Length of longest character of the code page (in bytes).
 
 // We need to get a ptr to GetCPInfoEx since it is not present on Windows 95 and NT4
 typedef BOOL (__stdcall *PFGetCPInfoEx)(UINT, DWORD, LPCPINFOEXA);

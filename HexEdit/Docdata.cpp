@@ -404,7 +404,7 @@ void CHexEditDoc::Change(enum mod_type utype, FILE_ADDRESS address, FILE_ADDRESS
 								   utype == mod_insert_file) )
 		{
 			// Remove pending searches after current address (to avoid double search)
-			std::list<pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
+			std::list<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
 			for (pcurr = to_search_.begin(), pend = to_search_.end(); pcurr != pend; ++pcurr)
 			{
 				if (pcurr->first >= address)
@@ -432,7 +432,7 @@ void CHexEditDoc::Change(enum mod_type utype, FILE_ADDRESS address, FILE_ADDRESS
 				ASSERT(0);
 
 			// Adjust pending search addresses
-			std::list<pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
+			std::list<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
 			for (pcurr = to_search_.begin(), pend = to_search_.end(); pcurr != pend; ++pcurr)
 			{
 				if (pcurr->first >= address)
@@ -506,17 +506,17 @@ void CHexEditDoc::Change(enum mod_type utype, FILE_ADDRESS address, FILE_ADDRESS
 								   utype == mod_insert  ||
 								   utype == mod_insert_file) )
 		{
-			to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(address - (aa->pboyer_->length() - 1), length_));
+			to_search_.push_back({ address - (aa->pboyer_->length() - 1), length_ });
 			find_total_ += length_ - (address - (aa->pboyer_->length() - 1));
 		}
 		else if (utype == mod_delforw || utype == mod_delback)
 		{
-			to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(address - (aa->pboyer_->length() - 1), address));
+			to_search_.push_back({ address - (aa->pboyer_->length() - 1), address });
 			find_total_ += aa->pboyer_->length() - 1;
 		}
 		else
 		{
-			to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(address - (aa->pboyer_->length() - 1), address + (clen <= 0 ? 1 : clen)));
+			to_search_.push_back({ address - (aa->pboyer_->length() - 1), address + (clen <= 0 ? 1 : clen) });
 			find_total_ += clen + aa->pboyer_->length() - 1;
 		}
 
@@ -643,7 +643,7 @@ BOOL CHexEditDoc::Undo(CView *pview, int index, BOOL same_view)
 									undo_.back().utype == mod_insert_file) )
 			{
 				// Remove pending searches after current address (to avoid double search)
-				std::list<pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
+				std::list<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
 				for (pcurr = to_search_.begin(), pend = to_search_.end(); pcurr != pend; ++pcurr)
 				{
 					if (pcurr->first >= undo_.back().address)
@@ -673,7 +673,7 @@ BOOL CHexEditDoc::Undo(CView *pview, int index, BOOL same_view)
 					ASSERT(0);
 
 				// Adjust pending search addresses
-				std::list<pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
+				std::list<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::iterator pcurr, pend;
 				for (pcurr = to_search_.begin(), pend = to_search_.end(); pcurr != pend; ++pcurr)
 				{
 					if (pcurr->first >= undo_.back().address)
@@ -751,21 +751,21 @@ BOOL CHexEditDoc::Undo(CView *pview, int index, BOOL same_view)
 									   undo_.back().utype == mod_insert_file) )
 			{
 				// xxx we still need to delete old occurrences to end of file
-				to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(undo_.back().address - (aa->pboyer_->length() - 1), length_));
+				to_search_.push_back({ undo_.back().address - (aa->pboyer_->length() - 1), length_ });
 				find_total_ += length_ - (undo_.back().address - (aa->pboyer_->length() - 1));
 			}
 			else if (undo_.back().utype == mod_insert || undo_.back().utype == mod_insert_file)
 			{
-				to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>
-										 (undo_.back().address - aa->pboyer_->length() + 1,
-										  undo_.back().address));
+				to_search_.push_back({
+					undo_.back().address - aa->pboyer_->length() + 1,
+					undo_.back().address });
 				find_total_ += aa->pboyer_->length() - 1;
 			}
 			else
 			{
-				to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>
-										 (undo_.back().address - aa->pboyer_->length() + 1,
-										  undo_.back().address + undo_.back().len));
+				to_search_.push_back({
+					undo_.back().address - aa->pboyer_->length() + 1,
+					undo_.back().address + undo_.back().len });
 				find_total_ += undo_.back().len + aa->pboyer_->length() - 1;
 			}
 

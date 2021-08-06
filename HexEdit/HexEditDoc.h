@@ -29,8 +29,6 @@
 #include "expr.h"
 #include "timer.h"
 
-using namespace std;
-
 // This enum is for the different modification types that can be made
 // to the document.  It is used for keeping track of changes made in the
 // undo array and for passing info about changes made to views.
@@ -428,20 +426,20 @@ public:
 
 	timer view_time_, edit_time_;     // Track total time file is open for view (ie, read only) or edit
 
-	pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> Replacements()
+	std::pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> Replacements()
 	{
 		if (need_change_track_) rebuild_change_tracking();
-		return make_pair(&replace_addr_, &replace_len_);
+		return { &replace_addr_, &replace_len_ };
 	}
-	pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> Insertions()
+	std::pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> Insertions()
 	{
 		if (need_change_track_) rebuild_change_tracking();
-		return make_pair(&insert_addr_, &insert_len_);
+		return { &insert_addr_, &insert_len_ };
 	}
-	pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> Deletions()
+	std::pair<std::vector<FILE_ADDRESS> *, std::vector<FILE_ADDRESS> *> Deletions()
 	{
 		if (need_change_track_) rebuild_change_tracking();
-		return make_pair(&delete_addr_, &delete_len_);
+		return { &delete_addr_, &delete_len_ };
 	}
 
 	const char *why0() const
@@ -733,30 +731,30 @@ public:
 	std::pair<FILE_ADDRESS, FILE_ADDRESS> GetNextOtherDiff(FILE_ADDRESS from, int rr = 0);
 	std::pair<FILE_ADDRESS, FILE_ADDRESS> GetLastOtherDiff(int rr = 0);
 
-	pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> OrigReplacements(int rr = 0)
+	std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> OrigReplacements(int rr = 0)
 	{
-		return make_pair(&comp_[rr].m_replace_A, &comp_[rr].m_replace_len);
+		return { &comp_[rr].m_replace_A, &comp_[rr].m_replace_len };
 	}
-	pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> OrigInsertions(int rr = 0)
+	std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> OrigInsertions(int rr = 0)
 	{
-		return make_pair(&comp_[rr].m_insert_A, &comp_[rr].m_insert_len);
+		return { &comp_[rr].m_insert_A, &comp_[rr].m_insert_len };
 	}
-	pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> OrigDeletions(int rr = 0)
+	std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> OrigDeletions(int rr = 0)
 	{
-		return make_pair(&comp_[rr].m_delete_A, &comp_[rr].m_delete_len);
+		return { &comp_[rr].m_delete_A, &comp_[rr].m_delete_len };
 	}
 
-	pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> CompReplacements()
+	std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> CompReplacements()
 	{
-		return make_pair(&comp_[0].m_replace_B, &comp_[0].m_replace_len);
+		return { &comp_[0].m_replace_B, &comp_[0].m_replace_len };
 	}
-	pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> CompInsertions()
+	std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> CompInsertions()
 	{
-		return make_pair(&comp_[0].m_insert_B, &comp_[0].m_delete_len);
+		return { &comp_[0].m_insert_B, &comp_[0].m_delete_len };
 	}
-	pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> CompDeletions()
+	std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> CompDeletions()
 	{
-		return make_pair(&comp_[0].m_delete_B, &comp_[0].m_insert_len);
+		return { &comp_[0].m_delete_B, &comp_[0].m_insert_len };
 	}
 
 	void GetCompareData(const std::vector<FILE_ADDRESS> **p_insert_A, const std::vector<FILE_ADDRESS> **p_insert_B, const std::vector<FILE_ADDRESS> **p_insert_len,
@@ -934,7 +932,7 @@ private:
 	bool clear_found_;          // Signals the bg thread to clear found_ to avoid foreground delays
 
 	// List of ranges to search in background (first = start, second = byte past end)
-	std::list<pair<FILE_ADDRESS, FILE_ADDRESS> > to_search_;
+	std::list<std::pair<FILE_ADDRESS, FILE_ADDRESS> > to_search_;
 	std::set<FILE_ADDRESS> found_;      // Addresses where current search text was found
 	// List of adjustments pending due to insertions/deletions (first = address, second = adjustment amount)
 	std::list<adjustment> to_adjust_;

@@ -20,7 +20,6 @@
 
 #include <algorithm>
 #include <vector>
-using namespace std;
 #include <boost/tuple/tuple.hpp>
 namespace CryptoPP { // forward declarations
 	class HashTransformation; 
@@ -279,13 +278,13 @@ public:
 				 int char_height, int char_width, int char_width_w,
 				 COLORREF, FILE_ADDRESS start_addr, FILE_ADDRESS end_addr,
 				 bool merge = true, int draw_height = -1);
-	void draw_deletions(CDC* pDC, const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+	void draw_deletions(CDC* pDC, const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 						FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 						const CRectAp &doc_rect, bool neg_x, bool neg_y,
 						int line_height, int char_width, int char_width_w,
 						COLORREF colour);
 	void draw_backgrounds(CDC* pDC,
-						const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+						const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 						FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 						const CRectAp &doc_rect, bool neg_x, bool neg_y,
 						int line_height, int char_width, int char_width_w,
@@ -1020,7 +1019,7 @@ private:
 	// are a lot of overlapping occurrences it can be very slow to redraw the background
 	// of the same areas several times.  By storing the areas (which may vary in length)
 	// we can quickly draw overlapping search occurrences.
-	std::vector<pair<FILE_ADDRESS, FILE_ADDRESS> > search_pair_;  // Areas that need to be drawn to indicate found occurrences
+	std::vector<std::pair<FILE_ADDRESS, FILE_ADDRESS> > search_pair_;  // Areas that need to be drawn to indicate found occurrences
 	int search_length_;
 	void get_search_in_range(CPointAp &pos);
 

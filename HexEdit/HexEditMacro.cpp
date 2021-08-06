@@ -44,7 +44,7 @@ void CHexEditApp::macro_play(long play_times /*=1*/, const std::vector<key_macro
 	ASSERT(km_last_calc <= km_view);
 
 	if (pmac->size() == 0) return;
-	std::vector <key_macro, allocator<key_macro> >::const_iterator pk;
+	std::vector<key_macro>::const_iterator pk;
 
 	++playing_;
 
@@ -114,7 +114,7 @@ void CHexEditApp::macro_play(long play_times /*=1*/, const std::vector<key_macro
 				theApp.last_fill_state_ = (*pk).v64;
 				theApp.last_fill_str_.Empty();
 				{
-					std::vector <key_macro, allocator<key_macro> >::const_iterator pknext = pk;
+					std::vector<key_macro>::const_iterator pknext = pk;
 					++pknext;
 					if ((*pknext).ktype == km_new_str)
 					{
@@ -495,7 +495,7 @@ void CHexEditApp::macro_play(long play_times /*=1*/, const std::vector<key_macro
 				break;
 			case km_insert:
 				{
-					std::vector <key_macro, allocator<key_macro> >::const_iterator pknext = pk;
+					std::vector<key_macro>::const_iterator pknext = pk;
 					++pknext;
 					if ((*pknext).ktype == km_insert_str)
 					{
@@ -1899,7 +1899,7 @@ BOOL CHexEditApp::macro_save(const char *filename, const std::vector<key_macro> 
 	{
 		short str_len;                  // Length of string for km_find_text etc
 		ASSERT(pmac->size() > 0);
-		std::vector <key_macro, allocator<key_macro> >::const_iterator pk;
+		std::vector<key_macro>::const_iterator pk;
 
 		CFile ff(filename, CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeBinary);
 

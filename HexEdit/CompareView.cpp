@@ -709,7 +709,7 @@ void CCompareView::OnDraw(CDC* pDC)
 		CSingleLock sl(&(GetDocument()->docdata_), TRUE); // Protect shared data access to the returned vectors
 
 		// Just draw revision 0 here
-		pair<const vector<FILE_ADDRESS> *, const vector<FILE_ADDRESS> *> alp = GetDocument()->CompDeletions();
+		std::pair<const std::vector<FILE_ADDRESS> *, const std::vector<FILE_ADDRESS> *> alp = GetDocument()->CompDeletions();
 		draw_deletions(pDC, *alp.first, *alp.second,
 						first_virt, last_virt, doc_rect, neg_x, neg_y,
 						line_height, char_width, char_width_w, phev_->comp_col_);
@@ -1458,7 +1458,7 @@ void CCompareView::draw_bg(CDC* pDC, const CRectAp &doc_rect, bool neg_x, bool n
 	return;
 }
 
-void CCompareView::draw_deletions(CDC* pDC, const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+void CCompareView::draw_deletions(CDC* pDC, const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 								  FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 								  const CRectAp &doc_rect, bool neg_x, bool neg_y,
 								  int line_height, int char_width, int char_width_w,
@@ -1524,7 +1524,7 @@ void CCompareView::draw_deletions(CDC* pDC, const vector<FILE_ADDRESS> & addr, c
 }
 
 void CCompareView::draw_backgrounds(CDC* pDC,
-									const vector<FILE_ADDRESS> & addr, const vector<FILE_ADDRESS> & len, 
+									const std::vector<FILE_ADDRESS> & addr, const std::vector<FILE_ADDRESS> & len,
 									FILE_ADDRESS first_virt, FILE_ADDRESS last_virt,
 									const CRectAp &doc_rect, bool neg_x, bool neg_y,
 									int line_height, int char_width, int char_width_w,

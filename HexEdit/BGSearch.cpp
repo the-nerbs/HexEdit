@@ -270,7 +270,7 @@ int CHexEditDoc::SearchProgress(int &occurrences)
 	FILE_ADDRESS total_left = 0;
 
 	// Work out how much we have to search (including already searched part of top entry of to_search_ list)
-	std::list<pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp;
+	std::list<std::pair<FILE_ADDRESS, FILE_ADDRESS> >::const_iterator pp;
 
 	for (pp = to_search_.begin(); pp != to_search_.end(); ++pp)
 	{
@@ -564,7 +564,7 @@ void CHexEditDoc::StartSearch(FILE_ADDRESS start /*=-1*/, FILE_ADDRESS end /*=-1
 	{
 		// Search whole file
 		ASSERT(end == -1);
-		to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(0,-1));
+		to_search_.push_back({ 0, -1 });
 		find_total_ += length_;
 		TRACE("+++ StartSearch: 0 to -1\n");
 	}
@@ -576,12 +576,12 @@ void CHexEditDoc::StartSearch(FILE_ADDRESS start /*=-1*/, FILE_ADDRESS end /*=-1
 		// Search end of file first
 		if (end < length_)
 		{
-			to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(end, -1));
+			to_search_.push_back({ end, -1 });
 			find_total_ += length_ - end;
 		}
 		if (start > 0)
 		{
-			to_search_.push_back(pair<FILE_ADDRESS, FILE_ADDRESS>(0, start));
+			to_search_.push_back({ 0, start });
 			find_total_ += start;
 		}
 	}

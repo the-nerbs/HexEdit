@@ -3402,14 +3402,14 @@ void CCalcDlg::build_menus()
 	if (last_var_build < mm_->expr_.VarChanged())
 	{
 		int ii = 1;                // Just used to make sure each menu item has a unique ID
-		vector <CString> varNames;
+		std::vector<CString> varNames;
 		mm.CreatePopupMenu();
 
 		varNames = mm_->expr_.GetVarNames(CJumpExpr::TYPE_INT);
 		if (!varNames.empty())
 		{
 			msub.CreatePopupMenu();
-			for (vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
+			for (std::vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
 			{
 				msub.AppendMenu(MF_STRING, ii++, *ps);
 			}
@@ -3422,7 +3422,7 @@ void CCalcDlg::build_menus()
 		if (!varNames.empty())
 		{
 			msub.CreatePopupMenu();
-			for (vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
+			for (std::vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
 			{
 				msub.AppendMenu(MF_STRING, ii++, *ps);
 			}
@@ -3435,7 +3435,7 @@ void CCalcDlg::build_menus()
 		if (!varNames.empty())
 		{
 			msub.CreatePopupMenu();
-			for (vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
+			for (std::vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
 			{
 				msub.AppendMenu(MF_STRING, ii++, *ps);
 			}
@@ -3448,7 +3448,7 @@ void CCalcDlg::build_menus()
 		if (!varNames.empty())
 		{
 			msub.CreatePopupMenu();
-			for (vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
+			for (std::vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
 			{
 				msub.AppendMenu(MF_STRING, ii++, *ps);
 			}
@@ -3461,7 +3461,7 @@ void CCalcDlg::build_menus()
 		if (!varNames.empty())
 		{
 			msub.CreatePopupMenu();
-			for (vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
+			for (std::vector<CString>::const_iterator ps = varNames.begin(); ps != varNames.end(); ++ps)
 			{
 				msub.AppendMenu(MF_STRING, ii++, *ps);
 			}

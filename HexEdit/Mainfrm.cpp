@@ -5426,7 +5426,7 @@ void CMainFrame::OnUpdateDecCombo(CCmdUI* pCmdUI)
 }
 
 // We need a case-insensitive search that works the same as CBS_SORT
-struct case_insensitive_greater : binary_function<CString, CString, bool>
+struct case_insensitive_greater : std::binary_function<CString, CString, bool>
 {
 	bool operator()(const CString &s1, const CString &s2) const
 	{
@@ -5926,9 +5926,9 @@ void CJumpExpr::SaveVars()
 }
 
 // Get the names of all variables of a certain type
-vector<CString> CJumpExpr::GetVarNames(CJumpExpr::type_t typ)
+std::vector<CString> CJumpExpr::GetVarNames(CJumpExpr::type_t typ)
 {
-	vector<CString> retval;
+	std::vector<CString> retval;
 
 	for (std::map<CString, value_t>::const_iterator pp = var_.begin();
 		 pp != var_.end(); ++pp)
