@@ -782,6 +782,7 @@ void CFindSheet::GetSearch(const unsigned char **pps, const unsigned char **ppma
 	}
 	else
 	{
+		// Text search (with wildcards)
 		ASSERT(pp == p_page_text_);
 		if (charset_ == RB_CHARSET_ASCII)
 		{

@@ -9,43 +9,45 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+#include <cstdint>
+#include <memory>
+
 class boyer
 {
 public:
 	// Construction
-	boyer(const unsigned char *pat, size_t len, const unsigned char *mask);
+	boyer(const std::uint8_t* pat, std::size_t len, const std::uint8_t* mask);
 	boyer(const boyer &);
 	boyer &operator=(const boyer &);
-	~boyer();
 
 	// Attributes
-	size_t length() { return pattern_len_; }
-	const unsigned char *pattern() { return pattern_; }
-	const unsigned char *mask() { return mask_; }
+	std::size_t length() { return pattern_len_; }
+	const std::uint8_t* pattern() { return pattern_.get(); }
+	const std::uint8_t* mask() { return mask_.get(); }
 
 	// Operations
-	unsigned char *findforw(unsigned char *pp, size_t len,
+	std::uint8_t* findforw(std::uint8_t* pp, std::size_t len,
 						BOOL icase, int tt,
 						BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 						int alignment, int offset, __int64 base_addr, __int64 address) const;
-	unsigned char *findback(unsigned char *pp, size_t len,
+	std::uint8_t* findback(std::uint8_t* pp, std::size_t len,
 							BOOL icase, int tt,
 							BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 							int alignment, int offset, __int64 base_addr, __int64 address) const;
 
 private:
-	unsigned char *mask_find(unsigned char *pp, size_t len,
+	std::uint8_t* mask_find(std::uint8_t* pp, std::size_t len,
 							 BOOL icase, int tt,
 							 BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 							 int alignment, int offset, __int64 base_addr, __int64 address) const;
-	unsigned char *mask_findback(unsigned char *pp, size_t len,
+	std::uint8_t* mask_findback(std::uint8_t* pp, std::size_t len,
 								 BOOL icase, int tt,
 								 BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 								 int alignment, int offset, __int64 base_addr, __int64 address) const;
 
-	unsigned char *pattern_;	// Current search bytes
-	unsigned char *mask_;		// Which bits are used (all if NULL)
-	size_t pattern_len_;		// Length of search bytes
-	size_t fskip_[256];			// Use internally in forward searches
-	size_t bskip_[256];			// Use internally in backward searches
+	std::unique_ptr<std::uint8_t[]> pattern_;	// Current search bytes
+	std::unique_ptr<std::uint8_t[]> mask_;		// Which bits are used (all if NULL)
+	std::size_t pattern_len_;					// Length of search bytes
+	std::size_t fskip_[256];					// Use internally in forward searches
+	std::size_t bskip_[256];					// Use internally in backward searches
 };

@@ -1267,6 +1267,7 @@ BOOL CFile64::Open( LPCTSTR filename, UINT open_flags )
 		_TCHAR *FilePart;
 		VERIFY(::GetFullPathName(filename, sizeof(fullname), fullname, &FilePart));
 
+		// TODO: This does not work for UNC paths.
 		ASSERT(fullname[1] == ':' && fullname[2] == '\\');
 		fullname[3] = '\0';
 

@@ -8,7 +8,9 @@
 //
 
 #include "stdafx.h"
-#include <string.h>
+
+#include <cstring>
+#include <numeric>
 
 #include "boyer.h"
 
@@ -21,7 +23,7 @@ static char THIS_FILE[] = __FILE__;
 extern unsigned char e2a_tab[256];
 
 // Converts an EBCDIC char to upper case
-static unsigned char e2u_tab[] =
+static std::uint8_t e2u_tab[] =
 {
 		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
 		0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
@@ -60,7 +62,7 @@ static unsigned char e2u_tab[] =
 		0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff,
 };
 
-static unsigned char e2l_tab[] =
+static std::uint8_t e2l_tab[] =
 {
 		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,
 		0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,
@@ -99,7 +101,7 @@ static unsigned char e2l_tab[] =
 		0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff,
 };
 
-static unsigned char bit_count[] =
+static std::uint8_t bit_count[] =
 {
 	0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
 	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,2,3,3,4,3,4,4,5,3,4,4,5,4,5,5,6,
@@ -112,28 +114,40 @@ static unsigned char bit_count[] =
 };
 
 // Normal constructor
-boyer::boyer(const unsigned char *pat, size_t patlen, const unsigned char *mask)
+boyer::boyer(const std::uint8_t* pat, std::size_t patlen, const std::uint8_t* mask) :
+	pattern_{ std::make_unique<std::uint8_t[]>(patlen) },
+	mask_{},
+	pattern_len_{ patlen },
+	fskip_{},
+	bskip_{}
 {
-	size_t ii;
+	ASSERT(pat);
+
+	std::size_t ii;
 
 	// Keep a copy of the pattern
-	pattern_ = new unsigned char[patlen];
-	memcpy(pattern_, pat, patlen);
-	if (mask != NULL)
+	std::memcpy(pattern_.get(), pat, patlen);
+
+	if (mask)
 	{
-		mask_ = new unsigned char[patlen];
-		memcpy(mask_, mask, patlen);
+		mask_ = std::make_unique<std::uint8_t[]>(patlen);
+		std::memcpy(mask_.get(), mask, patlen);
 	}
-	else
-		mask_ = NULL;
 
 	for (ii = 0; ii < 256; ++ii)
+	{
 		fskip_[ii] = bskip_[ii] = patlen;
+	}
+
 	for (ii = 0; ii < patlen; ++ii)
+	{
 		fskip_[pat[ii]] = patlen - (ii + 1);
+	}
+
 	for (ii = patlen; ii > 0; ii--)
-		bskip_[pat[ii-1]] = ii - 1;
-	pattern_len_ = patlen;
+	{
+		bskip_[pat[ii - 1]] = ii - 1;
+	}
 
 #ifdef _DEBUG
 	ASSERT(sizeof(bit_count) == 256);
@@ -141,29 +155,39 @@ boyer::boyer(const unsigned char *pat, size_t patlen, const unsigned char *mask)
 	// Check the values in out bit_count table
 	for (int kk = 0; kk < 256; ++kk)
 	{
-		int count=0;
-		for (int jj = 0; jj < 8; ++jj) if ((kk>>jj)&0x01) ++count;
+		int count = 0;
+
+		for (int jj = 0; jj < 8; ++jj)
+		{
+			if ((kk >> jj) & 0x01)
+			{
+				++count;
+			}
+		}
+
 		ASSERT(bit_count[kk] == count);
 	}
 #endif
 }
 
 // Copy constructor
-boyer::boyer(const boyer &from)
+boyer::boyer(const boyer &from) :
+	pattern_{ std::make_unique<std::uint8_t[]>(from.pattern_len_) },
+	mask_{},
+	pattern_len_{ from.pattern_len_ },
+	fskip_{},
+	bskip_{}
 {
-	pattern_len_ = from.pattern_len_;
-	pattern_ = new unsigned char[pattern_len_];
-	memcpy(pattern_, from.pattern_, pattern_len_);
-	if (from.mask_ != NULL)
-	{
-		mask_ = new unsigned char[pattern_len_];
-		memcpy(mask_, from.mask_, pattern_len_);
-	}
-	else
-		mask_ = NULL;
+	std::memcpy(pattern_.get(), from.pattern_.get(), pattern_len_);
 
-	memcpy(fskip_, from.fskip_, sizeof(fskip_));
-	memcpy(bskip_, from.bskip_, sizeof(bskip_));
+	if (from.mask_)
+	{
+		mask_ = std::make_unique<std::uint8_t[]>(pattern_len_);
+		std::memcpy(mask_.get(), from.mask_.get(), pattern_len_);
+	}
+
+	std::memcpy(fskip_, from.fskip_, sizeof(fskip_));
+	std::memcpy(bskip_, from.bskip_, sizeof(bskip_));
 }
 
 // Copy assignment operator
@@ -172,27 +196,21 @@ boyer &boyer::operator=(const boyer &from)
 	if (&from != this)
 	{
 		pattern_len_ = from.pattern_len_;
-		pattern_ = new unsigned char[pattern_len_];
-		memcpy(pattern_, from.pattern_, pattern_len_);
-		if (from.mask_ != NULL)
+
+		pattern_ = std::make_unique<std::uint8_t[]>(pattern_len_);
+		std::memcpy(pattern_.get(), from.pattern_.get(), pattern_len_);
+
+		if (from.mask_)
 		{
-			mask_ = new unsigned char[pattern_len_];
-			memcpy(mask_, from.mask_, pattern_len_);
+			mask_ = std::make_unique<std::uint8_t[]>(pattern_len_);
+			std::memcpy(mask_.get(), from.mask_.get(), pattern_len_);
 		}
-		else
-			mask_ = NULL;
 
-		memcpy(fskip_, from.fskip_, sizeof(fskip_));
-		memcpy(bskip_, from.bskip_, sizeof(bskip_));
+		std::memcpy(fskip_, from.fskip_, sizeof(fskip_));
+		std::memcpy(bskip_, from.bskip_, sizeof(bskip_));
 	}
-	return *this;
-}
 
-boyer::~boyer()
-{
-	delete[] pattern_;
-	if (mask_ != NULL)
-		delete[] mask_;
+	return *this;
 }
 
 // - extra params: wholeword, alignment, mask
@@ -203,16 +221,19 @@ boyer::~boyer()
 // wholeword = only match equal if characters on either side are not alpha
 // alignment = only match if first byte has this alignment (in file) - use 1 for no alignment check
 // address = address of first byte within file - used for alignment check
-unsigned char *boyer::findforw(unsigned char *pp, size_t len, BOOL icase, int tt,
+std::uint8_t* boyer::findforw(std::uint8_t* pp, std::size_t len, BOOL icase, int tt,
 						   BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 						   int alignment, int offset, __int64 base_addr,  __int64 address) const
 {
+	if (len < pattern_len_)
+		return NULL;
+
 	// Search with a mask is handled completely differently
 	if (mask_ != NULL)
 		return mask_find(pp, len, icase, tt, wholeword, alpha_before, alpha_after, alignment, offset, base_addr, address);
 
-	size_t spos = pattern_len_ - 1;     // Posn within searched bytes
-	size_t patpos = pattern_len_ - 1;   // Posn within search pattern
+	std::size_t spos = pattern_len_ - 1;     // Posn within searched bytes
+	std::size_t patpos = pattern_len_ - 1;   // Posn within search pattern
 
 	// Leave icase/ebcdic tests outside the loop for speed
 	if (tt == 3 && icase)
@@ -367,16 +388,19 @@ unsigned char *boyer::findforw(unsigned char *pp, size_t len, BOOL icase, int tt
 	return NULL;                // Pattern not found
 }
 
-unsigned char *boyer::findback(unsigned char *pp, size_t len, BOOL icase, int tt,
+std::uint8_t* boyer::findback(std::uint8_t* pp, std::size_t len, BOOL icase, int tt,
 							   BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 							   int alignment, int offset, __int64 base_addr, __int64 address) const
 {
+	if (len < pattern_len_)
+		return NULL;
+
 	// Search with a mask is handled completely differently
 	if (mask_ != NULL)
 		return mask_findback(pp, len, icase, tt, wholeword, alpha_before, alpha_after, alignment, offset, base_addr, address);
 
 	long spos = len - pattern_len_;     // Current position within search bytes
-	size_t patpos = 0;                  // Current position within pattern
+	std::size_t patpos = 0;             // Current position within pattern
 
 	// Leave icase/ebcdic tests outside the loop for speed
 	if (tt == 3 && icase)
@@ -532,19 +556,31 @@ unsigned char *boyer::findback(unsigned char *pp, size_t len, BOOL icase, int tt
 // search text and then sees if the rest of the string matches.  This will be slower
 // but in the future we may be able to pass stats on number of different bytes
 // in the file to at least look for the least common byte.
-unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int tt,
+std::uint8_t* boyer::mask_find(std::uint8_t* pp, std::size_t len, BOOL icase, int tt,
 								BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 								int alignment, int offset, __int64 base_addr, __int64 address) const
 {
+	ASSERT(len >= pattern_len_);
+
 #ifdef _DEBUG
 	// If case-insensitive mask can only have all bits on or off
-	if (icase) { for (size_t  ii=0; ii < pattern_len_; ++ii) ASSERT(mask_[ii] == 0 || mask_[ii] == 0xFF); }
+	if (icase)
+	{
+		for (std::size_t  ii=0; ii < pattern_len_; ++ii)
+			ASSERT(mask_[ii] == 0 || mask_[ii] == 0xFF);
+	}
 #endif
+
+	if (std::accumulate(&mask_[0], &mask_[pattern_len_], 0) == 0)
+	{
+		// mask is all 0s, so any input will match it.
+		return pp;
+	}
 
 	int best_pos = -1;          // Index into pattern_ of byte that we will search for
 	int best_bits = 0;          // Number of bits in mask_[bestpos]
 	BOOL best_alpha = TRUE;     // Is the best found so far an alpha (and icase is on)
-	size_t ii;
+	std::size_t ii;
 
 	for (ii = 0; ii < pattern_len_; ++ii)
 	{
@@ -572,7 +608,7 @@ unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int t
 	ASSERT(best_pos >= -1 && best_pos < int(pattern_len_));
 
 	// Now do the search
-	for (unsigned char *pfound = pp + best_pos; ; ++pfound)
+	for (std::uint8_t* pfound = pp + best_pos; ; ++pfound)
 	{
 		if (best_pos == -1)
 		{
@@ -583,14 +619,14 @@ unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int t
 			ASSERT(!icase || !best_alpha);
 
 			// Search for byte
-			pfound = (unsigned char *)memchr(pfound, pattern_[best_pos], len - (pfound-pp));
+			pfound = (std::uint8_t* )memchr(pfound, pattern_[best_pos], len - (pfound-pp));
 		}
 		else if (!icase || !best_alpha)
 		{
 			ASSERT(best_bits > 0);
 
 			// Perform masked search
-			unsigned char *qq, *qend = pp + len;
+			std::uint8_t* qq, *qend = pp + len;
 			for (qq = pfound; qq < qend; ++qq)
 			{
 				if ((*qq & mask_[best_pos]) == (pattern_[best_pos] & mask_[best_pos]))
@@ -606,8 +642,8 @@ unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int t
 			ASSERT(icase && best_alpha);
 
 			// Search for both cases
-			unsigned char *p1 = (unsigned char *)memchr(pfound, e2l_tab[pattern_[best_pos]], len - (pfound-pp));
-			unsigned char *p2 = (unsigned char *)memchr(pfound, e2u_tab[pattern_[best_pos]], len - (pfound-pp));
+			std::uint8_t* p1 = (std::uint8_t* )memchr(pfound, e2l_tab[pattern_[best_pos]], len - (pfound-pp));
+			std::uint8_t* p2 = (std::uint8_t* )memchr(pfound, e2u_tab[pattern_[best_pos]], len - (pfound-pp));
 
 			if (p1 == NULL)
 				pfound = p2;
@@ -623,8 +659,8 @@ unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int t
 			ASSERT(icase && best_alpha && tt != 3);
 
 			// Search for both cases
-			unsigned char *p1 = (unsigned char *)memchr(pfound, tolower(pattern_[best_pos]), len - (pfound-pp));
-			unsigned char *p2 = (unsigned char *)memchr(pfound, toupper(pattern_[best_pos]), len - (pfound-pp));
+			std::uint8_t* p1 = (std::uint8_t* )memchr(pfound, tolower(pattern_[best_pos]), len - (pfound-pp));
+			std::uint8_t* p2 = (std::uint8_t* )memchr(pfound, toupper(pattern_[best_pos]), len - (pfound-pp));
 
 			if (p1 == NULL)
 				pfound = p2;
@@ -643,7 +679,7 @@ unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int t
 		BOOL passed = TRUE;     // Signals if the match failed for any reason
 
 		// Check that the pattern/mask actually matches
-		unsigned char *base = pfound - best_pos;
+		std::uint8_t* base = pfound - best_pos;
 		ASSERT(base >= pp);
 
 		for (ii = 0; ii < pattern_len_; ++ii)
@@ -709,19 +745,31 @@ unsigned char *boyer::mask_find(unsigned char *pp, size_t len, BOOL icase, int t
 	return NULL;
 }
 
-unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, int tt,
+std::uint8_t* boyer::mask_findback(std::uint8_t* pp, std::size_t len, BOOL icase, int tt,
 									BOOL wholeword, BOOL alpha_before, BOOL alpha_after,
 									int alignment, int offset, __int64 base_addr, __int64 address) const
 {
+	ASSERT(len >= pattern_len_);
+
 #ifdef _DEBUG
 	// If case-insensitive then mask can only have all bits on or off
-	if (icase) { for (size_t  ii=0; ii < pattern_len_; ++ii) ASSERT(mask_[ii] == 0 || mask_[ii] == 0xFF); }
+	if (icase)
+	{
+		for (std::size_t  ii=0; ii < pattern_len_; ++ii)
+			ASSERT(mask_[ii] == 0 || mask_[ii] == 0xFF);
+	}
 #endif
+
+	if (std::accumulate(&mask_[0], &mask_[pattern_len_], 0) == 0)
+	{
+		// mask is all 0s, so any input will match it.
+		return pp;
+	}
 
 	int best_pos = -1;          // Index into pattern_ of byte that we will search for
 	int best_bits = 0;          // Number of bits in mask_[bestpos]
 	BOOL best_alpha = TRUE;     // Is the best found so far an alpha (and icase is on)
-	size_t ii;
+	std::size_t ii;
 
 	for (ii = 0; ii < pattern_len_; ++ii)
 	{
@@ -749,7 +797,7 @@ unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, i
 	ASSERT(best_pos >= 0 && best_pos < int(pattern_len_));
 
 	// Now do the search
-	for (unsigned char *pfound = pp + len - pattern_len_ + best_pos; ; pfound--)
+	for (std::uint8_t* pfound = pp + len - pattern_len_ + best_pos; ; pfound--)
 	{
 		if (best_pos == -1)
 		{
@@ -760,8 +808,8 @@ unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, i
 			ASSERT(!icase || !best_alpha);
 
 			// Search for byte from end
-//            pfound = (unsigned char *)memrchr(pfound, pattern_[best_pos], len - (pfound-pp));
-			unsigned char *qq;
+//            pfound = (std::uint8_t* )memrchr(pfound, pattern_[best_pos], len - (pfound-pp));
+			std::uint8_t* qq;
 			for (qq = pfound; qq >= pp; qq--)
 			{
 				if (*qq == pattern_[best_pos])
@@ -777,7 +825,7 @@ unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, i
 			ASSERT(best_bits > 0);
 
 			// Perform masked search
-			unsigned char *qq;
+			std::uint8_t* qq;
 			for (qq = pfound; qq >= pp; qq--)
 			{
 				if ((*qq & mask_[best_pos]) == (pattern_[best_pos] & mask_[best_pos]))
@@ -793,7 +841,7 @@ unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, i
 			ASSERT(icase && best_alpha);
 
 			// Search EBCDIC ignoring case
-			unsigned char *qq;
+			std::uint8_t* qq;
 			for (qq = pfound; qq >= pp; qq--)
 			{
 				if (e2u_tab[*qq] == e2u_tab[pattern_[best_pos]])
@@ -809,7 +857,7 @@ unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, i
 			ASSERT(icase && best_alpha && tt != 3);
 
 			// Search ASCII ignoring case
-			unsigned char *qq;
+			std::uint8_t* qq;
 			for (qq = pfound; qq >= pp; qq--)
 			{
 				if (toupper(*qq) == toupper(pattern_[best_pos]))
@@ -828,7 +876,7 @@ unsigned char *boyer::mask_findback(unsigned char *pp, size_t len, BOOL icase, i
 		BOOL passed = TRUE;     // Signals if the match failed for any reason
 
 		// Check that the pattern/mask actually matches
-		unsigned char *base = pfound - best_pos;
+		std::uint8_t* base = pfound - best_pos;
 		ASSERT(base >= pp);
 
 		for (ii = 0; ii < pattern_len_; ++ii)

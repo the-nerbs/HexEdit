@@ -32137,640 +32137,322 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Algorithm.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BGAerial.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BGCompare.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BGPreview.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BGSearch.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BGstats.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Bin2Src.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Bookmark.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BookmarkDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\BookmarkFind.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Boyer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CalcDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CalcEdit.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CalcHist.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CFile64.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\ChildFrm.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CompareList.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CompareView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CompressDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Control.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\CopyCSrc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Crypto.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DataFormatView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDData.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDEVAL.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDFor.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDGlobal.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDIf.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDJUMP.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDMisc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDStruct.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDSwitch.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DFFDUseStruct.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Dialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\DirDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Docdata.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\EBCDIC.CPP">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\EmailDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Explorer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Expr.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\FindDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GenDockablePane.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GeneralCRC.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridBtnCell_src\BtnDataBase.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCell.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCellBase.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCellCombo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridBtnCell_src\InPlaceList.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridCtrl_src\GridCell.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridCtrl_src\GridCellBase.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridCtrl_src\GridCtrl.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridCtrl_src\GridDropTarget.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridCtrl_src\InPlaceEdit.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridCtrl_src\TitleTip.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GridTreeBtnCell_src\GridTreeBtnCell.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\GuiMisc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexEdit.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexEditDoc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexEditMacro.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexEditSplitter.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexEditView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexFileList.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexPrintDialog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexViewDraw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\HexViewPrint.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\IntelHex.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Mainfrm.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Misc.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\NavManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\NewCellTypes\GridCellCombo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\NewCellTypes\GridCellDateTime.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\NewCompare.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\NewFile.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\NewScheme.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\OpenSpecialDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Options.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Password.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Preview.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\PrevwView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Prop.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\RecentFileDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Register.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\ResizeCtrl.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\SaveDffd.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\ScrView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\SimpleGraph.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\SimpleSplitter.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\SpecialList.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Splasher.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\SRecord.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\STDAFX.CPP">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\SystemSound.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TabView.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Template.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Tipdlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TipWnd.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TParseDlg.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TParser.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TransparentListBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TransparentStatic2.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TreeColumn_src\GridTreeCell.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TreeColumn_src\GridTreeCellBase.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\TreeColumn_src\TreeColumn.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\UpdateChecker.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\UserTool.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Xmltree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Algorithm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BGAerial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BGCompare.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BGPreview.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BGSearch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BGstats.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Bin2Src.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Bookmark.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BookmarkDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\BookmarkFind.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Boyer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CalcDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CalcEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CalcHist.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CFile64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\ChildFrm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CompareList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CompareView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CompressDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Control.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\CopyCSrc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Crypto.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DataFormatView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDEVAL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDFor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDGlobal.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDIf.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDJUMP.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDMisc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDStruct.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDSwitch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DFFDUseStruct.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Dialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\DirDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Docdata.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\EBCDIC.CPP">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\EmailDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Explorer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Expr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\FindDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GenDockablePane.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GeneralCRC.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridBtnCell_src\BtnDataBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCell.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCellBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCellCombo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridBtnCell_src\InPlaceList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridCtrl_src\GridCell.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridCtrl_src\GridCellBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridCtrl_src\GridCtrl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridCtrl_src\GridDropTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridCtrl_src\InPlaceEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridCtrl_src\TitleTip.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GridTreeBtnCell_src\GridTreeBtnCell.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\GuiMisc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexEdit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexEditDoc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexEditMacro.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexEditSplitter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexEditView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexFileList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexPrintDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexViewDraw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\HexViewPrint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\IntelHex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Mainfrm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Misc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\NavManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\NewCellTypes\GridCellCombo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\NewCellTypes\GridCellDateTime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\NewCompare.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\NewFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\NewScheme.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\OpenSpecialDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Options.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Password.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Preview.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\PrevwView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Prop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\RecentFileDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Register.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\ResizeCtrl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\SaveDffd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\ScrView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\SimpleGraph.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\SimpleSplitter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\SpecialList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Splasher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\SRecord.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\STDAFX.CPP">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\SystemSound.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TabView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Template.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Tipdlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TipWnd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TParseDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TransparentListBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TransparentStatic2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TreeColumn_src\GridTreeCell.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TreeColumn_src\GridTreeCellBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\TreeColumn_src\TreeColumn.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\UpdateChecker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\UserTool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\HexEdit\Xmltree.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="..\HexEdit\Algorithm.cpp">
       <Filter>AppSources</Filter>
@@ -34044,10 +33726,322 @@
     <ClCompile Include="..\HexEdit\Xmltree.cpp">
       <Filter>AppSources</Filter>
     </ClCompile>
-    <ClCompile Include="../HexEdit/**/*.cpp">
+    <ClCompile Include="..\HexEdit\Algorithm.cpp">
       <Filter>AppSources</Filter>
     </ClCompile>
-    <ClCompile Include="../HexEdit/**/*.cpp">
+    <ClCompile Include="..\HexEdit\BGAerial.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\BGCompare.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\BGPreview.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\BGSearch.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\BGstats.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Bin2Src.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Bookmark.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\BookmarkDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\BookmarkFind.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Boyer.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CalcDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CalcEdit.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CalcHist.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CFile64.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\ChildFrm.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CompareList.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CompareView.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CompressDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Control.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\CopyCSrc.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Crypto.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DataFormatView.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDData.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDEVAL.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDFor.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDGlobal.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDIf.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDJUMP.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDMisc.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDStruct.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDSwitch.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DFFDUseStruct.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Dialog.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\DirDialog.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Docdata.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\EBCDIC.CPP">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\EmailDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Explorer.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Expr.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\FindDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GenDockablePane.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GeneralCRC.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridBtnCell_src\BtnDataBase.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCell.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCellBase.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridBtnCell_src\GridBtnCellCombo.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridBtnCell_src\InPlaceList.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridCtrl_src\GridCell.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridCtrl_src\GridCellBase.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridCtrl_src\GridCtrl.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridCtrl_src\GridDropTarget.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridCtrl_src\InPlaceEdit.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridCtrl_src\TitleTip.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GridTreeBtnCell_src\GridTreeBtnCell.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\GuiMisc.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexEdit.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexEditDoc.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexEditMacro.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexEditSplitter.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexEditView.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexFileList.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexPrintDialog.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexViewDraw.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\HexViewPrint.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\IntelHex.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Mainfrm.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Misc.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\NavManager.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\NewCellTypes\GridCellCombo.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\NewCellTypes\GridCellDateTime.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\NewCompare.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\NewFile.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\NewScheme.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\OpenSpecialDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Options.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Password.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Preview.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\PrevwView.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Prop.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\RecentFileDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Register.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\ResizeCtrl.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\SaveDffd.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\ScrView.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\SimpleGraph.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\SimpleSplitter.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\SpecialList.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Splasher.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\SRecord.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\STDAFX.CPP">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\SystemSound.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TabView.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Template.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Tipdlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TipWnd.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TParseDlg.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TParser.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TransparentListBox.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TransparentStatic2.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TreeColumn_src\GridTreeCell.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TreeColumn_src\GridTreeCellBase.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\TreeColumn_src\TreeColumn.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\UpdateChecker.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\UserTool.cpp">
+      <Filter>AppSources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HexEdit\Xmltree.cpp">
       <Filter>AppSources</Filter>
     </ClCompile>
     <ClCompile Include="../HexEdit/**/*.cpp">
@@ -34357,6 +34351,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TestFiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoyerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
