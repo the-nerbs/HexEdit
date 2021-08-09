@@ -1,4 +1,4 @@
-// CalcDlg.h : header file for Calculator Dialog
+// CalcDlg.h : header file for Calculator Dialog 
 //
 // Copyright (c) 2016 by Andrew W. Phillips
 //
@@ -19,9 +19,14 @@
 #include "Expr.h"
 #include "optypes.h"
 #include "ResizeCtrl.h"
-#include <mpirxx.h>
 
-// Just override CMFCButton so we can ceck the button colour
+#pragma warning(push)
+// TODO(warn): MPIR is raising a number of C4244 (narrowing conversion). are these *really* safe?
+#pragma warning(disable : 4244)
+#include <mpirxx.h>
+#pragma warning(pop)
+
+// Just override CMFCButton so we can check the button colour
 class CCalcButton : public CMFCButton
 {
 public:
@@ -32,7 +37,7 @@ public:
 // CCalcBits
 //
 // This is a child window of the calculator dialog that shows the current status
-// of the 64 bits of the current calcualtor integer value.  It indicates if on/off
+// of the 64 bits of the current calculator integer value.  It indicates if on/off
 // or if disabled (depends on number of calculator bits in use).  It also
 // allows (enabled) bits to be toggled just by clicking them.
 

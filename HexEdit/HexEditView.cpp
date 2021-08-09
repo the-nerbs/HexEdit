@@ -4023,7 +4023,7 @@ void CHexEditView::Dump(CDumpContext& dc) const
 	dc << "\nreadonly_  = " << display_.readonly;
 	dc << "\nsaved_start_/end_ = " << long(saved_start_) << " " << long(saved_end_);
 
-	std::vector <view_undo, allocator<view_undo> >::const_iterator pu;
+	std::vector<view_undo>::const_iterator pu;
 	for (pu = undo_.begin(); pu != undo_.end(); ++pu)
 	{
 		dc << "\nutype = " << (*pu).utype;

@@ -99,6 +99,7 @@
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="RangeSetTests.cpp" />
     <ClCompile Include="TestFiles.cpp" />
   </ItemGroup>
   <ItemGroup>

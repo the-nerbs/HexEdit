@@ -9,14 +9,25 @@
 #include <iterator>
 #include <utility>                  // for make_pair<T1,T2>()
 #include <functional>               // for less<T>
+#include <initializer_list>
 #include <istream>                  // used in << and >>
 #include <ios>
 #include <cassert>                  // for assert()
 
+/// \brief A set of integers that is space-optimized for densely-filled sets.
+///
+/// \details
+/// This collection stores consecutive spans of values as their start and end points.
+/// As such, this is best used for sets that are likely to be densely filled, but
+/// will be less efficient than a regular `std::set` when sparsely filled.
 template <class T, class Pred = std::less<T>,
 		  class Alloc = std::allocator<T> >
 class range_set
 {
+	// this *might* work for non-integer types, but it's not guaranteed.
+	// in particular, `one_more` and `one_less` assume integers.
+	static_assert(std::is_integral_v<T>, "T must be an integer type.");
+
 public:
 	// Define standard types for STL container
 	typedef typename Alloc allocator_type;
@@ -351,8 +362,8 @@ public:
 	{
 		increasing_ = compare_(T(0), T(1));
 	}
-#ifdef MEMBER_TEMPLATES
-	template<Init> range_set(Init p1, const Init &p2,
+
+	template<typename Init> range_set(Init p1, const Init &p2,
 		const Pred &p = Pred(), const Alloc &a = Alloc())
 		: compare_(p), allocator_(a)
 	{
@@ -362,31 +373,12 @@ public:
 		while (p1 != p2)
 			last_pos = insert(last_pos, *p1++);
 	}
-#else
-	range_set(const T *p1, const T *p2,
-			  const Pred &p = Pred(), const Alloc &a = Alloc())
-		: compare_(p), allocator_(a)
-	{
-		increasing_ = compare_(T(0), T(1));
 
-		const_iterator last_pos = begin();
-		while (p1 != p2)
-			last_pos = insert(last_pos, *p1++);
-	}
-	range_set(const_iterator p1, const const_iterator &p2,
-			  const Pred &p = Pred(), const Alloc &a = Alloc())
-		: compare_(p), allocator_(a)
-	{
-		assert(p1.pc_ == p2.pc_);       // Same container?
-		assert(p1.pc_ != 0);            // ... and valid?
-
-		increasing_ = compare_(T(0), T(1));
-
-		const_iterator last_pos = begin();
-		while (p1 != p2)
-			last_pos = insert(last_pos, *p1++);
-	}
-#endif
+	range_set(std::initializer_list<T> init,
+			  const Pred& p = Pred{},
+			  const Alloc& a = Alloc{})
+		: range_set{ init.begin(), init.end(), p, a }
+	{ }
 
 	// Use compiler generated copy constructor,
 	// copy assignment operator, and destructor
@@ -453,42 +445,40 @@ public:
 					insert_helper(p.pr_, v, one_more(v)).first,
 					true);
 	}
+
 	const_iterator insert(const const_iterator &p,
 						  const value_type &v)
 	{
 		assert(p.pc_ == this);          // For this container?
 		return insert_helper(p.pr_, v, one_more(v)).first;
 	}
-#ifdef MEMBER_TEMPLATES
-	template<Init> void insert(Init p1, const Init &p2)
-	{
-		const_iterator last_pos = begin();
-		while (p1 != p2)
-			last_pos = insert(last_pos, *p1++);
-	}
-#else
-	void insert(const T* p1, const T* p2)
-	{
-		const_iterator last_pos = begin();
-		while (p1 != p2)
-			last_pos = insert(last_pos, *p1++);
-	}
-	void insert(const_iterator p1, const const_iterator &p2)
-	{
-		assert(p1.pc_ == p2.pc_);            // Same container?
-		assert(p1.pc_ != this);              // but not this one
-		assert(p1.pc_ != 0);                 // Ensure valid.
 
+	template<typename Init> void insert(Init p1, const Init &p2)
+	{
 		const_iterator last_pos = begin();
 		while (p1 != p2)
 			last_pos = insert(last_pos, *p1++);
 	}
-#endif
+
+	/// \brief  Inserts all values between \p ss (inclusive) and \ee (exclusive).
+	/// 
+	/// \param  ss  The start of the range to add. Inclusive.
+	/// \param  ee  The end of the range to add. Exclusive.
 	std::pair<const_iterator, const_iterator>
 	insert_range(const value_type &ss, const value_type &ee)
 	{
 		return insert_helper(range_.begin(), ss, ee);
 	}
+
+	/// \brief  Inserts all values between \p ss (inclusive) and \ee (exclusive).
+	/// 
+	/// \param  p   A hint to where in this collection the new range may be inserted.
+	/// \param  ss  The start of the range to add. Inclusive.
+	/// \param  ee  The end of the range to add. Exclusive.
+	/// 
+	/// \details
+	/// If \p p does not point to the correct insertion point, the correct insertion
+	/// point will be found automatically.
 	std::pair<const_iterator, const_iterator>
 	insert_range(const const_iterator &p, const value_type &ss,
 				 const value_type &ee)
@@ -497,11 +487,20 @@ public:
 		return insert_helper(p.pr_, ss, ee);
 	}
 
+	/// \brief  Removes an element at \p p
+	/// 
+	/// \param  p   An iterator pointing to the element to remove.
 	const_iterator erase(const const_iterator &p)
 	{
 		assert(p.pc_ == this);         // For this container?
+		assert(p != end());            // end() is not valid
 		return erase_helper(p.pr_, p.value_,one_more(p.value_));
 	}
+
+	/// \brief  Removes all elements between \p p1 (inclusive) and \p p2 (exclusive).
+	/// 
+	/// \param  p1   An iterator pointing to the start of the range to remove.
+	/// \param  p2   An iterator pointing to the end of the range to remove.
 	const_iterator erase(const const_iterator &p1,
 						 const const_iterator &p2)
 	{
@@ -738,60 +737,62 @@ public:
 		return !(rs1 == rs2);
 	}
 
-	friend bool operator<(const range_set &rs1,
-						  const range_set &rs2)
-	{
-		range_t::const_iterator p1, p2;
-		for (p1 = rs1.range_.begin(), p2 = rs2.range_.begin();
-			 p1 != rs1.range_.end() && p2 != rs2.range_.end();
-			 ++p1, ++p2)
-		{
-			// Compare the next elt of each set
-			if (rs1.compare_((*p1).sfirst, (*p2).sfirst))
-				return true;
-			else if (rs1.compare_((*p2).sfirst, (*p1).sfirst))
-				return false;
-
-			if (rs1.compare_((*p1).slast, (*p2).slast))
-			{
-				// The rs1 segment is shorter than the rs2
-				// segment so it seems that rs2 < rs1, UNLESS
-				// we have reached the end of rs1
-				range_t::const_iterator t = p1;
-				++t;
-				return t == rs1.range_.end();
-			}
-			else if (rs1.compare_((*p2).slast, (*p1).slast))
-			{
-				// The rs2 segment is shorter than the rs1
-				// segment so it seems that rs1 < rs2, UNLESS
-				// we have reached the end of rs2
-				range_t::const_iterator t = p2;
-				++t;
-				return t != rs2.range_.end();
-			}
-		}
-		// If we haven't reached the end of rs2 then rs2 >= rs1
-		return p2 != rs2.range_.end();
-	}
-
-	friend bool operator>(const range_set &rs1,
-						  const range_set &rs2)
-	{
-		return rs2 < rs1;
-	}
-
-	friend bool operator<=(const range_set &rs1,
-						   const range_set &rs2)
-	{
-		return !(rs2 < rs1);
-	}
-
-	friend bool operator>=(const range_set &rs1,
-						   const range_set &rs2)
-	{
-		return !(rs1 < rs2);
-	}
+// These do not appear to be used anywhere. 
+// If they end up being needed for any reason, then I'll need to add tests for them.
+//	friend bool operator<(const range_set &rs1,
+//						  const range_set &rs2)
+//	{
+//		range_t::const_iterator p1, p2;
+//		for (p1 = rs1.range_.begin(), p2 = rs2.range_.begin();
+//			 p1 != rs1.range_.end() && p2 != rs2.range_.end();
+//			 ++p1, ++p2)
+//		{
+//			// Compare the next elt of each set
+//			if (rs1.compare_((*p1).sfirst, (*p2).sfirst))
+//				return true;
+//			else if (rs1.compare_((*p2).sfirst, (*p1).sfirst))
+//				return false;
+//
+//			if (rs1.compare_((*p1).slast, (*p2).slast))
+//			{
+//				// The rs1 segment is shorter than the rs2
+//				// segment so it seems that rs2 < rs1, UNLESS
+//				// we have reached the end of rs1
+//				range_t::const_iterator t = p1;
+//				++t;
+//				return t == rs1.range_.end();
+//			}
+//			else if (rs1.compare_((*p2).slast, (*p1).slast))
+//			{
+//				// The rs2 segment is shorter than the rs1
+//				// segment so it seems that rs1 < rs2, UNLESS
+//				// we have reached the end of rs2
+//				range_t::const_iterator t = p2;
+//				++t;
+//				return t != rs2.range_.end();
+//			}
+//		}
+//		// If we haven't reached the end of rs2 then rs2 >= rs1
+//		return p2 != rs2.range_.end();
+//	}
+//
+//	friend bool operator>(const range_set &rs1,
+//						  const range_set &rs2)
+//	{
+//		return rs2 < rs1;
+//	}
+//
+//	friend bool operator<=(const range_set &rs1,
+//						   const range_set &rs2)
+//	{
+//		return !(rs2 < rs1);
+//	}
+//
+//	friend bool operator>=(const range_set &rs1,
+//						   const range_set &rs2)
+//	{
+//		return !(rs1 < rs2);
+//	}
 };
 
 #endif
