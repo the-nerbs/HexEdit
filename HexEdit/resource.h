@@ -32,6 +32,8 @@
 #define IDS_WEB_REG_MC                  121
 #define IDS_WEB_UPGRADE                 122
 #define IDS_WEB_FORUMS                  123
+#define IDS_WEB_ISSUE                   124
+#define IDS_WEB_REPORT_ISSUE            124
 #define IDR_MAINFRAME                   128
 #define IDR_HEXEDTYPE                   129
 #define IDB_FILE_OPENU                  130
@@ -153,7 +155,6 @@
 #define IDB_DEL                         228
 #define IDB_ADD                         229
 #define IDB_NEW                         229
-#define IDD_EMAIL                       229
 #define IDB_UP                          230
 #define IDD_OPT_COLOURS                 230
 #define IDB_DOWN                        231
@@ -592,17 +593,13 @@
 #define IDC_FP_MANT                     1075
 #define IDC_ASR                         1075
 #define IDC_FP_EXP                      1076
-#define IDC_SUBJECT                     1077
 #define IDC_FILE_READONLY               1078
-#define IDC_NAME                        1078
 #define IDC_FILE_HIDDEN                 1079
-#define IDC_ADDRESS                     1079
 #define IDC_INSTALL_CODE                1079
 #define IDC_FIND_GROUP                  1079
 #define IDC_FIND_HEX                    1080
 #define IDC_FILE_SYSTEM                 1080
 #define IDC_UNARY_SIGN                  1080
-#define IDC_ATTACHMENT                  1080
 #define IDC_FIND_ASCII                  1081
 #define IDC_UNARY_INC                   1081
 #define IDC_FILE_ARCHIVED               1081
@@ -614,7 +611,6 @@
 #define IDC_COMBO                       1085
 #define IDC_UNARY_FLIP                  1085
 #define IDC_REFRESH_NEVER               1086
-#define IDC_BUG                         1086
 #define IDC_UNARY_ROL                   1086
 #define IDC_MACHINE                     1086
 #define IDC_PRINT_SPACE1                1086
@@ -622,14 +618,12 @@
 #define IDC_DFFD_SPLIT                  1086
 #define ID_FONT_INC                     1087
 #define IDC_REFRESH_SECS                1087
-#define IDC_ENHANCE                     1087
 #define IDC_PRINT_SPACE1HALF            1087
 #define IDC_ADDRESS_SPECIFIED           1087
 #define IDC_DFFD_TAB                    1087
 #define ID_FONT_DEC                     1088
 #define IDC_UNICODE_DESC                1088
 #define IDC_REFRESH_PLAYS               1088
-#define IDC_OTHER                       1088
 #define IDC_SITE                        1088
 #define IDC_CHAR                        1089
 #define IDC_UNARY_LSR                   1089
@@ -706,17 +700,13 @@
 #define IDC_CURRENT                     1136
 #define IDC_NEW                         1137
 #define IDC_DOWN                        1138
-#define IDC_TO                          1139
 #define IDC_CHANGE_TRACKING             1140
 #define IDC_BORDERS                     1141
 #define IDC_CT_INSERTIONS               1141
-#define IDC_SYSTYPE                     1142
 #define IDC_CT_MODIFICATIONS            1142
-#define IDC_TEXT                        1143
 #define IDC_CT_DELETIONS                1143
 #define IDC_THUMB_ZOOM                  1143
 #define IDC_DEL                         1144
-#define IDC_VERSION                     1144
 #define IDC_CT_DELCOUNT                 1144
 #define IDC_UP                          1145
 #define IDC_OPEN_FONT                   1145
@@ -730,14 +720,12 @@
 #define IDC_LINE2                       1150
 #define IDC_LINE3                       1151
 #define IDC_LINE4                       1152
-#define IDC_EMAIL_HELP                  1153
 #define IDC_MACRO_HELP                  1154
 #define IDC_LOADMACRO                   1155
 #define IDC_MACRO_NAME                  1155
 #define IDC_MACRO_COMMENT               1156
 #define IDC_DESC_COLOUR                 1156
 #define IDC_SAVEMACRO                   1157
-#define IDC_EMAIL                       1157
 #define IDC_MACRODIR                    1158
 #define IDC_DESC_SCHEME                 1158
 #define IDC_COSTS                       1163
@@ -1033,9 +1021,7 @@
 #define IDC_FOLDER_VIEW                 1431
 #define IDC_EXPLORER                    1432
 #define IDC_FILTER_OPTS                 1433
-#define IDC_ATTACH                      1434
 #define IDC_FOLDER_HIDDEN               1434
-#define IDC_ATTACHMENT_BROWSE           1435
 #define IDC_VALUE                       1436
 #define IDC_CALC_COMBO                  1436
 #define IDC_EXPR                        1436
@@ -1366,7 +1352,6 @@
 #define ID_SWAP_MARK                    32834
 #define ID_EDIT_READFILE                32835
 #define ID_EDIT_FIND2                   32837
-#define ID_HELP_EMAIL                   32838
 #define ID_SCROLL_UP                    32839
 #define ID_SCROLL_DOWN                  32840
 #define ID_REDRAW                       32841
@@ -1412,7 +1397,6 @@
 #define ID_HELP_FORUM                   32886
 #define ID_HELP_FAQ                     32887
 #define ID_HELP_HOMEPAGE                32888
-#define ID_HELP_DONATE                  32889
 #define ID_VIEW_USER_TOOLBAR1           32901
 #define ID_VIEW_USER_TOOLBAR2           32902
 #define ID_VIEW_USER_TOOLBAR3           32903
@@ -1818,6 +1802,9 @@
 #define ID_BASE64DECODE                 39233
 #define ID_BASE64URLENCODE              39234
 #define ID_BASE64URLDECODE              39235
+#define ID_HELP_REPORTANISSUE           39240
+#define ID_HELP_REPORTANISSUE39241      39241
+#define ID_HELP_REPORT_ISSUE            39242
 #define IDS_WARNING_DO_NOT_RENUMBER     52700
 #define IDS_BOOKMARK_NOFILE             52701
 #define IDS_BOOKMARK_NOTFOUND           52702
@@ -1885,8 +1872,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        530
-#define _APS_NEXT_COMMAND_VALUE         39240
+#define _APS_NEXT_RESOURCE_VALUE        531
+#define _APS_NEXT_COMMAND_VALUE         39243
 #define _APS_NEXT_CONTROL_VALUE         1721
 #define _APS_NEXT_SYMED_VALUE           252
 #endif

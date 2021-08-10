@@ -34,18 +34,26 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // remains consistent on all systems.
 IDR_HEXEDTYPE           ICON                    "res\\HexEditDoc.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Mainbar.bmp"
+
 IDR_EDITBAR             BITMAP                  "res\\editbar.bmp"
+
 IDR_STDBAR              BITMAP                  "res\\toolbar.bmp"
+
 IDR_NAVBAR              BITMAP                  "res\\navbar.bmp"
+
 IDR_FORMATBAR           BITMAP                  "res\\formtbar.bmp"
+
 IDR_MISC                BITMAP                  "res\\misc.bmp"
+
 IDR_OPER                BITMAP                  "res\\operations.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -145,7 +153,7 @@ BEGIN
     BUTTON      ID_CONTEXT_HELP
     BUTTON      ID_APP_ABOUT
     BUTTON      ID_HELP_WEB
-    BUTTON      ID_HELP_EMAIL
+    BUTTON      ID_HELP_REPORT_ISSUE
     BUTTON      ID_DFFD_HIDE
     BUTTON      ID_DFFD_SPLIT
     BUTTON      ID_DFFD_TAB
@@ -370,13 +378,11 @@ BEGIN
         END
         POPUP "&Web Pages"
         BEGIN
+            MENUITEM "HexEdit Home Page",           ID_HELP_HOMEPAGE
             MENUITEM "Support Forums",              ID_HELP_FORUM
             MENUITEM "Web Help",                    ID_HELP_WEB
-            MENUITEM SEPARATOR
-            MENUITEM "HexEdit Home Page",           ID_HELP_HOMEPAGE
-            MENUITEM "Donate",                      ID_HELP_DONATE
         END
-        MENUITEM "&Email Support...",           ID_HELP_EMAIL
+        MENUITEM "Report an &Issue",            ID_HELP_REPORT_ISSUE
         MENUITEM SEPARATOR
         POPUP "Detect && &Repair"
         BEGIN
@@ -916,13 +922,11 @@ BEGIN
         END
         POPUP "&Web Pages"
         BEGIN
+            MENUITEM "HexEdit Home Page",           ID_HELP_HOMEPAGE
             MENUITEM "Support Forums",              ID_HELP_FORUM
             MENUITEM "Web Help",                    ID_HELP_WEB
-            MENUITEM SEPARATOR
-            MENUITEM "HexEdit Home Page",           ID_HELP_HOMEPAGE
-            MENUITEM "Donate",                      ID_HELP_DONATE
         END
-        MENUITEM "&Email Support...",           ID_HELP_EMAIL
+        MENUITEM "Report an &Issue",            ID_HELP_REPORT_ISSUE
         MENUITEM SEPARATOR
         POPUP "&Repair"
         BEGIN
@@ -2135,10 +2139,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About HexEdit"
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
-    LTEXT           "HexEdit 5.0",IDC_LINE1,150,24,166,8
-    LTEXT           "Copyright 1999-2016 Expert Commercial Software Pty Ltd",IDC_LINE2,150,42,96,18
-    PUSHBUTTON      "&Email...",IDC_EMAIL,322,38,61,14
-    PUSHBUTTON      "URL",IDC_BUTTON_URL,150,73,166,14,WS_GROUP
+    LTEXT           "HexEdit 5.0",IDC_LINE1,150,24,234,8
+    LTEXT           "Copyright 1999-2016 Expert Commercial Software Pty Ltd\nAdditional updates copyright 2021 the-nerbs",IDC_LINE2,150,42,234,24
+    PUSHBUTTON      "URL",IDC_BUTTON_URL,150,73,234,14,WS_GROUP
     LTEXT           "Third party software used in HexEdit:",IDC_LINE4,150,105,166,8
     LISTBOX         IDC_ACK,150,122,166,105,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_NODATA | WS_VSCROLL
     PUSHBUTTON      "&More Info...",IDC_ACK_MORE,322,133,61,14
@@ -2660,12 +2663,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Expert Commercial Software Pty Ltd"
             VALUE "FileDescription", "HexEdit Application"
-            VALUE "FileVersion", "5.0.0.1347"
+            VALUE "FileVersion", "5.0.0.1387"
             VALUE "InternalName", "HexEdit"
             VALUE "LegalCopyright", "Copyright © 1999-2016  Expert Commercial Software"
             VALUE "OriginalFilename", "HEXEDIT.EXE"
             VALUE "ProductName", "HexEdit"
-            VALUE "ProductVersion", "5.0.0.1347"
+            VALUE "ProductVersion", "5.0.0.1387"
         END
     END
     BLOCK "VarFileInfo"
@@ -2956,6 +2959,10 @@ BEGIN
         BOTTOMMARGIN, 127
     END
 
+    IDD_ABOUT, DIALOG
+    BEGIN
+    END
+
     IDD_OPT_WINEDIT, DIALOG
     BEGIN
     END
@@ -2999,6 +3006,17 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3246,7 +3264,6 @@ BEGIN
     ID_SWAP_MARK            "Swap positions of the cursor and mark\nSwap Cursor with Mark"
     ID_EDIT_READFILE        "Insert a file at the cursor position\nInsert File"
     ID_EDIT_FIND2           "Specify bytes to search for\nHex Find"
-    ID_HELP_EMAIL           "Get help from the developer via email\nEmail support"
     ID_SCROLL_UP            "Scroll the display upwards\nScroll Up"
     ID_SCROLL_DOWN          "Scroll the display downwards\nScroll Down"
     ID_REDRAW               "Scroll to middle and redraw display\nRedraw"
@@ -3290,11 +3307,10 @@ BEGIN
     CG_IDS_FILE_ABSENT2     "You can put the tips file (HexEdit.tip) in the same directory as HexEdit.exe or the working directory where you run HexEdit.  The tips file was not found in either of those places."
     CG_IDP_FILE_CORRUPT2    "Trouble reading the tips file"
     CG_IDS_TIPOFTHEDAYHELP2 "&Help"
-    IDS_WEB_ADDRESS         "http://www.hexedit.com/"
-    IDS_WEB_DONATE          "http://www.hexedit.com/donate.htm"
-    IDS_WEB_HELP            "http://www.hexedit.com/contact_form.aspx"
-    IDS_WEB_UPGRADE         "http://www.hexedit.com/upgrade.html"
-    IDS_WEB_FORUMS          "http://www.hexedit.com/forums.html"
+    IDS_WEB_ADDRESS         "https://github.com/the-nerbs/HexEdit"
+    IDS_WEB_HELP            "TODO: online help"
+    IDS_WEB_FORUMS          "https://github.com/the-nerbs/HexEdit/discussions"
+    IDS_WEB_REPORT_ISSUE    "https://github.com/the-nerbs/HexEdit/issues/new"
 END
 
 STRINGTABLE
@@ -3449,7 +3465,6 @@ BEGIN
     ID_HELP_WEB             "Go to the HexEdit web site for help\nHelp via Web"
     ID_HELP_FORUM           "Go to the HexEdit Support Forums\nSupport Forums"
     ID_HELP_HOMEPAGE        "Go to the HexEdit Home Page\nHexEdit Home Page"
-    ID_HELP_DONATE          "Go to the Donation web page\nDonate"
 END
 
 STRINGTABLE
@@ -3809,6 +3824,11 @@ BEGIN
     ID_PREVW_BG_GREY        "Use default window background color\nStandard Background"
 END
 
+STRINGTABLE
+BEGIN
+    ID_HELP_REPORT_ISSUE    "Report a bug or enhancement to HexEdit.\nReport an Issue"
+END
+
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -3828,23 +3848,41 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\hexedit2.ico"
+
 IDR_MAINFRAME2          ICON                    "res\\ico00001.ico"
+
 IDI_UP                  ICON                    "res\\up.ico"
+
 IDI_DOWN                ICON                    "res\\down.ico"
+
 IDI_NEW                 ICON                    "res\\new.ico"
+
 IDI_DEL                 ICON                    "res\\del.ico"
+
 IDR_MAINFRAME4          ICON                    "res\\ico00002.ico"
+
 IDI_STRUCT              ICON                    "res\\struct.ico"
+
 IDI_IF                  ICON                    "res\\if.ico"
+
 IDI_FOR                 ICON                    "res\\for.ico"
+
 IDI_DATA                ICON                    "res\\data.ico"
+
 IDI_EVAL                ICON                    "res\\eval.ico"
+
 IDI_JUMP                ICON                    "res\\jump.ico"
+
 IDI_SWITCH              ICON                    "res\\switch.ico"
+
 IDI_QUESTIONMARK        ICON                    "RES\\question.ico"
+
 IDI_EXCLAMATIONMARK     ICON                    "RES\\exclam.ico"
+
 IDI_INFO                ICON                    "RES\\info.ico"
+
 IDI_CROSS               ICON                    "RES\\cross.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3852,59 +3890,113 @@ IDI_CROSS               ICON                    "RES\\cross.ico"
 //
 
 IDB_LIGHTBULB           BITMAP                  "res\\litebulb.bmp"
+
 IDB_IMAGELIST           BITMAP                  "res\\imagelis.bmp"
+
 IDB_DEVIMAGES           BITMAP                  "res\\devimage.bmp"
+
 IDB_SEARCH              BITMAP                  "res\\search.bmp"
+
 IDB_BACK                BITMAP                  "res\\back.bmp"
+
 IDB_BACK_HOT            BITMAP                  "res\\back_hot.bmp"
+
 IDB_FORW                BITMAP                  "res\\forw.bmp"
+
 IDB_FORW_HOT            BITMAP                  "res\\forw_hot.bmp"
+
 IDB_REFRESH             BITMAP                  "res\\refresh.bmp"
+
 IDB_REFRESH_HOT         BITMAP                  "res\\refresh_hot.bmp"
+
 IDB_PARENT              BITMAP                  "res\\parent.bmp"
+
 IDB_PARENT_HOT          BITMAP                  "res\\parent_hot.bmp"
+
 IDB_VIEW                BITMAP                  "res\\view.bmp"
+
 IDB_VIEW_HOT            BITMAP                  "res\\view_hot.bmp"
+
 IDB_HORZ                BITMAP                  "res\\flip.bmp"
+
 IDB_HORZ_HOT            BITMAP                  "res\\flip_hot.bmp"
+
 IDB_VERT                BITMAP                  "res\\vert.bmp"
+
 IDB_VERT_HOT            BITMAP                  "res\\vert_hot.bmp"
+
 IDB_OPTIONSIMAGES       BITMAP                  "RES\\optionsimages.bmp"
+
 IDB_HIST                BITMAP                  "res\\hist.bmp"
+
 IDB_FILTERS             BITMAP                  "res\\filters.bmp"
+
 IDB_DOCDISPLAY          BITMAP                  "res\\docdisplay.bmp"
+
 IDB_DOCEDIT             BITMAP                  "res\\docedit.bmp"
+
 IDB_DISPLAY             BITMAP                  "res\\display.bmp"
+
 IDB_EDIT                BITMAP                  "res\\edit.bmp"
+
 IDB_SYSTEM              BITMAP                  "res\\system.bmp"
+
 IDB_STDBAR_H            BITMAP                  "res\\toolbarHot.bmp"
+
 IDB_STDBAR_C            BITMAP                  "res\\toolbarCold.bmp"
+
 IDB_STDBAR_D            BITMAP                  "res\\toolbarDisabled.bmp"
+
 IDB_EDITBAR_H           BITMAP                  "res\\editbarHot.bmp"
+
 IDB_EDITBAR_C           BITMAP                  "res\\editbarCold.bmp"
+
 IDB_EDITBAR_D           BITMAP                  "res\\editbarDisabled.bmp"
+
 IDB_NAVBAR_H            BITMAP                  "res\\navbarHot.bmp"
+
 IDB_NAVBAR_C            BITMAP                  "res\\navbarCold.bmp"
+
 IDB_NAVBAR_D            BITMAP                  "res\\navbarDisabled.bmp"
+
 IDB_FMTBAR_H            BITMAP                  "res\\formtbarHot.bmp"
+
 IDB_FMTBAR_C            BITMAP                  "res\\formtbarCold.bmp"
+
 IDB_FMTBAR_D            BITMAP                  "res\\formtbarDisabled.bmp"
+
 IDB_MISCBAR_H           BITMAP                  "res\\miscHot.bmp"
+
 IDB_MISCBAR_C           BITMAP                  "res\\miscCold.bmp"
+
 IDB_MISCBAR_D           BITMAP                  "res\\miscDisabled.bmp"
+
 IDB_OPERBAR_H           BITMAP                  "res\\operationsHot.bmp"
+
 IDB_OPERBAR_C           BITMAP                  "res\\operationsCold.bmp"
+
 IDB_OPERBAR_D           BITMAP                  "res\\operationsDisabled.bmp"
+
 IDB_BM_ADD              BITMAP                  "res\\bookmark_new.bmp"
+
 IDB_BM_ADD_HOT          BITMAP                  "res\\bookmark_new_hot.bmp"
+
 IDB_BM_DEL              BITMAP                  "res\\bookmark_del.bmp"
+
 IDB_BM_DEL_HOT          BITMAP                  "res\\bookmark_del_hot.bmp"
+
 IDB_BM_GOTO             BITMAP                  "res\\bookmark_go.bmp"
+
 IDB_BM_GOTO_HOT         BITMAP                  "res\\bookmark_go_hot.bmp"
+
 IDB_BM_VALIDATE         BITMAP                  "res\\bookmark_val.bmp"
+
 IDB_BM_VALIDATE_HOT     BITMAP                  "res\\bookmark_val_hot.bmp"
+
 IDB_HELP                BITMAP                  "res\\help.bmp"
+
 IDB_HELP_HOT            BITMAP                  "res\\help_hot.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -4185,38 +4277,6 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,176,39,50,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,176,58,50,14
     PUSHBUTTON      "Help",IDC_PLAY_HELP,115,58,50,14,WS_GROUP
-END
-
-IDD_EMAIL DIALOGEX 0, 0, 278, 238
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CONTEXTHELP | WS_POPUP | WS_CAPTION | WS_SYSMENU
-EXSTYLE WS_EX_CONTEXTHELP
-CAPTION "Send Email to HexEdit Support"
-FONT 8, "MS Sans Serif", 0, 0, 0x1
-BEGIN
-    LTEXT           "&To *",IDC_STATIC,9,9,14,8
-    COMBOBOX        IDC_TO,41,3,116,67,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP,0,HIDC_TO
-    LTEXT           "&Subject *",IDC_STATIC,9,25,30,8
-    EDITTEXT        IDC_SUBJECT,41,22,116,14,ES_AUTOHSCROLL,0,HIDC_SUBJECT
-    GROUPBOX        "Type",IDC_STATIC,169,3,102,47,WS_GROUP
-    CONTROL         "&Bug report",IDC_BUG,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,179,12,49,10,0,HIDC_BUG
-    CONTROL         "&Enhancement request",IDC_ENHANCE,"Button",BS_AUTORADIOBUTTON,179,24,85,10,0,HIDC_ENHANCE
-    CONTROL         "&Other",IDC_OTHER,"Button",BS_AUTORADIOBUTTON,179,36,33,10,0,HIDC_OTHER
-    LTEXT           "&Description *",IDC_STATIC,9,42,41,8
-    EDITTEXT        IDC_TEXT,9,55,262,92,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL,0,HIDC_TEXT
-    CONTROL         "Attach:",IDC_ATTACH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,154,39,10,0,HIDC_ATTACH
-    EDITTEXT        IDC_ATTACHMENT,59,152,154,14,ES_AUTOHSCROLL,0,HIDC_ATTACHMENT
-    PUSHBUTTON      "Browse...",IDC_ATTACHMENT_BROWSE,221,152,50,14,0,0,HIDC_ATTACHMENT_BROWSE
-    LTEXT           "S&ystem version:",IDC_STATIC,9,177,50,8
-    COMBOBOX        IDC_SYSTYPE,59,175,63,96,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP,0,HIDC_SYSTYPE
-    LTEXT           "HexEdit &Version:",IDC_STATIC,130,173,26,17
-    COMBOBOX        IDC_VERSION,159,175,54,98,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP,0,HIDC_VERSION
-    PUSHBUTTON      "&Help",IDC_EMAIL_HELP,221,174,50,14
-    LTEXT           "Your &name:",IDC_STATIC,9,201,37,8
-    EDITTEXT        IDC_NAME,59,198,154,14,ES_AUTOHSCROLL,0,HIDC_NAME
-    LTEXT           "Email &address:",IDC_STATIC,9,219,46,8
-    EDITTEXT        IDC_ADDRESS,59,216,154,14,ES_AUTOHSCROLL,0,HIDC_ADDRESS
-    DEFPUSHBUTTON   "Send",IDOK,221,198,50,14,WS_GROUP
-    PUSHBUTTON      "&Cancel",IDCANCEL,221,216,50,14
 END
 
 IDD_CALC DIALOGEX 0, 0, 309, 224
@@ -5022,62 +5082,6 @@ END
 // Dialog Info
 //
 
-IDD_EMAIL DLGINIT
-BEGIN
-    IDC_TO, 0x403, 28, 0
-0x6548, 0x4578, 0x6964, 0x5374, 0x7075, 0x4740, 0x6f6f, 0x6c67, 0x4765, 
-0x6f72, 0x7075, 0x2e73, 0x6f63, 0x006d, 
-    IDC_TO, 0x403, 21, 0
-0x6548, 0x4578, 0x6964, 0x5374, 0x7075, 0x4740, 0x614d, 0x6c69, 0x632e, 
-0x6d6f, "\000" 
-    IDC_TO, 0x403, 23, 0
-0x5041, 0x6968, 0x6c6c, 0x7069, 0x3873, 0x3130, 0x4740, 0x616d, 0x6c69, 
-0x632e, 0x6d6f, "\000" 
-    IDC_SYSTYPE, 0x403, 12, 0
-0x6854, 0x7369, 0x7320, 0x7379, 0x6574, 0x006d, 
-    IDC_SYSTYPE, 0x403, 13, 0
-0x6957, 0x646e, 0x776f, 0x2073, 0x3032, 0x3030, "\000" 
-    IDC_SYSTYPE, 0x403, 11, 0
-0x6957, 0x646e, 0x776f, 0x2073, 0x5058, "\000" 
-    IDC_SYSTYPE, 0x403, 6, 0
-0x6956, 0x7473, 0x0061, 
-    IDC_SYSTYPE, 0x403, 10, 0
-0x6957, 0x646e, 0x776f, 0x2073, 0x0037, 
-    IDC_SYSTYPE, 0x403, 10, 0
-0x6957, 0x646e, 0x776f, 0x2073, 0x0038, 
-    IDC_SYSTYPE, 0x403, 6, 0
-0x744f, 0x6568, 0x0072, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e31, 0x0030, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e31, 0x0031, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e31, 0x0032, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e32, 0x0030, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e32, 0x0031, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e32, 0x0032, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e32, 0x0035, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e32, 0x0036, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e33, 0x0030, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e33, 0x0031, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e33, 0x0032, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e33, 0x0033, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e33, 0x0034, 
-    IDC_VERSION, 0x403, 12, 0
-0x6556, 0x7372, 0x6f69, 0x206e, 0x2e33, 0x0035, 
-    0
-END
-
 IDD_DFFD_DATA DLGINIT
 BEGIN
     IDC_DFFD_TYPE, 0x403, 5, 0
@@ -5176,10 +5180,6 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
-    IDD_EMAIL, DIALOG
-    BEGIN
-    END
-
     IDD_CALC, DIALOG
     BEGIN
         BOTTOMMARGIN, 200
@@ -5263,10 +5263,15 @@ END
 //
 
 IDC_HIGHLIGHT           CURSOR                  "res\\highligh.cur"
+
 IDC_SMALLARROWS         CURSOR                  "res\\curSmallArrows.cur"
+
 IDC_HANDOPEN            CURSOR                  "res\\HandOpen.cur"
+
 IDC_HANDGRAB            CURSOR                  "res\\HandGrab.cur"
+
 IDC_INFO                CURSOR                  "res\\info.cur"
+
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 

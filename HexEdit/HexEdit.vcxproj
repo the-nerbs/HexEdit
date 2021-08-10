@@ -187,7 +187,6 @@
     <ClCompile Include="DirDialog.cpp" />
     <ClCompile Include="DocData.cpp" />
     <ClCompile Include="EBCDIC.cpp" />
-    <ClCompile Include="EmailDlg.cpp" />
     <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="Expr.cpp" />
     <ClCompile Include="FindDlg.cpp" />
@@ -434,7 +433,6 @@
     <ClInclude Include="DFFDUseStruct.h" />
     <ClInclude Include="Dialog.h" />
     <ClInclude Include="DirDialog.h" />
-    <ClInclude Include="EmailDlg.h" />
     <ClInclude Include="Explorer.h" />
     <ClInclude Include="Expr.h" />
     <ClInclude Include="FindDlg.h" />

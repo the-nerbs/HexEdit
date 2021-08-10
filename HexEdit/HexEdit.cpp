@@ -33,7 +33,6 @@
 #include <HtmlHelp.h>
 #include <imagehlp.h>           // For ::MakeSureDirectoryPathExists()
 
-#include "EmailDlg.h"
 #include "HexFileList.h"
 #include "RecentFileDlg.h"
 #include "BookmarkDlg.h"
@@ -188,8 +187,8 @@ BEGIN_MESSAGE_MAP(CHexEditApp, CWinAppEx)
 		ON_COMMAND(ID_PROPERTIES, OnProperties)
 		ON_COMMAND(ID_PROPERTIES_BMP, OnPropertiesBitmap)
 		ON_COMMAND(ID_MULTI_PLAY, OnMultiPlay)
-		ON_COMMAND(ID_HELP_EMAIL, OnHelpEmail)
-		ON_UPDATE_COMMAND_UI(ID_HELP_EMAIL, OnUpdateHelpEmail)
+		ON_COMMAND(ID_HELP_REPORT_ISSUE, OnHelpReportIssue)
+		ON_UPDATE_COMMAND_UI(ID_HELP_REPORT_ISSUE, OnUpdateHelpReportIssue)
 		ON_COMMAND(ID_HELP_WEB, OnHelpWeb)
 		ON_UPDATE_COMMAND_UI(ID_HELP_WEB, OnUpdateHelpWeb)
 		ON_COMMAND(ID_WEB_PAGE, OnWebPage)
@@ -212,10 +211,8 @@ BEGIN_MESSAGE_MAP(CHexEditApp, CWinAppEx)
 		ON_COMMAND(ID_ZLIB_SETTINGS, OnCompressionSettings)
 		ON_COMMAND(ID_HELP_FORUM, OnHelpWebForum)
 		ON_COMMAND(ID_HELP_HOMEPAGE, OnHelpWebHome)
-		ON_COMMAND(ID_HELP_DONATE, OnHelpWebDonate)
 		ON_UPDATE_COMMAND_UI(ID_HELP_FORUM, OnUpdateHelpWeb)
 		ON_UPDATE_COMMAND_UI(ID_HELP_HOMEPAGE, OnUpdateHelpWeb)
-		ON_UPDATE_COMMAND_UI(ID_HELP_DONATE, OnUpdateHelpWeb)
 
 		// Repair commands
 		ON_COMMAND(ID_REPAIR_COPYUSERFILES, OnRepairFiles)
@@ -664,7 +661,7 @@ void CHexEditApp::InitVersionInfo()
 	// Get HexEdit version info from version resource
 	DWORD dummy;                                        // Version functions take parameters that do nothing?!
 	size_t vi_size;                                     // Size of all version info
-	void *buf;                                          // Buffer to hold all version info
+	void* buf = nullptr;                                // Buffer to hold all version info
 	void *p_version;                                    // Holds ptr to product version string in buffer
 	UINT len;                                           // Length of product version string
 
@@ -700,8 +697,8 @@ void CHexEditApp::InitVersionInfo()
 				}
 			}
 		}
-		free(buf);
 	}
+	free(buf);
 
 	// Getting OS version info
 	OSVERSIONINFO osvi;
@@ -933,7 +930,6 @@ void CHexEditApp::InitWorkspace()
 		ID_HELP_TUTE3,
 		ID_HELP_FORUM,
 		ID_HELP_HOMEPAGE,
-		ID_HELP_DONATE,
 		ID_REPAIR_DIALOGBARS,
 		ID_REPAIR_CUST,
 		ID_APP_ABOUT,
@@ -4112,14 +4108,13 @@ void CHexEditApp::ShowTipOfTheDay(void)
 		SaveToMacro(km_tips);
 }
 
-void CHexEditApp::OnHelpEmail()
+void CHexEditApp::OnHelpReportIssue()
 {
-	SendEmail();
+	::BrowseWeb(IDS_WEB_REPORT_ISSUE);
 }
 
-void CHexEditApp::OnUpdateHelpEmail(CCmdUI* pCmdUI)
+void CHexEditApp::OnUpdateHelpReportIssue(CCmdUI* pCmdUI)
 {
-	//pCmdUI->Enable(::GetProfileInt("MAIL", "MAPI", 0) == 1);
 	pCmdUI->Enable(TRUE);
 }
 
@@ -4210,29 +4205,32 @@ void CHexEditApp::OnHelpWeb()
 		VERIFY(str.LoadString(IDS_WEB_HELP));
 		pView->Navigate2(str);
 	}
-#else
+#elif 0
 	::BrowseWeb(IDS_WEB_HELP);
+#else
+	// TODO: online help.
+	HWND hWindow = AfxGetMainWnd()->GetSafeHwnd();
+	MessageBox(hWindow, "Online help is not available just yet. Sorry for the inconvenience!", "HexEdit", MB_ICONINFORMATION | MB_OK);
 #endif
 }
 
 void CHexEditApp::OnHelpWebForum()
 {
+	// note: links to github discussions (as of 9 August 2021)
 	::BrowseWeb(IDS_WEB_FORUMS);
 }
 
 void CHexEditApp::OnHelpWebHome()
 {
+	// note: links to github repo home (as of 9 August 2021)
 	::BrowseWeb(IDS_WEB_ADDRESS);
-}
-
-void CHexEditApp::OnHelpWebDonate()
-{
-	::BrowseWeb(IDS_WEB_DONATE);
 }
 
 void CHexEditApp::OnUpdateHelpWeb(CCmdUI* pCmdUI)
 {
-	pCmdUI->Enable(TRUE);
+	// TODO: online help.
+	BOOL enabled = pCmdUI->m_nID != ID_HELP_WEB;
+	pCmdUI->Enable(enabled);
 }
 
 // App command to run the dialog
@@ -4538,230 +4536,4 @@ COLORREF BestSearchCol()
 		return theApp.scheme_[0].search_col_;
 	else
 		return pv->GetSearchCol();
-}
-
-BOOL SendEmail(int def_type /*=0*/, const char *def_text /*=NULL*/, const char *def_name)
-{
-	BOOL retval = FALSE;
-	CHexEditApp *aa = dynamic_cast<CHexEditApp *>(AfxGetApp());
-
-	HINSTANCE hmapi = ::LoadLibrary("MAPI32.DLL");
-	if (hmapi == (HINSTANCE)0)
-	{
-		AfxMessageBox("MAPI32.DLL not found");
-		return FALSE;
-	}
-
-	LPMAPISENDMAIL pf = (LPMAPISENDMAIL)GetProcAddress(hmapi, "MAPISendMail");
-	if (pf == (LPMAPISENDMAIL)0)
-	{
-		AfxMessageBox("MAPI32.DLL failure");
-		::FreeLibrary(hmapi);
-		return FALSE;
-	}
-
-	CEmailDlg dlg;
-	dlg.type_ = def_type;
-	dlg.text_ = def_text;
-	dlg.name_ = def_name;
-	if (def_type == 2)
-	{
-		dlg.to_ = "info@HexEdit.com";
-		dlg.subject_ = "[hexedit] License";
-	}
-
-	// If bug report then default attachment file name to be the active file
-	CHexEditView *pv = NULL;
-	if (def_type == 0 &&
-		(pv = GetView()) != NULL &&
-		pv->GetDocument()->pfile1_ != NULL &&
-		pv->GetDocument()->length() < 4*1024*1024 &&
-		!pv->GetDocument()->IsDevice() )
-	{
-		dlg.attachment_ = pv->GetDocument()->pfile1_->GetFilePath();
-	}
-
-	while (dlg.DoModal() == IDOK)
-	{
-		// Send (or try to send) the mail
-		CString subject, text;          // Where subject & body of mail is built
-
-		// Set up the sender and receiver of the email
-		MapiRecipDesc from, to;
-		memset(&from, '\0', sizeof(from));
-		from.ulRecipClass = MAPI_ORIG;
-		from.lpszName = getenv("USERNAME");
-
-		CString address = "SMTP:" + dlg.to_;
-		memset(&to, '\0', sizeof(to));
-		to.ulRecipClass = MAPI_TO;
-		to.lpszName = "andrew";
-		to.lpszAddress = address.GetBuffer(0);
-
-		// Build the subject and message text from the info the user entered.
-		// NOTE: The subject should include the word "hexedit" to be filtered properly.
-		switch (dlg.type_)
-		{
-		case 0:
-			subject = "HEXEDIT BUG: ";
-			text = "TYPE: BUG REPORT\n";
-			break;
-		case 1:
-			subject = "HEXEDIT REQ: ";
-			text = "TYPE: ENHANCEMENT REQUEST\n";
-			break;
-		default:
-			subject = "HEXEDIT OTH: ";
-			text = "TYPE: OTHER\n";
-		}
-		subject += dlg.subject_;
-
-		// Add the system information to the email
-		text += "SYSTEM: ";
-		if (dlg.systype_.CompareNoCase("This system") == 0)
-		{
-			OSVERSIONINFO osvi;
-			osvi.dwOSVersionInfoSize = sizeof(osvi);
-			GetVersionEx(&osvi);
-
-			if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT &&
-				osvi.dwMajorVersion == 3 && osvi.dwMinorVersion >= 50)
-				text += "NT 3.5X";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion == 4)
-				text += "NT 4.0";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-				osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
-				text += "Windows 2000";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-				osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
-				text += "Windows XP";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && 
-				osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-				text += "Windows Server 2003";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS &&
-				osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-				text += "Windows 95";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS &&
-				osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-				text += "Windows 98";
-			else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS &&
-				osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-				text += "Windows ME";
-			CString version_info;
-			version_info.Format("  %ld.%ld (build %ld)", (long)osvi.dwMajorVersion,
-								(long)osvi.dwMinorVersion, (long)osvi.dwBuildNumber);
-			text += version_info;
-		}
-		else
-			text += dlg.systype_;
-
-		// Add info about the version of HexEdit and user details
-		text += "\nVERSION: ";
-		text += dlg.version_;
-		text += "\nNAME: ";
-		text += dlg.name_;
-		text += "\nEMAIL: ";
-		text += dlg.address_;
-		text += "\n";
-
-		text += dlg.text_;
-
-		// Set up the email header info
-		MapiMessage mm;
-		memset(&mm, '\0', sizeof(mm));
-		mm.lpszSubject = subject.GetBuffer(0);
-		mm.lpszNoteText = text.GetBuffer(0);
-		mm.lpOriginator = &from;
-		mm.nRecipCount = 1;
-		mm.lpRecips = &to;
-
-		MapiFileDesc mfd;
-		memset(&mfd, '\0', sizeof(mfd));
-
-		bool file_closed = false;       // Did we have to close the active file (in order to attach it)?
-		bool bg_search = false;         // Did we have to stop bg search before closing the file?
-		bool bg_comp = false;
-		if (dlg.attach_)
-		{
-			mm.nFileCount = 1;
-			mm.lpFiles = &mfd;
-			mfd.lpszPathName = (char *)(const char *)dlg.attachment_;
-
-			if (pv != NULL &&
-				pv->GetDocument()->pfile1_ != NULL &&
-				pv->GetDocument()->pfile1_->GetFilePath().CompareNoCase(dlg.attachment_) == 0 &&
-				!pv->GetDocument()->read_only())
-			{
-				// Cannot attach the current file if it is read-only so close it
-
-				// First make sure there are no unsaved changes
-				if (pv->GetDocument()->IsModified() &&
-					TaskMessageBox("Save File?",
-						"The attached file has unsaved changes.\n\n"
-						"Do you want to save it now?", MB_YESNO) == IDYES)
-				{
-					pv->GetDocument()->DoFileSave();
-				}
-
-				// Kill any background search in progress before closing the file
-				if (pv->GetDocument()->SearchOccurrences() == -2)
-				{
-					pv->GetDocument()->StopSearch();
-					bg_search = true;
-				}
-				if (pv->GetDocument()->CompareDifferences() == -2)
-				{
-					pv->GetDocument()->StopComp();
-					bg_comp = true;
-				}
-				pv->GetDocument()->close_file();
-				file_closed = true;
-			}
-		}
-
-		ULONG result = pf(0, 0, &mm, MAPI_LOGON_UI, 0);
-
-		// Reopen the active file if it was closed
-		if (file_closed)
-		{
-			pv->GetDocument()->open_file(dlg.attachment_);
-
-			// Restart background search if it was stopped
-			if (bg_search)
-				pv->GetDocument()->StartSearch();
-			if (bg_comp)
-				pv->GetDocument()->StartComp();
-
-			// xxx TBD fix for aerial thread too
-		}
-
-		if (result == 0)
-		{
-			retval = TRUE;
-			break;
-		}
-
-		// For some reason 2 is returned (XP only) if attachment is currently open
-		// in modeReadWrite (even if shareDenyRead not used)
-		if ((result == 2 ||
-			 result == MAPI_E_ATTACHMENT_NOT_FOUND ||
-			 result == MAPI_E_ATTACHMENT_OPEN_FAILURE) &&
-			TaskMessageBox("Error opening attachment",
-						   "The file to be attached could not be found or opened for "
-						   "some reason (for example, no read permissions).\n\n"
-						  "Try again?", MB_YESNO) != IDYES)
-		{
-			break;
-		}
-
-		if (TaskMessageBox("MAPI error",  "An error was encountered creating the email session\n\n"
-						  "Try again?", MB_YESNO) != IDYES)
-		{
-			break;
-		}
-	}
-
-	::FreeLibrary(hmapi);
-
-	return retval;
 }

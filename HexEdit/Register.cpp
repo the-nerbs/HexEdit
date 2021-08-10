@@ -56,7 +56,6 @@ void CAbout::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CAbout, CDialog)
 	ON_WM_ERASEBKGND()
-	ON_BN_CLICKED(IDC_EMAIL, OnEmail)
 	ON_BN_CLICKED(IDC_ACK_MORE, OnAckMore)
 	ON_LBN_DBLCLK(IDC_ACK, OnDblclkAck)
 END_MESSAGE_MAP()
@@ -77,7 +76,7 @@ static const char *ack_name[] =
 	"Window Splitter class (MFC) - Robert A. T. Káldy",
 	"Splash screen (MFC) - P. J. Naughter",
 	"Transparent controls (MFC) - Ali Rafiee",
-	"range_set class - Andrew W. Phillips (me)",
+	"range_set class - Andrew W. Phillips",
 	"Folder Selection Dialog - Andrew Phillips",
 	"Git (version control) - Linus Torvalds + others",
 	"GitHub (open-source repository)",
@@ -86,19 +85,19 @@ static const char *ack_name[] =
 
 static const char *ack_url[] =
 {
-	"http://www.boost.org/",
-	"http://freeimage.sourceforge.net/",
-	"http://mpir.org/",
+	"https://www.boost.org/",
+	"https://freeimage.sourceforge.io/",
+	"https://mpir.org/",
 	"https://www.cryptopp.com/",
-	"http://www.zlib.net/",
-	"http://www.codeproject.com/KB/miscctrl/gridctrl.aspx",
-	"http://www.codeproject.com/KB/miscctrl/gridtreectrl.aspx",
-	"http://www.codeproject.com/KB/dialog/resizectrl.aspx",
-	"http://www.codeproject.com/KB/splitter/kaldysimplesplitter.aspx",
-	"http://www.codeproject.com/KB/dialog/splasher.aspx",
-	"http://www.codeproject.com/KB/static/TransparentStaticCtrl.aspx",
-	"http://www.ddj.com/dept/cpp/184403660",
-	"http://www.codeguru.com/cpp/w-d/dislog/dialogforselectingfolders/article.php/c1885/",
+	"https://zlib.net/",
+	"https://www.codeproject.com/Articles/8/MFC-Grid-control-2-27",
+	"https://www.codeproject.com/Articles/479/Tree-control-and-Buttons-for-MFC-Grid-control",
+	"https://www.codeproject.com/Articles/632/CResizeCtrl",
+	"https://www.codeproject.com/Articles/6181/Simple-Splitter-with-CWnd-derived-Panes",
+	"https://www.codeproject.com/Articles/403/Splasher-v1-32-A-Splash-Screen-Implementation",
+	"https://www.codeproject.com/Articles/9064/Yet-Another-Transparent-Static-Control",
+	"https://www.drdobbs.com/a-container-for-a-set-of-ranges/184403660",
+	"https://www.codeguru.com/cpp/w-d/dislog/dialogforselectingfolders/article.php/c1885/Dialog-for-Selecting-Directories.htm",
 	"https://git-scm.com/",
 	"https://github.com/AndrewWPhillips/HexEdit",
 	NULL
@@ -113,7 +112,7 @@ BOOL CAbout::OnInitDialog()
 
 	fix_controls();
 
-	// Set up acknowledgements
+	// Set up acknowledgments
 	ctl_ack_.ResetContent();
 	for (const char** ppp = ack_name; *ppp != NULL; ++ppp)
 		ctl_ack_.AddString(*ppp);
@@ -168,11 +167,6 @@ void CAbout::fix_controls()
 	url_ctl_.SizeToContent(TRUE, TRUE);
 
 	UpdateData(FALSE);
-}
-
-void CAbout::OnEmail()
-{
-	::SendEmail();
 }
 
 void CAbout::OnAckMore()

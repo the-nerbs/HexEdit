@@ -568,7 +568,7 @@ protected:
 	afx_msg void OnTest();
 		DECLARE_MESSAGE_MAP()
 
-public:  // These really should be private but are called from SendEmail
+private:
 	BOOL open_file(LPCTSTR lpszPathName); // Open or reopen file_
 	void close_file();
 

@@ -45,7 +45,6 @@ protected:
 	virtual BOOL OnInitDialog();
 	//}}AFX_MSG
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
-	afx_msg void OnEmail();
 	afx_msg void OnAckMore();
 	afx_msg void OnDblclkAck();
 	DECLARE_MESSAGE_MAP()

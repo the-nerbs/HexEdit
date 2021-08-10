@@ -130,9 +130,6 @@
     <ClCompile Include="EBCDIC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EmailDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Explorer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -811,9 +808,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DirDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="EmailDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Explorer.h">

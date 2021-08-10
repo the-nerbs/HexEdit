@@ -332,8 +332,8 @@ public:
 	afx_msg void OnProperties();
 	afx_msg void OnPropertiesBitmap();
 	afx_msg void OnMultiPlay();
-	afx_msg void OnHelpEmail();
-	afx_msg void OnUpdateHelpEmail(CCmdUI* pCmdUI);
+	afx_msg void OnHelpReportIssue();
+	afx_msg void OnUpdateHelpReportIssue(CCmdUI* pCmdUI);
 	afx_msg void OnHelpWeb();
 	afx_msg void OnUpdateHelpWeb(CCmdUI* pCmdUI);
 	afx_msg void OnWebPage();
@@ -355,7 +355,6 @@ public:
 	//}}AFX_MSG
 	afx_msg void OnHelpWebForum();
 	afx_msg void OnHelpWebHome();
-	afx_msg void OnHelpWebDonate();
 	afx_msg void OnCompressionSettings();
 	afx_msg void OnFileSaveAll();
 	afx_msg void OnFileCloseAll();
@@ -918,7 +917,5 @@ extern CHexEditView *GetView();
 extern COLORREF BestDecAddrCol();
 extern COLORREF BestHexAddrCol();
 extern COLORREF BestSearchCol();
-
-extern BOOL SendEmail(int def_type = 0, const char *def_text = NULL, const char *def_name = NULL);
 
 #endif
