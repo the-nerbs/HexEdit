@@ -351,9 +351,6 @@
     <None Include="RES\back_hot.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\graphics\HexEditButtons\calc.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Res\cogs.ico">
       <Filter>Resource Files</Filter>
     </None>

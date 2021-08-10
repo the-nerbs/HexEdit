@@ -3,12 +3,6 @@
 *.opensdf
 *.sdf
 HexEdit/GitRevision.h
-HexEdit/Release/
-HexEdit/Output/
-HexEdit/Debug/
-HexEdit/ipch/
-HexEdit/RegHelper/Debug/
-HexEdit/RegHelper/Release/
 HexEdit/HTMLHelp/!SkinSubFolder!/
 HexEdit/HTMLHelp/*.hhk_backup
 HexEdit/HTMLHelp/*.hha
@@ -23,17 +17,12 @@ HexEdit/HTMLHelp/*.js
 HexEdit/HTMLHelp/*.h
 HexEdit/HTMLHelp/*.chm
 HexEdit/HTMLHelp/!chm_tmp_folder_0/
-HexEdit/Install/Release/
-HexEdit/Install/*.brk
-HexEdit/Install/*.fld
-HexEdit/Install/*.msm
-HexEdit/Graphics/*.jpg
-HexEdit/Graphics/*.bmp
-HexEdit/Graphics/*.png
+Resources/Graphics/*.jpg
+Resources/Graphics/*.bmp
+!Resources/Graphics/Backgrnd.bmp
+Resources/Graphics/*.png
 HexEdit/videos/*.avi
 HexEdit/Videos/Work/
-ThirdParty/CryptoPP/Win32/
-ThirdParty/CryptoPP/*.copied
 
 
 # more additions

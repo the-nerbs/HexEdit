@@ -277,7 +277,6 @@
     <None Include="resource.hm" />
     <None Include="RES\back.bmp" />
     <None Include="RES\back_hot.bmp" />
-    <None Include="..\..\graphics\HexEditButtons\calc.bmp" />
     <None Include="res\bookmark_del.bmp" />
     <None Include="res\bookmark_del_hot.bmp" />
     <None Include="res\bookmark_go.bmp" />

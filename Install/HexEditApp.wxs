@@ -91,9 +91,9 @@
 
       <!-- graphics files -->
       <Component Id="Graphics" Guid="579efcdf-ee72-49e6-96fb-638b8f00d68e">
-        <File Source="$(var.HexEdit.ProjectDir)Graphics\Splash.bmp" />
-        <File Source="$(var.HexEdit.ProjectDir)Graphics\About.jpg" />
-        <File Source="$(var.HexEdit.ProjectDir)Graphics\Backgrnd.bmp" />
+        <File Source="$(var.GraphicsDir)Splash.bmp" />
+        <File Source="$(var.GraphicsDir)About.jpg" />
+        <File Source="$(var.GraphicsDir)Backgrnd.bmp" />
         <File Source="$(var.HexEdit.ProjectDir)DefaultToolbarImages.bmp" />
       </Component>
       

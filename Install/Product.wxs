@@ -23,8 +23,8 @@
     <FeatureRef Id="ContextMenu" />
 
     <UIRef Id="UISequence"/>
-    <WixVariable Id="WixUIBannerBmp" Value="$(var.HexEdit.ProjectDir)Graphics\Banner.bmp"/>
-    <WixVariable Id="WixUIDialogBmp" Value="$(var.HexEdit.ProjectDir)Graphics\Installer.bmp"/>
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.GraphicsDir)\Banner.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.GraphicsDir)\Installer.bmp"/>
     <WixVariable Id="WixUILicenseRtf" Value="$(var.LicensePath)"/>
   </Product>
 
