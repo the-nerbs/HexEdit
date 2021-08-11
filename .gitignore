@@ -17,10 +17,6 @@ HexEdit/HTMLHelp/*.js
 HexEdit/HTMLHelp/*.h
 HexEdit/HTMLHelp/*.chm
 HexEdit/HTMLHelp/!chm_tmp_folder_0/
-Resources/Graphics/*.jpg
-Resources/Graphics/*.bmp
-!Resources/Graphics/Backgrnd.bmp
-Resources/Graphics/*.png
 HexEdit/videos/*.avi
 HexEdit/Videos/Work/
 
