@@ -1,0 +1,338 @@
+<!doctype HTML public "-//W3C//DTD HTML 4.0 Frameset//EN">
+
+<html>
+
+<!--(==============================================================)-->
+<!--(Document created with RoboEditor. )============================-->
+<!--(==============================================================)-->
+
+<head>
+
+<title>clipboard</title>
+
+<!--(Meta)==========================================================-->
+
+<meta http-equiv=content-type content="text/html; charset=windows-1252">
+<meta name=copyright value="1999-2001 Expert Commercial Software">
+<meta name=date content="05 31, 2001 11:05:15 PM">
+<meta name=generator content="RoboHELP by eHelp Corporation - www.ehelp.com">
+<meta name=generator-major-version content=0.1>
+<meta name=generator-minor-version content=1>
+<meta name=filetype content=kadov>
+<meta name=filetype-version content=1>
+<meta name=page-count content=1>
+<meta name=layout-height content=1104>
+<meta name=layout-width content=1564>
+
+
+<!--(Links)=========================================================-->
+
+<link rel="StyleSheet" href="..\Hexedit.css">
+
+
+
+</head>
+
+<!--(Body)==========================================================-->
+
+
+<body>
+
+<h2><font style="font-family: Arial;"
+			face=Arial>Selecting and the Clipboard</font></h2>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p>To select part of a file you can use the mouse or the keyboard. To use 
+ the mouse, click the first byte you want to select and drag the mouse 
+ to the last byte. Alternatively, you can click (and release) on the first 
+ byte then shift-click (hold down the Shift key while you click) the last 
+ byte. Shift-clicking is very useful if you need to select a large area 
+ since you can use the scroll bar to quickly move to the other end of the 
+ desired range.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p>To use the keyboard you can use the Shift key with the normal cursor 
+ movement keys. For example, to select everything from the current cursor 
+ position to the end of the file press Shift+Ctrl+End.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p>Once selected you can cut or copy the bytes to the clipboard in the 
+ normal manner. Note that you cannot cut if the window is in either of 
+ the read-only or overtype modes since this will delete bytes from the 
+ file. You can also perform many other operations with selected text such 
+ as write it to a file, print, compress, export etc.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0;
+			margin-bottom: 0;
+			font-weight: bold;">Selection Length</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">While you are making a selection 
+ a small &quot;tip&quot; window is displayed which displays the length 
+ of the selection (in hex or decimal depending on how addresses are currently 
+ displayed).</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;"><img src="../tip.gif"
+												style="border-style: none;
+														border: none;
+														width: 31px;
+														height: 12px;"
+												width=31
+												height=12
+												border=0>You can bring 
+ this tip window up at any time by holding down the &quot;Shift&quot; key.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">There is also an option for 
+ showing what power of 2 the selection length is divisible by. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->This 
+ is useful as some commands only work with a selection length which is 
+ a multiple of 2, 4 or 8. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->This 
+ option can be turned off in <a HREF="../dlg_options/HIDD_OPT_WORKDISPLAY.htm">Workspace 
+ Display</a> page of the Options dialog.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0;
+			margin-bottom: 0;
+			font-weight: bold;">Highlighter</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p>The highlighter has already been mentioned but it can also be viewed 
+ as allowing a disconnected or discontiguous selection (ie all the selected 
+ bytes do not have to be next to each other).</p>
+
+<p>&nbsp;</p>
+
+<p>You can use the <a href="../cmd_edit/HID_HIGHLIGHT.htm">highlighter</a> 
+ to mark particular important bytes within a file. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->Clicking 
+ the highlighter, highlights the selected bytes. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->To 
+ quickly create several highlights, turn on highlighter mode (click the 
+ highlighter button when there are no bytes selected), thence all subsequent 
+ selections made will be highlighted. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->Highlighter 
+ mode can be used when comparing files to highlight all differences that 
+ were found.</p>
+
+<p>&nbsp;</p>
+
+<p style="font-weight: bold;"><span style="font-weight: bold;"><span style="font-weight: bold;">C</span>lipboard 
+ Formats</span></p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">You have a choice of how <span 
+ class=HexEdit>HexEdit</span> works with the clipboard, but first you 
+ need to understand how data is stored on the Windows clipboard. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->There 
+ are actually three different ways that are used depending on the circumstances:</p>
+
+<ol style="list-style: decimal;"
+	type=1>
+	
+	<li class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">Data 
+ is copied to the clipboard in two different formats at the same time. 
+ <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->This is 
+ how the clipboard has been used since HexEdit 1.0.</p></li>
+	
+	<ul>
+		
+		<li style="list-style: disc;"
+			type=disc
+			class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">binary 
+ format (the same as used in Visual Studio hex editor) - this allows copying 
+ and pasting with no loss of data (unlike text formats which cannot handle 
+ all byte values)</p></li>
+		
+		<li style="list-style: disc;"
+			type=disc
+			class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">text 
+ format, converted from the current character set as necessary - this allows 
+ copying and pasting with text editors, word processors, etc</p></li>
+	</ul>
+	
+	<li class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">Data 
+ is copied to the clipboard as hex text.</p></li>
+	
+	<ul>
+		
+		<li style="list-style: disc;"
+			type=disc
+			class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">text 
+ format, where each byte is stored as two hex digits (plus space and end 
+ of line characters) - data can be copied and pasted in <span class=HexEdit>HexEdit 
+ </span> (with no lost information) and pasted as hex text into a text 
+ editor</p></li>
+	</ul>
+	
+	<li class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">If the 
+ data is too large for the clipboard to handle a special clipboard format 
+ is used where only a small amount of information is held in memory and 
+ the actual data is kept in a temporary file.</p></li>
+	
+	<ul>
+		
+		<li style="list-style: disc;"
+			type=disc
+			class=kadov-p><p style="margin-top: 0; margin-bottom: 0;">custom 
+ format, where the actual data is stored in a temporary file - allows copying 
+ and pasting of selections of any size (subject to disk space), but the 
+ data cannot be pasted into other software</p></li>
+	</ul>
+</ol>
+
+<p style="margin-top: 0; margin-bottom: 0;">For large data the last format 
+ is always used, but whether 1 or 2 is used depends on settings chosen 
+ in <a href="../dlg_options/HIDD_OPT_WORKSPACE.htm">Workspace Editing Options</a>.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">There are also other ways to 
+ interact with the clipboard, all of which work with text. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->First, 
+ you need to understand that text on the clipboard is stored internally 
+ as Unicode (in versions of Windows derived from NT). <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->When 
+ you copy or paste text data in <span class=HexEdit>HexEdit</span> 
+ the text will be automatically converted according to the current character 
+ set. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->If 
+ you are using EBCDIC then anything you cut or copy to the clipboard will 
+ be converted from EBCDIC to Unicode.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">When pasting from the clipboard 
+ the reverse conversion is supplied, so if you are pasting from a Windows 
+ text editor into <span class=HexEdit>HexEdit</span> in EBCDIC mode 
+ the text would automatically be converted from ASCII or Unicode to EBCDIC. 
+ <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->However 
+ if you are copying and pasting within HexEdit then the binary format 
+ data is used in preference to the text data and hence no conversion is 
+ performed. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->If 
+ you want to copy and paste within <span class=HexEdit>HexEdit</span> 
+ and convert between character sets you need instead to use one of the 
+ <a HREF="../cmd_edit/HID_PASTE_ASCII.htm">Paste As ASCII</a>, <a HREF="../cmd_edit/HID_PASTE_EBCDIC.htm">Paste 
+ As EBCDIC</a>, or <a HREF="../cmd_edit/HID_PASTE_UNICODE.htm">Paste As 
+ Unicode Text</a> commands.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">The <a HREF="../cmd_edit/HID_COPY_CCHAR.htm">Copy 
+ As C Source</a> allows even more sophisticated ways to copy text to the 
+ clipboard. This was designed for initialising many different sorts of 
+ array in C, C++ and other programming languages, but it is far more useful 
+ than that - for example you can create CSV integer or floating point data 
+ suitable for importing into other programs such as a spreadsheet.</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p style="font-weight: bold;">Working with Large Files</p>
+
+<p style="margin-top: 0; margin-bottom: 0;">&nbsp;</p>
+
+<p>The clipboard is great for working with small to medium sized blocks 
+ of data, but will not work for blocks of more than about 16 Mbytes. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->Furthermore, 
+ when you paste data into <span class=HexEdit>HexEdit</span> the pasted 
+ data is stored in memory. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->If 
+ you paste a lot of large blocks of data you will cause Windows to slow 
+ down or even crash through memory exhaustion.</p>
+
+<p>&nbsp;</p>
+
+<p>The Append to File and the Append to Same File commands were created 
+ to avoid these problems. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->With 
+ these commands you can easily build multi-Mbyte or even multi-Gbyte files 
+ easily, by building a file from large blocks appended to a file in order.</p>
+
+<p>&nbsp;</p>
+
+<p>Another problem with large files is that the scrollbars are virtually 
+ useless. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->In 
+ a multi-Gbyte file there are many Mbytes between each &quot;notch&quot; 
+ of the scroll bar, and it can take hours to page to the address you want. 
+ <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->Of course, 
+ you can easily jump to an address with one of the Hex or Decimal Address 
+ tools or the Go To command. <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->But 
+ how do you select a large block since you need to use the vertical scroll 
+ bar before shift-clicking? <!--kadov_tag{{<spaces>}}-->&nbsp;<!--kadov_tag{{</spaces>}}-->The 
+ solution is to jump to one end (using a jump tool or the Go To command) 
+ and mark the position (using the Mark command), then jump to the other 
+ end and use the &quot;Extend to Mark&quot; command.</p>
+
+<p>&nbsp;</p>
+
+<p><span style="font-weight: bold;">For further information see:</span></p>
+
+<p style="margin-left: 120.50pt; text-indent: -120.50pt;"><a href="..\misc\keys.htm">Keyboard 
+ shortcuts</a>&nbsp;for how to select, cut and paste using the keyboard</p>
+
+<p style="margin-left: 120.50pt; text-indent: -120.50pt;"><a href="..\menus\menu_edit.htm">Edit 
+ menu</a>&nbsp;for clipboard and selection commands</p>
+
+<p style="margin-left: 120.50pt; text-indent: -120.50pt;">&nbsp;</p>
+
+<p style="text-indent: -120.50pt; margin-left: 201px;">
+<!--Metadata type="DesignerControl" startspan
+<object CLASSID="clsid:FF80F713-5DC6-11d0-A7B4-00AADC53E937"
+		ID=RelatedTopics
+		BORDER=0
+		style="margin-top: 0px;
+				margin-bottom: 0px;
+				margin-left: 0px;
+				margin-right: 0px;
+				vertical-align: baseline;"
+		align=bottom>
+<param name="_Version" value="65536" >
+<param name="_ExtentX" value="2117" >
+<param name="_ExtentY" value="556" >
+<param name="_StockProps" value="13" >
+<param name="ForeColor" value="0" >
+<param name="BackColor" value="12632256" >
+<param name="UseButton" value="-1" >
+<param name="ControlLabel" value="Related Topics" >
+<param name="UseIcon" value="0" >
+<param name="Items" value="Append Same File;..\cmd_edit\HID_EDIT_APPENDSAME.htm$$**$$Append Selection to File;..\cmd_edit\HID_EDIT_APPENDFILE.htm$$**$$Copy As C Source;..\cmd_edit\HID_COPY_CCHAR.htm$$**$$Copy As Hex Text;..\cmd_edit\HID_COPY_HEX.htm$$**$$Copy command;..\cmd_edit\HID_EDIT_COPY.htm$$**$$Cut command;..\cmd_edit\HID_EDIT_CUT.htm$$**$$Delete command;..\cmd_misc\HID_DEL.htm$$**$$Edit Menu Commands;..\menus\menu_edit.htm$$**$$Extend To Mark Command;..\cmd_edit\HID_EXTENDTO_MARK.htm$$**$$Find Selection;..\cmd_misc\HID_SEARCH_SEL.htm$$**$$Paste As ASCII;..\cmd_edit\HID_PASTE_ASCII.htm$$**$$Paste As EBCDIC Text;..\cmd_edit\HID_PASTE_EBCDIC.htm$$**$$Paste As Unicode Text;..\cmd_edit\HID_PASTE_UNICODE.htm$$**$$Paste command;..\cmd_edit\HID_EDIT_PASTE.htm$$**$$Select All command;..\cmd_edit\HID_SELECT_ALL.htm$$**$$Select Line command;..\cmd_misc\HID_SELECT_LINE.htm$$**$$Write Selection to File;..\cmd_edit\HID_EDIT_WRITEFILE.htm$$**$$" >
+<param name="Image" value="" >
+<param name="FontInfo" value="MS Sans Serif,8,0,," >
+<param name="_CURRENTFILEPATH" value="D:\andrew\cpp\HexEdit\HTMLHelp\overviewbasics\clipboard.htm" >
+<param name="_ID" value="RelatedTopics" >
+<param name="UseMenu" value="-1" >
+<param name="Frame" value="" >
+<param name="Window" value="" >
+</object>-->
+<OBJECT
+  CLASSID="clsid:ADB880A6-D8FF-11CF-9377-00AA003B7A11"
+  ID="RelatedTopics"  TYPE="application/x-oleobject" >
+  <PARAM  NAME="Command"  VALUE="Related Topics,MENU">
+  <PARAM  NAME="Button"  VALUE="Text:Related Topics">
+  <PARAM  NAME="Font"  VALUE="MS Sans Serif,8,0,,">
+  <PARAM  NAME="Item1"  VALUE="Append Same File;..\cmd_edit\HID_EDIT_APPENDSAME.htm">
+  <PARAM  NAME="Item2"  VALUE="Append Selection to File;..\cmd_edit\HID_EDIT_APPENDFILE.htm">
+  <PARAM  NAME="Item3"  VALUE="Copy As C Source;..\cmd_edit\HID_COPY_CCHAR.htm">
+  <PARAM  NAME="Item4"  VALUE="Copy As Hex Text;..\cmd_edit\HID_COPY_HEX.htm">
+  <PARAM  NAME="Item5"  VALUE="Copy command;..\cmd_edit\HID_EDIT_COPY.htm">
+  <PARAM  NAME="Item6"  VALUE="Cut command;..\cmd_edit\HID_EDIT_CUT.htm">
+  <PARAM  NAME="Item7"  VALUE="Delete command;..\cmd_misc\HID_DEL.htm">
+  <PARAM  NAME="Item8"  VALUE="Edit Menu Commands;..\menus\menu_edit.htm">
+  <PARAM  NAME="Item9"  VALUE="Extend To Mark Command;..\cmd_edit\HID_EXTENDTO_MARK.htm">
+  <PARAM  NAME="Item10"  VALUE="Find Selection;..\cmd_misc\HID_SEARCH_SEL.htm">
+  <PARAM  NAME="Item11"  VALUE="Paste As ASCII;..\cmd_edit\HID_PASTE_ASCII.htm">
+  <PARAM  NAME="Item12"  VALUE="Paste As EBCDIC Text;..\cmd_edit\HID_PASTE_EBCDIC.htm">
+  <PARAM  NAME="Item13"  VALUE="Paste As Unicode Text;..\cmd_edit\HID_PASTE_UNICODE.htm">
+  <PARAM  NAME="Item14"  VALUE="Paste command;..\cmd_edit\HID_EDIT_PASTE.htm">
+  <PARAM  NAME="Item15"  VALUE="Select All command;..\cmd_edit\HID_SELECT_ALL.htm">
+  <PARAM  NAME="Item16"  VALUE="Select Line command;..\cmd_misc\HID_SELECT_LINE.htm">
+  <PARAM  NAME="Item17"  VALUE="Write Selection to File;..\cmd_edit\HID_EDIT_WRITEFILE.htm">
+</OBJECT>
+
+<!--Metadata type="DesignerControl" endspan-->
+ </p>
+
+</body>
+
+</html>
