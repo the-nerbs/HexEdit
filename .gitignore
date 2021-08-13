@@ -3,16 +3,15 @@
 *.opensdf
 *.sdf
 docs/*.chm
+docs/*.chw
 docs/HTMLHelp/!SkinSubFolder!/
 docs/HTMLHelp/*.hhk_backup
 docs/HTMLHelp/*.hha
 docs/HTMLHelp/*.hhc_backup
-docs/HTMLHelp/*.hhp
 docs/HTMLHelp/*.trb
 docs/HTMLHelp/*.trf
 docs/HTMLHelp/*.trk
 docs/HTMLHelp/*.trs
-docs/HTMLHelp/*.hhk
 docs/HTMLHelp/*.js
 docs/HTMLHelp/*.h
 docs/HTMLHelp/!chm_tmp_folder_0/

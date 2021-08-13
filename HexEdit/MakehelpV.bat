@@ -1,4 +1,6 @@
 @echo off
+setlocal EnableExtensions
+
 REM MakeHelpV.bat - make help files (updated for use with VS2010)
 
 REM It creates the help map files used by RoboHelp to do context
@@ -35,3 +37,17 @@ del "DlgIdMap.tmp"
 
 ECHO Control IDs (for What's This help)
 copy /y helpid.hm+resource.hm  "%HTMLHELP%\CtlIdMap.h"
+
+
+ECHO Building CHM file . . .
+
+where hhc.exe >NUL 2>NUL
+IF ERRORLEVEL 1 GOTO nohhc
+
+PUSHD %HTMLHELP%
+hhc.exe HexEdit.hhp
+ECHO Build complete
+GOTO :EOF
+
+:nohhc
+ECHO warning : HHC.EXE not found. Skipping HTML help build.
