@@ -11,7 +11,7 @@
     <ComponentGroup Id="HelpFiles"
                     Directory="INSTALLFOLDER">
       <Component Guid="138c1df9-9058-409b-8e8a-c30d3612757d">
-        <File Source="$(var.HexEdit.ProjectDir)HTMLHelp\HexEdit.CHM"
+        <File Source="$(var.ChmPath)"
               KeyPath="yes" />
       </Component>
 

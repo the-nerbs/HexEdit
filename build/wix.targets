@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <WixVariable Include="Version" Value="$(Version)" />
+    
     <WixVariable Include="GraphicsDir" Value="$(RootDir)Resources\Graphics\" />
+    <WixVariable Include="ChmPath" Value="$(RootDir)docs\HexEdit.CHM" />
     <WixVariable Include="LicensePath" Value="$(RootDir)Resources\license.rtf" />
     <WixVariable Include="ReadmePath" Value="$(RootDir)Resources\readme.rtf" />
   </ItemGroup>
