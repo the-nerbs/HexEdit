@@ -390,7 +390,6 @@
     <None Include="Ebcdic.tab" />
     <None Include="HexEdit.tip" />
     <None Include="ReadMe.txt" />
-    <None Include="Touchf.bat" />
     <None Include="manifest.xml">
       <SubType>Designer</SubType>
     </None>

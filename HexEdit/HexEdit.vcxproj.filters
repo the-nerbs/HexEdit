@@ -654,9 +654,6 @@
     <None Include="ReadMe.txt">
       <Filter>Text Files</Filter>
     </None>
-    <None Include="Touchf.bat">
-      <Filter>Text Files</Filter>
-    </None>
     <None Include="res\bookmark_del.bmp">
       <Filter>Resource Files</Filter>
     </None>
