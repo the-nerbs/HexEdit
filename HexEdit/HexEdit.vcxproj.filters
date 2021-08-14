@@ -259,9 +259,6 @@
     <ClCompile Include="TransparentStatic2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="UpdateChecker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UserTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -948,9 +945,6 @@
     <ClInclude Include="TransparentStatic2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UpdateChecker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UserTool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1032,6 +1026,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\hexedit2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\Resources\Graphics\Backgrnd.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\Resources\Graphics\Splash.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

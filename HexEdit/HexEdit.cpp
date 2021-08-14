@@ -57,7 +57,6 @@
 #include "CompressDlg.h" // For compression settings dialog
 #include "Password.h"   // For encryption password dialog
 #include "Splasher.h"       // For splash window
-#include "UpdateChecker.h"  // For checking for updates
 
 #include <FreeImage.h>
 
@@ -473,26 +472,6 @@ BOOL CHexEditApp::InitInstance()
 
 		LoadOptions();
 		InitVersionInfo();
-
-		if (update_check_)
-		{
-			time_t now = time(NULL);
-			time_t prev = (time_t)GetProfileInt(_T("Update"), _T("LastCheckDate"), 0);  // last time we checked
-			if (now > prev + (30*24L*60*60L))  // Check about once a month
-			{
-				UpdateChecker checker(_T("http://www.hexedit.com/version.txt"));
-				if (checker.Online())
-				{
-					if (checker.UpdateAvailable(version_))
-					{
-						AvoidableTaskDialog(IDS_UPDATE_AVAILABLE,
-						                    "A newer version of HexEdit is currently available for download.", NULL, NULL, 
-						                    TDCBF_OK_BUTTON, MAKEINTRESOURCE(IDI_INFO));
-					}
-					WriteProfileInt(_T("Update"), _T("LastCheckDate"), (int)now);
-				}
-			}
-		}
 
 		// CCommandLineParser replaces app's CommandLineInfo class.
 		// This uses ParseParam() method (via app's ParseCommandLine() method)
@@ -2163,7 +2142,6 @@ void CHexEditApp::LoadOptions()
 	splash_ = GetProfileInt("Options", "Splash", 1) ? TRUE : FALSE;
 	tipofday_ = GetProfileInt("Tip", "StartUp", 0) ? FALSE : TRUE;      // inverted
 	run_autoexec_ = GetProfileInt("Options", "RunAutoExec", 1) ? TRUE : FALSE;
-	update_check_ = GetProfileInt("Update", "Check", 1) ? TRUE : FALSE;
 
 	open_locn_   = GetProfileInt("Options", "OpenLocn",  1);
 	open_folder_ = GetProfileString("Options", "OpenFolder");
@@ -2676,7 +2654,6 @@ void CHexEditApp::SaveOptions()
 	WriteProfileInt("Options", "Splash", splash_ ? 1 : 0);
 	WriteProfileInt("Tip", "StartUp", tipofday_ ? 0 : 1);   // inverted
 	WriteProfileInt("Options", "RunAutoExec", run_autoexec_ ? 1 : 0);
-	WriteProfileInt("Update", "Check", update_check_ ? 1 : 0);
 
 	WriteProfileInt("Options", "OpenLocn", open_locn_);
 	WriteProfileString("Options", "OpenFolder", open_folder_);
@@ -3257,7 +3234,6 @@ void CHexEditApp::get_options(struct OptValues &val)
 	val.splash_ = splash_;
 	val.tipofday_ = tipofday_;
 	val.run_autoexec_ = run_autoexec_;
-	val.update_check_ = update_check_;
 
 	// Folder options
 	val.open_locn_ = open_locn_;
@@ -3495,7 +3471,6 @@ void CHexEditApp::set_options(struct OptValues &val)
 	splash_ = val.splash_;
 	tipofday_ = val.tipofday_;
 	run_autoexec_ = val.run_autoexec_;
-	update_check_ = val.update_check_;
 
 	open_locn_ = val.open_locn_;
 	open_folder_ = val.open_folder_;

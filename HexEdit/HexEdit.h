@@ -657,7 +657,6 @@ public:
 	BOOL splash_;                       // Display splash screen?
 	BOOL tipofday_;                     // Show tip of the day at startup?
 	BOOL run_autoexec_;                 // Run AutoExec.HEM at startup if it exists
-	BOOL update_check_;                 // Check for updates?
 
 	// Folder options
 	int     open_locn_;                 // Default folder for open dialog (0=current doc folder, ... see enum FOLDER_LOCN)

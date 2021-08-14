@@ -238,7 +238,6 @@
     <ClCompile Include="TParser.cpp" />
     <ClCompile Include="TransparentListBox.cpp" />
     <ClCompile Include="TransparentStatic2.cpp" />
-    <ClCompile Include="UpdateChecker.cpp" />
     <ClCompile Include="UserTool.cpp" />
     <ClCompile Include="Xmltree.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -482,7 +481,6 @@
     <ClInclude Include="TParser.h" />
     <ClInclude Include="TransparentListBox.h" />
     <ClInclude Include="TransparentStatic2.h" />
-    <ClInclude Include="UpdateChecker.h" />
     <ClInclude Include="UserTool.h" />
     <ClInclude Include="w2k_def.h" />
     <ClInclude Include="Xmltree.h" />
@@ -507,6 +505,14 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\hexedit2.ico" />
+    <None Include="..\Resources\Graphics\Backgrnd.bmp">
+      <DeploymentContent>true</DeploymentContent>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Resources\Graphics\Splash.bmp">
+      <DeploymentContent>true</DeploymentContent>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

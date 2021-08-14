@@ -1372,9 +1372,6 @@ When the active folder is changed in the Explorer file window the tree (folder) 
 .topic HIDC_CRC_INITREM
 Initial remainder used before CRC algorithm begins.
 
-.topic HIDC_UPDATE
-Select this to check for updates via the Internet.  Checks are performed no more often than once a month.
-
 .topic HIDC_CRC_NAME
 Shows the name of the currently selected CRC.  You also enter a new name here before saving a new set of CRC settings,
 

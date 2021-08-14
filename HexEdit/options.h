@@ -83,7 +83,6 @@ struct OptValues
 	BOOL    splash_;
 	BOOL    tipofday_;
 	BOOL    run_autoexec_;
-	BOOL	update_check_;
 
 	// Folder options
 	int     open_locn_;
