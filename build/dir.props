@@ -7,5 +7,7 @@
     <ArtifactsObjDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'obj'))</ArtifactsObjDir>
 
     <ArtifactsPackagesDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'package'))</ArtifactsPackagesDir>
+
+    <ArtifactsInstallerDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', 'installer'))</ArtifactsInstallerDir>
   </PropertyGroup>
 </Project>

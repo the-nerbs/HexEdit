@@ -1,0 +1,35 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-2019'
+
+variables:
+  solution: './HexEdit.sln'
+  buildPlatform: 'Win32'
+  versionBase: '5.0.1'
+  build: $[counter(variables.versionBase, 1)]
+  version: $[format('{0}.{1}', variables.versionBase, variables.build)]
+  VCPKG_BINARY_SOURCES: 'clear;nuget,https://pkgs.dev.azure.com/scottnerbetski/HexEdit/_packaging/HexEdit-Cache/nuget/v3/index.json,readwrite'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetAuthenticate@0
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '.\RestoreProjects.sln'
+
+- task: MSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: 'Release'
+#    msbuildArguments: '/p:Version="$(version)" /p:ContinuousIntegrationBuild="true"'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'artifacts\installer\Release'
+    ArtifactName: 'release'
+    publishLocation: 'Container'

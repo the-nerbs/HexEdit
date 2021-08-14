@@ -5,7 +5,7 @@
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
 
     <!-- actual output path -->
-    <BaseOutputPath>$(ArtifactsBinDir)$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseOutputPath>$(ArtifactsInstallerDir)</BaseOutputPath>
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
   </PropertyGroup>
 
