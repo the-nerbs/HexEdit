@@ -1,14 +1,4 @@
 <Project>
-  <!--
-    TODO: how to handle this path?
-    (Also need to import these vcpkg props/targets files from the cpp props/targets!)
-    
-    GitHub actions use an environment variable `VCPKG_INSTALLATION_ROOT`.
-    Azure pipelines seem to use the same images as that based on:
-      https://github.com/Microsoft/azure-pipelines-image-generation
-    being archived and linking to:
-      https://github.com/actions/virtual-environments
-  -->
   <Import Project="$(VCPkgMSBuildScriptsDir)vcpkg.targets" />
 
   <Target Name="CheckValidPlatform" BeforeTargets="Build">
