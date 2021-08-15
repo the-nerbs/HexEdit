@@ -2,34 +2,12 @@
   "name": "hexedit",
   "version": "5.0.1",
   "dependencies": [
-    {
-      "name": "boost-crc",
-      "version>=": "1.76.0"
-    },
-    {
-      "name": "boost-tuple",
-      "version>=": "1.76.0"
-    },
-    {
-      "name": "catch2",
-      "version>=": "2.13.6"
-    },
-    {
-      "name": "cryptopp",
-      "version>=": "8.5.0"
-    },
-    {
-      "name": "freeimage",
-      "version>=": "3.18.0#19"
-    },
-    {
-      "name": "mpir",
-      "version>=": "3.0.0#10"
-    },
-    {
-      "name": "zlib",
-      "version>=": "1.2.11"
-    }
-  ],
-  "builtin-baseline": "dd462392f4651dcbce3051225a20b161035bef5e"
+      "boost-crc",
+      "boost-tuple",
+      "catch2",
+      "cryptopp",
+      "freeimage",
+      "mpir",
+      "zlib"
+  ]
 }
