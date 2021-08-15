@@ -28,6 +28,8 @@ steps:
     configuration: 'Release'
 #    msbuildArguments: '/p:Version="$(version)" /p:ContinuousIntegrationBuild="true"'
 
+- pwsh: Get-ChildItem -Path "artifacts\installer\Release" -Filter "*.exe" | Get-FileHash | Format-List >"artifacts\installer\Release\hash.txt"
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: 'artifacts\installer\Release'
