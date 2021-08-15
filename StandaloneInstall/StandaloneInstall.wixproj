@@ -19,6 +19,10 @@
     <Compile Include="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
     <WixExtension Include="WixBalExtension">
       <HintPath>$(WixExtDir)\WixBalExtension.dll</HintPath>
       <Name>WixBalExtension</Name>
@@ -49,11 +53,11 @@
                   DestinationFolder="$(RootDir)\tools"
                   DestinationFileName="VC_redist.x86.exe"
                   SourceUrl="https://aka.ms/vs/16/release/vc_redist.x86.exe" />
-    
+
   </Target>
   <PropertyGroup>
     <BuildDependsOn>PrepareBuild;$(BuildDependsOn)</BuildDependsOn>
   </PropertyGroup>
-  
+
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets'))" />
 </Project>

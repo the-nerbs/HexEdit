@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Bundle Name="HexEdit"
           Version="$(var.Version)"
           Manufacturer="Expert Commercial Software Pty Ltd"
@@ -13,17 +14,23 @@
                                               SuppressOptionsUI="yes" />
     </BootstrapperApplicationRef>
 
+    <util:FileSearch Id="FindVcRuntime"
+                     Path="[SYSTEMFOLDER]vcruntime140.dll"
+                     Variable="HAVE_VCRUNTIME140" />
+
     <Chain>
       <!--VC redist from https://aka.ms/vs/16/release/vc_redist.x86.exe -->
       <ExePackage SourceFile="$(var.SolutionDir)tools\VC_redist.x86.exe"
-                  DisplayName="Microsoft Visual C++ Runtime" />
+                  DisplayName="Microsoft Visual C++ Runtime"
+                  InstallCommand="/install /quiet"
+                  UninstallCommand="/uninstall /quiet"
+                  DetectCondition="HAVE_VCRUNTIME140" />
 
       <MsiPackage SourceFile="$(var.Install.TargetPath)"
                   DisplayName="HexEdit Application"
                   DisplayInternalUI="yes">
         <MsiProperty Name="RUNFROMBUNDLE" Value="1"/>
       </MsiPackage>
-        
     </Chain>
   </Bundle>
 </Wix>
