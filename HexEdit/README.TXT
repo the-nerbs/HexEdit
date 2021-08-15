@@ -17,7 +17,7 @@ options that extract sub-directories, since there are files in the
 RES and other sub-directories.
 
 Note that a prebuilt release of HexEdit is available separately
-at the web site http://www.hexedit.com.
+on the releases page https://github.com/the-nerbs/HexEdit/releases.
 
 
 About the Code

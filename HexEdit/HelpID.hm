@@ -14,8 +14,6 @@
 #define HID_TIPOFTHEDAY               0x1006F
 
 // These help IDs are not generated automatically
-#define HIDD_EMAIL_HELP			      0x01000
-#define HID_EMAIL_SEND			      0x01001
 #define HID_MULTIPLAY_OK		      0x01010
 #define HIDD_MULTIPLAY_HELP           0x01018
 #define HIDD_MACRO_SAVE_HELP          0x01020

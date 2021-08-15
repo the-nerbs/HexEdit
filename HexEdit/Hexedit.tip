@@ -22,8 +22,6 @@ You can drag the handles in the ruler to adjust display settings like the number
 
 To get popup help on a control in any dialog, click the context help tool - a small question mark (?) in the top right of the dialog - then click the control you are interested in.  Alternatively right click the control to get context help.
 
-There are many video tutorials (5 to 10 minutes each) that teach you how to use HexEdit.  Click the Tutorials link on our web site or go to http://www.hexedit.com/videos.htm.
-
 There are four "standard" color schemes associated with the different character sets (ASCII, ANSI, IBM/OEM, EBCDIC).  If you are using a standard scheme and swap to a different character set display the color scheme is automatically changed to match the display.
 
 You can find out how many bytes are selected at any time by pressing the Shift key.  The selection length is displayed in a popup "tip" in the same base (hex or decimal) as addresses are currently being displayed.

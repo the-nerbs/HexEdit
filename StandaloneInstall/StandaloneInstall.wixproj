@@ -7,7 +7,7 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>10b34865-3de3-4a9e-b3aa-9135fc6cf0d5</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>HexEdit$(Version)_WithRedists</OutputName>
+    <OutputName>HexEdit$(Version)</OutputName>
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

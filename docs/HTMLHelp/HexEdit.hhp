@@ -127,7 +127,6 @@ cmd_file\Import_Intel_Hex.htm
 cmd_file\Import_Motorola_S_Records.htm
 cmd_help\HID_APP_ABOUT.htm
 cmd_help\HID_CONTEXT_HELP.htm
-cmd_help\HID_HELP_EMAIL.htm
 cmd_help\HID_HELP_FAQ.htm
 cmd_help\HID_HELP_FINDER.htm
 cmd_help\HID_HELP_FORUM.htm
@@ -460,7 +459,6 @@ dlg_options\HIDD_OPT_WORKLAYOUT.htm
 dlg_options\HIDD_OPT_WORKSPACE.htm
 dlg_options\New_Scheme_Dialog.htm
 dlg_other\AFX_HIDD_FONT.htm
-dlg_other\HIDD_EMAIL.htm
 dlg_other\HIDD_NEW_COMPARE.htm
 dlg_other\HIDD_OPEN_SPECIAL.htm
 dlg_other\HIDD_WINDOW_MANAGER.htm

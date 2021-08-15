@@ -286,8 +286,6 @@
   </topic>
   <topic>cmd_help\HID_TIPOFTHEDAY.htm
   </topic>
-  <topic>cmd_help\HID_HELP_EMAIL.htm
-  </topic>
   <topic>cmd_help\HID_HELP_FINDER.htm
   </topic>
   <topic>cmd_help\HID_HELP_WEB.htm
@@ -325,8 +323,6 @@
   <topic>cmd_help\HID_HELP_INDEX.htm
   </topic>
   <topic>cmd_control\HID_SC_RESTORE.htm
-  </topic>
-  <topic>dlg_other\HIDD_EMAIL.htm
   </topic>
   <topic>cmd_help\HID_HELP_USING.htm
   </topic>

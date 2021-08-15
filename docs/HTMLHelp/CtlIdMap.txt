@@ -22,9 +22,6 @@ Used to describe what the macro is for and how to run it.  This comment is displ
 .topic HIDC_PASSWORD_MASK
 Turn on masking if anyone could possibly see your screen while you enter the password.
 
-.topic HIDC_TO
-Select where you want to send the email.  The default is by far the best choice unless mail to it bounces.
-
 .topic HIDC_EQUALS
 Calculates the result of the pending binary operation.  Depending on the operator and the operands this may generate an error or overflow condition.
 
@@ -138,9 +135,6 @@ Uses "hex text" when working with the clipboard.  Using this option when binary 
 
 .topic HIDC_HEX_HIST
 Displays a list of most recent hex jumps,  using either the hex jump tool or the GO button in the calculator (in hex mode).
-
-.topic HIDC_REGISTER
-Select this option to email your registration information  Select info@hexedit.com from the To: list.
 
 .topic HIDC_ROR
 Rotates the first value by the number of bits given in the second value.  The bits are moved to the right and any bits falling off the right end are added to the left end.  Rotating by the current number of bits in use gives the same value, since the bits are moved back to their original position.
@@ -673,9 +667,6 @@ The name of the active file.
 .topic HIDC_PASSWORD_MIN
 Set the minimum password length that is required for your purposes.
 
-.topic HIDC_ATTACH
-Select this to attach a file to send with the email.
-
 .topic HIDC_CSRC_CHAR
 Generate comma-separated list of characters.  Each character is enclosed in single-quotes.  All control characters are handled.
 
@@ -1131,9 +1122,6 @@ Jumps to the corresponding Workspace options page which has similar options but 
 
 .topic HIDC_ALG
 Select the encryption algorithm from this list.
-
-.topic HID_EMAIL_SEND
-Click the "Send" button to send the email.  If you have no currently active mail session you may be prompted to select a Profile (choose the default profile unless you have a good reason not to).  If the profile you chose requires a password you will be prompted for that too.
 
 .topic HIDC_VERSION
 The version of HexEdit in use.  You would not normally change this from the default value, which is the version you are running.
@@ -1615,12 +1603,6 @@ MD5 (cryptographic checksum) of the whole file calculated in the background.
 .topic HIDC_COMPRESSION_WINDOW_SIZE
 Size of the window into the data that is used.  A large value is recommended.
 
-.topic HIDC_COSTS
-This is an explanation of the costs and methods of payment.  Click the Help button for more information.
-
-.topic HIDC_ADDRESS
-Please enter one or more email addresses in case we need to contact with you for more information.
-
 .topic HIDC_PRINT_DUP_LINES
 Duplicate lines are printed once followed by a count of the number of identical lines.  This is useful when printing sections of files that contain large numbers of repeated bytes such a nuls.
 
@@ -1723,9 +1705,6 @@ Displays a list of most recent decimal jumps,  using either the decimal jump too
 .topic HIDC_SLIDER_TIP
 Move the slider to adjust the transparency of the tip window.  Hold the mouse over the window to make it fully visible.
 
-.topic HIDC_REG_EMAIL
-Click this button to email your registration code and other information.  But you must send payment by regular mail for security.
-
 .topic HIDC_ALG_KEYLEN
 This is the key length used by the algorithm.  In general the bigger the key length, the harder the encryption is to break.
 
@@ -1815,9 +1794,6 @@ When the file is opened other programs are not prevented from reading or modifyi
 
 .topic HIDC_MACRO_NAME
 The file name for the macro.  The ".HEM" extension is added automatically.
-
-.topic HIDC_SUBJECT
-Enter a brief description of the bug or subject of the email.
 
 .topic HIDC_CSRC_FLOAT_SIZE
 Format of IEEE floating point numbers taken from the file.
