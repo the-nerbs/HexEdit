@@ -348,12 +348,6 @@
     <None Include="RES\back_hot.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Res\cogs.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Res\colour.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\cross.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -375,28 +369,16 @@
     <None Include="RES\display.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Res\display.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Res\docdisp.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\docdisplay.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\docedit.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Res\docedit.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\down.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\edit.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\edit.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\editbar.bmp">
@@ -417,16 +399,7 @@
     <None Include="RES\exclam.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Res\filter.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\flip.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\flip1.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\flip1_ho.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\flip_hot.bmp">
@@ -477,9 +450,6 @@
     <None Include="Res\ico00002.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="RES\icon2.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\icon3.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -501,19 +471,10 @@
     <None Include="RES\jump.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="RES\layout.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\litebulb.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Res\macro.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Res\Mainbar.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\mainfram.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\misc.bmp">
@@ -564,9 +525,6 @@
     <None Include="RES\parent_hot.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Res\printer.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\question.ico">
       <Filter>Resource Files</Filter>
     </None>
@@ -588,25 +546,10 @@
     <None Include="RES\system.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="RES\templates.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\tips.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="RES\tmp.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\Toolbar.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\toolbar24.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\toolbar24_cold.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="RES\toolbar24_disabled.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\toolbarCold.bmp">
@@ -631,9 +574,6 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="RES\view_hot.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Res\window.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="HLP\HexEdit.rtf">
@@ -701,6 +641,12 @@
       <Filter>Text Files</Filter>
     </None>
     <None Include="..\Templates\_windows_types.xml" />
+    <None Include="..\Resources\Graphics\Backgrnd.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Resources\Graphics\Splash.bmp">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="HexEdit.rc">
@@ -1026,12 +972,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\hexedit2.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Resources\Graphics\Backgrnd.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Resources\Graphics\Splash.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
