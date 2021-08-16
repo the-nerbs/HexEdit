@@ -20,7 +20,6 @@
     <FeatureRef Id="HexEditApp" />
     <FeatureRef Id="HelpFiles" />
     <FeatureRef Id="Templates" />
-    <FeatureRef Id="ContextMenu" />
 
     <UIRef Id="UISequence"/>
     <WixVariable Id="WixUIBannerBmp" Value="$(var.GraphicsDir)\Banner.bmp"/>
@@ -32,8 +31,9 @@
     <Property Id="ADD_DESKTOP_SHORTCUT" Value="1" Secure="yes" />
     <Property Id="ADD_START_MENU_SHORTCUT" Value="1" Secure="yes" />
     <Property Id="ADD_START_MENU_UTILITIES_SHORTCUT" Secure="yes" />
-    <Property Id="RUNFROMBUNDLE" />
-
+    <Property Id="ADD_EXPLORER_CONTEXT_MENU" Value="1" Secure="yes" />
+    <Property Id="RUNFROMBUNDLE" Value="0" />
+    
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="HexEdit" />

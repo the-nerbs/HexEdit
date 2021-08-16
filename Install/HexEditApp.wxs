@@ -82,6 +82,19 @@
                   Arguments="/ignoreme" />
       </Component>
       
+      <!-- Context menu "Open with HexEdit" entry -->
+      <Component Id="HexEdit.ContextMenu">
+        <Condition>ADD_EXPLORER_CONTEXT_MENU = "1"</Condition>
+        <RegistryValue Root="HKCR"
+                       Key="*\Shell\HexEdit"
+                       Type="string"
+                       Value="Open with HexEdit" />
+        <RegistryValue Root="HKCR"
+                       Key="*\Shell\HexEdit\command"
+                       Type="string"
+                       Value='"[#hexedit.exe]" "%1"' />
+      </Component>
+      
       <!-- RegHelper exe -->
       <Component Guid="41ad319d-8116-42bc-9f53-d6de66b78cb9">
         <File Source="$(var.RegHelper.TargetPath)"

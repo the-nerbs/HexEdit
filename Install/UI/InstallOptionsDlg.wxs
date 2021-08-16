@@ -45,6 +45,13 @@
                  CheckBoxValue="1"
                  Property="ADD_START_MENU_UTILITIES_SHORTCUT"
                  Text="!(loc.InstallOptionsDlgStartMenuUtilitiesShortcut)" />
+
+        <Control Id="ContextMenu" Type="CheckBox"
+                 X="30" Y="135"
+                 Width="330" Height="18"
+                 CheckBoxValue="1"
+                 Property="ADD_EXPLORER_CONTEXT_MENU"
+                 Text="!(loc.InstallOptionsDlgExplorer)" />
         
       </Dialog>
     </UI>

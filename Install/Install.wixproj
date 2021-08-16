@@ -19,7 +19,6 @@
     <SuppressIces>ICE38</SuppressIces>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ContextMenu.wxs" />
     <Compile Include="HelpFiles.wxs" />
     <Compile Include="HexEditApp.wxs" />
     <Compile Include="Product.wxs" />

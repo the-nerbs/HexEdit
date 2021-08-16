@@ -21,7 +21,6 @@
   <String Id="InstallOptionsDlgDesktopShortcut">Place a shortcut on your desktop.</String>
   <String Id="InstallOptionsDlgStartMenuShortcut">Place a shortcut in your start menu.</String>
   <String Id="InstallOptionsDlgStartMenuUtilitiesShortcut">Place a shortcut in your start menu in a folder named "Utilities".</String>
-  
-  
-  
+  <String Id="InstallOptionsDlgExplorer">Add "Open with HexEdit" to Windows Explorer context menus (for all users).</String>
+
 </WixLocalization>
