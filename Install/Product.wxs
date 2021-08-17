@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="72fc9dea-4803-4d67-9989-3b5c5bdb0a66"
+  <Product Id="3c260568-2639-435e-8a6e-dc1ed1d44add"
            Name="HexEdit"
            Version="$(var.Version)"
            Language="1033"

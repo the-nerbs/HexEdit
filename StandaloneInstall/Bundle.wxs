@@ -15,8 +15,9 @@
     </BootstrapperApplicationRef>
 
     <util:FileSearch Id="FindVcRuntime"
-                     Path="[SYSTEMFOLDER]vcruntime140.dll"
-                     Variable="HAVE_VCRUNTIME140" />
+                     Path="[SystemFolder]vcruntime140.dll"
+                     Result="exists"
+                     Variable="vcruntime_installed" />
 
     <Chain>
       <!--VC redist from https://aka.ms/vs/16/release/vc_redist.x86.exe -->
@@ -24,7 +25,8 @@
                   DisplayName="Microsoft Visual C++ Runtime"
                   InstallCommand="/install /quiet"
                   UninstallCommand="/uninstall /quiet"
-                  DetectCondition="HAVE_VCRUNTIME140" />
+                  Permanent="yes"
+                  DetectCondition="vcruntime_installed = 1" />
 
       <MsiPackage SourceFile="$(var.Install.TargetPath)"
                   DisplayName="HexEdit Application"
