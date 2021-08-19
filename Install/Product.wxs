@@ -14,7 +14,15 @@
              Comments="Copyright 2016.  All rights reserved."
              Description="[ProductName] Installation" />
 
+    <Icon Id="hexedit.ico" SourceFile="$(var.HexEdit.ProjectDir)res\hexedit2.ico" />
+
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <Upgrade Id="4052797F-082D-4C55-BA37-1D9D6289E6AF">
+      <UpgradeVersion Property="WIX_UPGRADE_DETECTED_2"
+                      Minimum="0.0.0.0"
+                      Maximum="5.0.0.0"/>
+    </Upgrade>
+    
     <MediaTemplate EmbedCab="yes" />
 
     <FeatureRef Id="HexEditApp" />
@@ -33,7 +41,7 @@
     <Property Id="ADD_START_MENU_UTILITIES_SHORTCUT" Secure="yes" />
     <Property Id="ADD_EXPLORER_CONTEXT_MENU" Value="1" Secure="yes" />
     <Property Id="RUNFROMBUNDLE" Value="0" />
-    
+
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="HexEdit" />
@@ -41,8 +49,9 @@
 
       <Directory Id="AppDataFolder">
         <Directory Id="APPDATA_ECSOFTWARE" Name="ECSoftware">
-          <Directory Id="APPDATA_HEXEDIT" Name="HexEdit" />
-          <Directory Id="APPDATA_TEMPLATES" Name="Templates" />
+          <Directory Id="APPDATA_HEXEDIT" Name="HexEdit">
+            <Directory Id="APPDATA_TEMPLATES" />
+          </Directory>
         </Directory>
       </Directory>
 

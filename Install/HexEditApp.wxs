@@ -8,6 +8,7 @@
              Absent="disallow"
              Display="hidden">
       <ComponentGroupRef Id="HexEditApp" />
+      <ComponentGroupRef Id="HexEditApp_User" />
       <ComponentGroupRef Id="TemplateFiles_INSTALL" />
       <ComponentGroupRef Id="ThirdPartyDlls" />
     </Feature>
@@ -83,7 +84,7 @@
       </Component>
       
       <!-- Context menu "Open with HexEdit" entry -->
-      <Component Id="HexEdit.ContextMenu">
+      <Component Id="HexEdit.ContextMenu" Guid="21b603ec-8480-4de9-8320-ae252ee3dffc">
         <Condition>ADD_EXPLORER_CONTEXT_MENU = "1"</Condition>
         <RegistryValue Root="HKCR"
                        Key="*\Shell\HexEdit"
@@ -96,7 +97,7 @@
       </Component>
       
       <!-- RegHelper exe -->
-      <Component Guid="41ad319d-8116-42bc-9f53-d6de66b78cb9">
+      <Component Id="RegHelper.exe" Guid="41ad319d-8116-42bc-9f53-d6de66b78cb9">
         <File Source="$(var.RegHelper.TargetPath)"
               KeyPath="yes"
               Checksum="yes" />
@@ -110,7 +111,7 @@
         <File Source="$(var.HexEdit.ProjectDir)DefaultToolbarImages.bmp" />
       </Component>
       
-      <!-- Test data files -->
+      <!-- Test data/demo files -->
       <Component Id="TestData" Guid="fa7b04b6-0744-4864-adec-c591d8d8e99d">
         <File Source="$(var.HexEdit.ProjectDir)TestData\_charinc.hem" />
         <File Source="$(var.HexEdit.ProjectDir)TestData\AllChars.hem" />
@@ -128,6 +129,33 @@
         <File Source="$(var.HexEdit.ProjectDir)Ebcdic.tab"
               KeyPath="yes"/>
       </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="HexEditApp_User"
+                    Directory="APPDATA_HEXEDIT">
+
+      <Component Id="ToolbarImagesUser">
+        <File Id="DefaultToolbarImagesUser"
+              Source="$(var.HexEdit.ProjectDir)DefaultToolbarImages.bmp"
+              Name="ToolbarImages.bmp"
+              KeyPath="yes" />
+        <RemoveFile Id="RemoveOtherFiles"
+                    Name="*"
+                    On="uninstall"/>
+      </Component>
+
+      <!-- Test data/demo files -->
+      <Component Id="TestDataUser" Guid="0dc2df72-351c-4d3c-b957-379541a5d848">
+        <File Id="charinc.hem.user"
+              Source="$(var.HexEdit.ProjectDir)TestData\_charinc.hem" />
+        
+        <File Id="allchars.hem.user"
+              Source="$(var.HexEdit.ProjectDir)TestData\AllChars.hem" />
+        
+        <File Id="shatestvector.hem.user"
+              Source="$(var.HexEdit.ProjectDir)TestData\ShaTestVector1GB.hem" />
+      </Component>
+      
     </ComponentGroup>
   </Fragment>
 </Wix>
