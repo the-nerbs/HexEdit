@@ -47,7 +47,8 @@
         <Shortcut Id="hexedit.exe.shortcut"
                   Name="HexEdit"
                   Directory="DesktopFolder"
-                  Target="[#hexedit.exe]" />
+                  Target="[#hexedit.exe]"
+                  Icon="hexedit.ico" />
       </Component>
 
       <Component Id="HexEdit.exe.shortcut.start"
@@ -63,7 +64,8 @@
         <Shortcut Id="hexedit.exe.shortcut.start"
                   Name="HexEdit"
                   Directory="ProgramMenuFolder"
-                  Target="[#hexedit.exe]" />
+                  Target="[#hexedit.exe]"
+                  Icon="hexedit.ico" />
       </Component>
 
       <Component Id="HexEdit.exe.shortcut.startutils"
@@ -78,9 +80,9 @@
         
         <Shortcut Id="hexedit.exe.shortcut.startutils"
                   Name="HexEdit"
-                  Directory="START_UTILITIES"
+                  Directory="StartUtilities"
                   Target="[#hexedit.exe]"
-                  Arguments="/ignoreme" />
+                  Icon="hexedit.ico"  />
       </Component>
       
       <!-- Context menu "Open with HexEdit" entry -->

@@ -36,6 +36,7 @@
   </Product>
 
   <Fragment>
+    <Property Id="ARPPRODUCTICON" Value="HexEdit.ico" />
     <Property Id="ADD_DESKTOP_SHORTCUT" Value="1" Secure="yes" />
     <Property Id="ADD_START_MENU_SHORTCUT" Value="1" Secure="yes" />
     <Property Id="ADD_START_MENU_UTILITIES_SHORTCUT" Secure="yes" />
@@ -57,7 +58,7 @@
 
       <Directory Id="DesktopFolder" />
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="START_UTILITIES" Name="Utilities" />
+        <Directory Id="StartUtilities" Name="Utilities" />
       </Directory>
     </Directory>
 
@@ -93,7 +94,7 @@
                       On="uninstall" />
         
         <RemoveFolder Id="CleanupStartMenuFolder"
-                      Directory="START_UTILITIES"
+                      Directory="StartUtilities"
                       On="uninstall" />
       </Component>
     </Feature>
