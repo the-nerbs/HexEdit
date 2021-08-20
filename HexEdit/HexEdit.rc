@@ -1533,8 +1533,6 @@ BEGIN
     "S",            ID_EDIT_FIND2,          VIRTKEY, ALT, NOINVERT
     "T",            ID_VIEWTEST,            VIRTKEY, CONTROL, NOINVERT
     "T",            ID_GRAPHIC_TOGGLE,      VIRTKEY, ALT, NOINVERT
-    "T",            ID_TEST2,               VIRTKEY, CONTROL, ALT, NOINVERT
-    "T",            ID_TEST,                VIRTKEY, SHIFT, CONTROL, NOINVERT
     "U",            ID_SCROLL_UP,           VIRTKEY, CONTROL, NOINVERT
     "U",            ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT

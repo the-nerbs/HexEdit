@@ -264,7 +264,6 @@ public:
 	afx_msg void OnMdiNewVertGroup();
 	afx_msg void OnMdiCancel();
 
-	afx_msg void OnTest();
 	DECLARE_MESSAGE_MAP()
 
 public:

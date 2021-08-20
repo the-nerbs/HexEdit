@@ -544,7 +544,6 @@ protected:
 // Generated message map functions
 protected:
 		//{{AFX_MSG(CHexEditDoc)
-	afx_msg void OnDocTest();
 	afx_msg void OnKeepTimes();
 	afx_msg void OnUpdateKeepTimes(CCmdUI* pCmdUI);
 	afx_msg void OnDffdRefresh();
@@ -565,7 +564,6 @@ protected:
 
 	afx_msg void OnCompNew();            // Open file to compare against
 
-	afx_msg void OnTest();
 		DECLARE_MESSAGE_MAP()
 
 private:

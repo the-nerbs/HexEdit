@@ -1360,9 +1360,6 @@
 #define ID_OEM_TOGGLE                   32846
 #define ID_EDIT_GOTO                    32847
 #define ID_CALCULATOR                   32849
-#define ID_TEST                         32850
-#define ID_DOCTEST                      32851
-#define ID_TEST2                        32852
 #define ID_VIEWTEST                     32853
 #define ID_WEB_PAGE                     32854
 #define ID_CUSTOMIZE                    32855

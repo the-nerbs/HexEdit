@@ -236,8 +236,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 		ON_COMMAND(ID_MDI_CANCEL, OnMdiCancel)
 		ON_COMMAND(ID_MDI_TABBED_DOCUMENT, OnMdiTabbedDocument)
 		ON_UPDATE_COMMAND_UI(ID_MDI_TABBED_DOCUMENT, OnUpdateMdiTabbedDocument)
-
-		ON_COMMAND(ID_TEST, OnTest)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -5695,12 +5693,6 @@ void CMainFrame::OnUpdateMdiTabbedDocument(CCmdUI* pCmdUI)
 	pCmdUI->SetCheck();
 }
 
-
-// Just for testing things (invoked with Ctrl+Shift+T)
-void CMainFrame::OnTest()
-{
-//    m_wndSplitter.Flip();
-}
 
 /////////////////////////////////////////////////////////////////////////////
 // CJumpExpr - override of expr_eval that stores values for whole program

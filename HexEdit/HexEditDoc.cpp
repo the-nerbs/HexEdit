@@ -47,7 +47,6 @@ IMPLEMENT_DYNCREATE(CHexEditDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CHexEditDoc, CDocument)
 		//{{AFX_MSG_MAP(CHexEditDoc)
-	ON_COMMAND(ID_DOCTEST, OnDocTest)
 	ON_COMMAND(ID_KEEP_TIMES, OnKeepTimes)
 	ON_UPDATE_COMMAND_UI(ID_KEEP_TIMES, OnUpdateKeepTimes)
 	ON_COMMAND(ID_DFFD_REFRESH, OnDffdRefresh)
@@ -77,7 +76,6 @@ BEGIN_MESSAGE_MAP(CHexEditDoc, CDocument)
 	ON_COMMAND(ID_MAKE_FAVOURITE, OnMakeFavourite)
 	ON_UPDATE_COMMAND_UI(ID_MAKE_FAVOURITE, OnUpdateMakeFavourite)
 
-	ON_COMMAND(ID_TEST2, OnTest)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -2157,43 +2155,5 @@ void CHexEditDoc::OnUpdateMakeFavourite(CCmdUI* pCmdUI)
 	}
 	else
 		pCmdUI->Enable(FALSE);
-}
-
-void CHexEditDoc::OnDocTest()
-{
-}
-
-void CHexEditDoc::OnTest()
-{
-#if 0
-	CXmlTree xt;
-
-	if (!xt.LoadString("<?xml version=\"1.0\" ?>\n"
-					   "<b>\n"
-					   "  <s>\n"
-					   "    <d1/>\n"
-					   "  </s>\n"
-					   "  <d2/>\n"
-					   "</b>\n"
-					   ))
-	{
-		CString mess;
-
-		mess.Format("Error: %s\n\nLine: %s", xt.ErrorMessage(), xt.ErrorLineText());
-		AfxMessageBox(mess);
-	}
-	else
-	{
-		MSXML2::IXMLDOMElementPtr pnew = xt.m_pdoc->createElement(_bstr_t("Elem1"));
-		pnew->insertBefore(xt.m_pdoc->createElement(_bstr_t("Elem2")), _variant_t());
-		CXmlTree::CElt root = xt.GetRoot();
-		CXmlTree::CElt ee = root.GetChild("s");
-		CXmlTree::CElt ee2 = root.GetChild("d2");
-		ee2.InsertClone(ee, NULL);
-//        root.m_pelt->insertBefore(pnew, _variant_t());
-
-		AfxMessageBox(xt.DumpXML());
-	}
-#endif
 }
 
