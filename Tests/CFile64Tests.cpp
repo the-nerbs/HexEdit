@@ -1,6 +1,6 @@
 #include "Stdafx.h"
-#include "Garbage.h"
-#include "TestFiles.h"
+#include "utils/Garbage.h"
+#include "utils/TestFiles.h"
 
 #include "CFile64.h"
 
@@ -229,4 +229,15 @@ TEST_CASE("CFile64 Write")
     {
         CHECK(buffer[i] == '1' + i);
     }
+}
+
+TEST_CASE("CFile64::SetLength")
+{
+    CFile64 file{ TestFiles::GetMutableFilePath(), CFile64::modeReadWrite };
+
+    file.SetLength(256);
+    REQUIRE(file.GetLength() == 256);
+
+    file.SetLength(0);
+    REQUIRE(file.GetLength() == 0);
 }

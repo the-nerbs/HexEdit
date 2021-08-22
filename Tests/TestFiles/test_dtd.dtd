@@ -1,0 +1,11 @@
+<!ELEMENT Root (TestElem1, TestElem2) >
+
+<!ELEMENT TestElem1 (TestElem1Child1, TestElem1Child2*) >
+<!ATTLIST TestElem1 test-attr-1 CDATA #REQUIRED
+                    test-attr-2 CDATA #REQUIRED >
+
+<!ELEMENT TestElem1Child1 (#PCDATA) >
+<!ELEMENT TestElem1Child2 (#PCDATA) >
+
+<!ELEMENT TestElem2 (TestElem2Child1+) >
+<!ELEMENT TestElem2Child1 EMPTY >

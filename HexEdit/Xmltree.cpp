@@ -10,18 +10,20 @@
 #include "xmltree.h"
 
 // Construct and load from file
-CXmlTree::CXmlTree(const LPCTSTR filename /*=NULL*/)
+CXmlTree::CXmlTree(const LPCTSTR filename /*=NULL*/) :
+	m_pdoc{}, m_filename{}, m_modified{ false }, m_error{ false }
 {
-	m_modified = false;
+	HRESULT hr = m_pdoc.CreateInstance(MSXML2::CLSID_DOMDocument);
+	if (FAILED(hr))
+	{
+		throw _com_error{ hr };
+	}
 
-	m_pdoc.CreateInstance(MSXML2::CLSID_DOMDocument);
 	if (filename != NULL)
 	{
 		m_filename = filename;
 		m_error = !m_pdoc->load(_bstr_t(m_filename));
 	}
-	else
-		m_error = false;
 }
 
 // Load XML from a file
@@ -44,26 +46,35 @@ bool CXmlTree::Save(LPCTSTR filename /*=NULL*/)
 	if (filename == NULL)
 	{
 		if (m_filename.IsEmpty())
+		{
 			return false;
+		}
+
 		filename = m_filename;
 	}
+
+	HRESULT hr = S_OK;
 	try
 	{
-		HRESULT hr;
 		hr = m_pdoc->save(_bstr_t(filename));
-
 		m_modified = false;     // What's on disk now matches what's in memory
-		return hr == S_OK;
 	}
 	catch (...)
 	{
-		return false;
+		hr = E_UNEXPECTED;
 	}
+
+	return hr == S_OK;
 }
 
 CString CXmlTree::GetDTDName() const
 {
-	return CString(LPCWSTR(m_pdoc->doctype->name));
+	MSXML2::IXMLDOMDocumentTypePtr dtd = m_pdoc->doctype;
+	if (dtd != nullptr)
+	{
+		return CString(LPCWSTR(dtd->name));
+	}
+	return CString{};
 }
 
 CString CXmlTree::ErrorMessage() const
@@ -160,9 +171,11 @@ CXmlTree::CElt CXmlTree::CElt::InsertNewChild(const LPCTSTR name, const CElt *be
 
 	m_powner->SetModified(true);
 	if (before != NULL)
-		return CElt(m_pelt->insertBefore(pnew, _variant_t((IDispatch *)(before->m_pelt))), m_powner);
-	else
-		return CElt(m_pelt->insertBefore(pnew, _variant_t()), m_powner);
+	{
+		return CElt(m_pelt->insertBefore(pnew, _variant_t((IDispatch*)(before->m_pelt))), m_powner);
+	}
+	
+	return CElt(m_pelt->insertBefore(pnew, _variant_t()), m_powner);
 }
 
 CXmlTree::CElt CXmlTree::CElt::InsertChild(CElt elt, const CElt *before /*=NULL*/)
@@ -173,9 +186,11 @@ CXmlTree::CElt CXmlTree::CElt::InsertChild(CElt elt, const CElt *before /*=NULL*
 
 	m_powner->SetModified(true);
 	if (before != NULL)
-		return CElt(m_pelt->insertBefore(elt.m_pelt, _variant_t((IDispatch *)(before->m_pelt))), m_powner);
-	else
-		return CElt(m_pelt->insertBefore(elt.m_pelt, _variant_t()), m_powner);
+	{
+		return CElt(m_pelt->insertBefore(elt.m_pelt, _variant_t((IDispatch*)(before->m_pelt))), m_powner);
+	}
+	
+	return CElt(m_pelt->insertBefore(elt.m_pelt, _variant_t()), m_powner);
 }
 
 CXmlTree::CElt CXmlTree::CElt::InsertClone(CElt elt, const CElt *before /*=NULL*/)
@@ -188,9 +203,11 @@ CXmlTree::CElt CXmlTree::CElt::InsertClone(CElt elt, const CElt *before /*=NULL*
 
 	m_powner->SetModified(true);
 	if (before != NULL)
-		return CElt(m_pelt->insertBefore(ee, _variant_t((IDispatch *)(before->m_pelt))), m_powner);
-	else
-		return CElt(m_pelt->insertBefore(ee, _variant_t()), m_powner);
+	{
+		return CElt(m_pelt->insertBefore(ee, _variant_t((IDispatch*)(before->m_pelt))), m_powner);
+	}
+	
+	return CElt(m_pelt->insertBefore(ee, _variant_t()), m_powner);
 }
 
 void CXmlTree::CElt::ReplaceChild(CElt new_elt, CElt old_elt)
@@ -212,6 +229,7 @@ CXmlTree::CElt CXmlTree::CElt::DeleteChild(CElt elt)
 
 void CXmlTree::CElt::DeleteAllChildren()
 {
+	ASSERT(m_powner != NULL && m_pelt != NULL);
 	CElt child, next_child;
 	for (child = GetFirstChild(); !child.IsEmpty(); child = next_child)
 	{
@@ -225,7 +243,11 @@ void CXmlTree::CElt::DeleteAllChildren()
 
 CXmlTree::CElt CXmlTree::CElt::Clone()
 {
-	return CXmlTree::CElt(m_pelt->cloneNode(VARIANT_TRUE), m_powner);
+	if (!m_pelt || !m_powner)
+	{
+		return CElt{};
+	}
+	return CElt(m_pelt->cloneNode(VARIANT_TRUE), m_powner);
 }
 
 CString CXmlTree::CElt::GetAttr(const LPCTSTR attr_name) const
@@ -234,12 +256,12 @@ CString CXmlTree::CElt::GetAttr(const LPCTSTR attr_name) const
 
 	_variant_t retval = m_pelt->getAttribute(_bstr_t(attr_name));
 	if (retval.vt == VT_NULL || retval.vt == VT_EMPTY)
-		return CString("");
-	else
 	{
-		retval.ChangeType(VT_BSTR);
-		return CString(LPCWSTR(_bstr_t(retval)));
+		return CString("");
 	}
+
+	retval.ChangeType(VT_BSTR);
+	return CString(LPCWSTR(_bstr_t(retval)));
 }
 
 void CXmlTree::CElt::SetAttr(const LPCTSTR attr_name, const LPCTSTR value)
@@ -254,14 +276,22 @@ void CXmlTree::CElt::RemoveAttr(const LPCTSTR attr_name)
 {
 	ASSERT(m_powner != NULL && m_pelt != NULL);
 
-	m_pelt->removeAttribute(_bstr_t(attr_name));
-	m_powner->SetModified(true);
+	HRESULT hr = m_pelt->removeAttribute(_bstr_t(attr_name));
+	if (hr != S_FALSE)
+	{
+		m_powner->SetModified(true);
+	}
 }
+
+
+//---------------------------------------------------------
+// CXmlTree::CFrag
 
 // Save all the children of a node (pelt) into a doc fragment (CFrag)
 void CXmlTree::CFrag::SaveKids(CElt *pelt)
 {
 	ASSERT(m_pfrag != NULL);
+	ASSERT(pelt != NULL);
 	CElt child;
 
 //    for (child = pelt->GetFirstChild(); !child.IsEmpty(); ++child)
@@ -269,20 +299,28 @@ void CXmlTree::CFrag::SaveKids(CElt *pelt)
 
 	// First move all the child nodes to the fragment
 	for (child = pelt->GetFirstChild(); !child.IsEmpty(); child = pelt->GetFirstChild())
+	{
 		m_pfrag->appendChild(child.m_pelt);
+	}
 
 	// Now clone all the moved nodes and add them back
 	MSXML2::IXMLDOMNodePtr pnode;
 
 	for (pnode = m_pfrag->firstChild; pnode != NULL; pnode = pnode->nextSibling)
+	{
 		pelt->m_pelt->appendChild(pnode->cloneNode(VARIANT_TRUE));
+	}
 }
 
 void CXmlTree::CFrag::InsertKids(CElt *pelt)
 {
 	ASSERT(m_pfrag != NULL);
-	pelt->m_pelt->appendChild(m_pfrag);
-	pelt->GetOwner()->SetModified(true);
+	ASSERT(pelt != NULL);
+	if (m_pfrag->childNodes->length > 0)
+	{
+		pelt->m_pelt->appendChild(m_pfrag);
+		pelt->GetOwner()->SetModified(true);
+	}
 }
 
 // We could have made this a superset of above by defaulting "before" to NULL,
@@ -314,9 +352,11 @@ CXmlTree::CElt CXmlTree::CFrag::InsertClone(CElt elt, const CElt *before /*=NULL
 
 	MSXML2::IXMLDOMElementPtr ee = elt.m_pelt->cloneNode(VARIANT_TRUE);   // TRUE = 0xFFFF not 1 !?!?!?
 	if (before != NULL)
-		return CElt(m_pfrag->insertBefore(ee, _variant_t((IDispatch *)(before->m_pelt))), m_powner);
-	else
-		return CElt(m_pfrag->insertBefore(ee, _variant_t()), m_powner);
+	{
+		return CElt(m_pfrag->insertBefore(ee, _variant_t((IDispatch*)(before->m_pelt))), m_powner);
+	}
+	
+	return CElt(m_pfrag->insertBefore(ee, _variant_t()), m_powner);
 }
 
 

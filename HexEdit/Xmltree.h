@@ -21,12 +21,12 @@ class CXmlTree
 	friend class CFrag;
 
 public:
-	CXmlTree(const LPCTSTR filename = NULL);
+	CXmlTree(const LPCTSTR filename = nullptr);
 	MSXML2::IXMLDOMDocumentPtr m_pdoc;   // COM Interface ptr to doc itself
 
 	bool LoadFile(LPCTSTR filename);
 	bool LoadString(LPCTSTR ss);
-	bool Save(LPCTSTR filename = NULL);
+	bool Save(LPCTSTR filename = nullptr);
 	void SetFileName(const LPCTSTR filename) { m_filename = filename; }
 	CString GetFileName() const { return m_filename; }
 	CString GetDTDName() const;
@@ -37,7 +37,6 @@ public:
 	bool IsModified() const { return m_modified; }
 	void SetModified(bool mm) { m_modified = mm; }
 
-	class CFrag;
 	class CElt
 	{
 		friend class CXmlTree;
@@ -55,21 +54,17 @@ public:
 #endif
 
 		long GetNumChildren() const;
-		long GetNumText() const;
 		CXmlTree *GetOwner() const { return m_powner; }
 
-		CString GetName() const { if (m_pelt != NULL) return CString(LPCWSTR(m_pelt->nodeName)); else return CString(""); }
-//        void SetName(LPCTSTR name) { if (m_pelt != NULL) m_pelt->nodeName = _bstr_t(name); }
+		CString GetName() const { return m_pelt ? static_cast<LPCTSTR>(m_pelt->nodeName) : _T(""); }
 
 		// Get parent, children, text etc
 		CElt GetParent() const;
 		CElt GetChild(long num) const;          // get a child element by posn
 		CElt GetFirstChild() const { return GetChild(long(0)); }
 		CElt GetChild(const LPCTSTR name) const;// get a child element by name
-		CString GetText(long num) const;        // get one text "section"
-		CString GetText() const;                // get all text concatenated
 
-		// Atributes
+		// Attributes
 		CString GetAttr(const LPCTSTR attr_name) const;
 		void SetAttr(const LPCTSTR attr_name, const LPCTSTR value);
 		void RemoveAttr(const LPCTSTR attr_name);
@@ -85,10 +80,46 @@ public:
 		CElt Clone();                                            // create a (deep) clone of this element
 
 		bool IsEmpty() const { return m_pelt == NULL; }
-		CElt operator++() { if (m_pelt != NULL) m_pelt = m_pelt->nextSibling; return *this; }
-		CElt operator++(int) { CElt tmp(*this); if (m_pelt != NULL) m_pelt = m_pelt->nextSibling; return tmp; }
-		CElt operator--() { if (m_pelt != NULL) m_pelt = m_pelt->previousSibling; return *this; }
-		CElt operator--(int) { CElt tmp(*this); if (m_pelt != NULL) m_pelt = m_pelt->previousSibling; return tmp; }
+
+		//TODO(standardization) - this should return a reference. Will that break anything?
+		CElt operator++()
+		{
+			if (m_pelt)
+			{
+				m_pelt = m_pelt->nextSibling;
+			}
+			return *this;
+		}
+
+		CElt operator++(int)
+		{
+			CElt tmp(*this);
+			if (m_pelt)
+			{
+				m_pelt = m_pelt->nextSibling;
+			}
+			return tmp;
+		}
+
+		//TODO(standardization) - this should return a reference. Will that break anything?
+		CElt operator--()
+		{
+			if (m_pelt)
+			{
+				m_pelt = m_pelt->previousSibling;
+			}
+			return *this;
+		}
+
+		CElt operator--(int)
+		{
+			CElt tmp(*this);
+			if (m_pelt)
+			{
+				m_pelt = m_pelt->previousSibling;
+			}
+			return tmp;
+		}
 
 	protected:
 		CXmlTree *m_powner;                     // CXmlTree class that this elt is associated with
@@ -97,7 +128,6 @@ public:
 // Using this operator causes compile error so make m_pelt public for direct access
 //        operator MSXML2::IXMLDOMElementPtr() { return m_pelt; }
 		MSXML2::IXMLDOMElementPtr m_pelt;        // Interface ptr to the element node
-//    	MSXML2::IXMLDOMNodePtr m_pelt;           // Interface ptr to the element node
 	};
 
 	class CFrag

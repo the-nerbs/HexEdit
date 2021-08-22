@@ -98,9 +98,11 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
+    <ClCompile Include="CXmlTreeTests.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RangeSetTests.cpp" />
-    <ClCompile Include="TestFiles.cpp" />
+    <ClCompile Include="utils\File.cpp" />
+    <ClCompile Include="utils\TestFiles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HexEdit\HexEdit.vcxproj">
@@ -108,8 +110,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Garbage.h" />
-    <ClInclude Include="TestFiles.h" />
+    <ClInclude Include="utils\CoInitialize.h" />
+    <ClInclude Include="utils\File.h" />
+    <ClInclude Include="utils\Garbage.h" />
+    <ClInclude Include="utils\TestFiles.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestFiles\CXmlTreeTestFile.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\test_dtd.dtd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

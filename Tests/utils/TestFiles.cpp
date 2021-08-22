@@ -1,5 +1,6 @@
 #include "Stdafx.h"
 #include "TestFiles.h"
+#include "File.h"
 
 #include <cstdint>
 #include <fstream>
@@ -57,6 +58,10 @@ namespace TestFiles
             std::ofstream stream{ _path, std::ios::binary };
             stream.write("TEST", 4);
         }
+
+        // make sure it's not read only.
+        file_attrs attrs = File::GetAttributes(_path);
+        File::SetAttributes(_path, attrs & ~file_attrs::readonly);
 
         return _path;
     }

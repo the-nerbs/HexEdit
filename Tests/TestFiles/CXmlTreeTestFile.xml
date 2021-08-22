@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Root SYSTEM "test_dtd.dtd">
+<Root>
+  <TestElem1 test-attr-1="" test-attr-2="value">
+    <TestElem1Child1>with text content!</TestElem1Child1>
+    <TestElem1Child2>1</TestElem1Child2>
+    <TestElem1Child2>2</TestElem1Child2>
+  </TestElem1>
+  <TestElem2>
+    <TestElem2Child1 />
+  </TestElem2>
+</Root>

@@ -1395,7 +1395,7 @@ LONGLONG CFile64::Seek( LONGLONG offset, UINT from )
 
    return_value.LowPart = ::SetFilePointer( m_FileHandle, return_value.LowPart, &return_value.HighPart, move_method );
 
-   if ( return_value.LowPart == 0xffffFFFF && ::GetLastError() != NO_ERROR )
+   if ( return_value.LowPart == INVALID_SET_FILE_POINTER && ::GetLastError() != NO_ERROR )
    {
 //      WFCTRACEERROR( ::GetLastError() );
 #if ! defined( WFC_STL )
@@ -1422,7 +1422,7 @@ BOOL CFile64::SetEndOfFile( LONGLONG length )
 {
 //   WFCLTRACEINIT( TEXT( "CFile64::SetEndOfFile()" ) );
 
-   if ( Seek( length, CFile::begin ) == FALSE )
+   if ( Seek( length, CFile::begin ) != length )
    {
 //      WFCTRACE( TEXT( "Can't seek." ) );
       return( FALSE );

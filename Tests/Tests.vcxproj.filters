@@ -21,7 +21,7 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestFiles.cpp">
+    <ClCompile Include="utils\TestFiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BoyerTests.cpp">
@@ -30,13 +30,29 @@
     <ClCompile Include="RangeSetTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CXmlTreeTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Garbage.h">
+    <ClInclude Include="utils\Garbage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestFiles.h">
+    <ClInclude Include="utils\TestFiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\CoInitialize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestFiles\test_dtd.dtd" />
+    <None Include="TestFiles\CXmlTreeTestFile.xml" />
   </ItemGroup>
 </Project>

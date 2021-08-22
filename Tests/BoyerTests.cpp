@@ -1,5 +1,5 @@
 #include "Stdafx.h"
-#include "Garbage.h"
+#include "utils/Garbage.h"
 
 #include "FindDlg.h"
 
