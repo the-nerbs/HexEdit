@@ -98,6 +98,7 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
+    <ClCompile Include="CReadSRecordTests.cpp" />
     <ClCompile Include="CXmlTreeTests.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RangeSetTests.cpp" />
@@ -110,6 +111,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="utils\AssertHelpers.h" />
     <ClInclude Include="utils\CoInitialize.h" />
     <ClInclude Include="utils\File.h" />
     <ClInclude Include="utils\Garbage.h" />
@@ -118,6 +120,10 @@
   <ItemGroup>
     <None Include="TestFiles\CXmlTreeTestFile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\srecords.srec">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="TestFiles\test_dtd.dtd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -16,4 +16,13 @@ namespace TestFiles
     /// \remarks
     /// The content of this file can not be assumed by any test.
     CString GetMutableFilePath();
+
+
+    /// \brief  Gets the path to the SRecords file.
+    /// 
+    /// \remarks
+    /// The contents of this file match the example on Wikipedia:
+    /// https://en.wikipedia.org/wiki/SREC_(file_format)#16-bit_memory_address
+    /// Retrieved 6 Sept 2021.
+    CString GetSRecordsFilePath();
 }
