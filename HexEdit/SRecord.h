@@ -3,6 +3,7 @@
 #ifndef SRECORD_INCLUDED
 #define SRECORD_INCLUDED
 
+#include <memory>
 
 // Writes Motorola S-records to a file from data in memory
 class CWriteSRecord
@@ -30,14 +31,17 @@ private:
 class CReadSRecord
 {
 public:
-	CReadSRecord(const char *filename, BOOL allow_discon = FALSE);
+	CReadSRecord(const char* filename, BOOL allow_discon = FALSE);
+	CReadSRecord(std::unique_ptr<CFile> stream, BOOL allow_discon = FALSE);
 	size_t Get(void *data, size_t max, unsigned long &address); // Get a line of data (S1/S2/S3) from the file
 	CString Error() const { return error_; }
 
 private:
 	int get_rec(void *data, size_t max_len, size_t &len, unsigned long &address);
 	unsigned long get_hex(char *pstart, int bytes, int &checksum);
-	CStdioFile file_;
+
+
+	std::unique_ptr<CFile> file_;
 	unsigned long addr_;                // Address of next record to be read or -1 if at start
 	unsigned long line_no_;             // Line number of last line of text read
 	CString error_;                     // Error message for last error (if any)

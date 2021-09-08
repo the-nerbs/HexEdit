@@ -22,10 +22,38 @@ TEST_CASE("CReadSRecord constructor")
 
 TEST_CASE("CReadSRecord Get")
 {
-    CReadSRecord reader{
-        static_cast<const char*>(TestFiles::GetSRecordsFilePath()),
-        TRUE
-    };
+    std::unique_ptr<CReadSRecord> reader;
+
+    SECTION("From file stream")
+    {
+        reader = std::make_unique<CReadSRecord>(
+            static_cast<const char*>(TestFiles::GetSRecordsFilePath()),
+            TRUE
+        );
+    }
+
+    SECTION("From memory stream")
+    {
+        std::unique_ptr<CMemFile> memstream = std::make_unique<CMemFile>();
+
+        // read the test file into the memory stream
+        CStdioFile source{
+            static_cast<const char*>(TestFiles::GetSRecordsFilePath()),
+            CFile::modeRead | CFile::typeText
+        };
+
+        char sourceBuf[1024];
+        UINT blockSize;
+        do
+        {
+            blockSize = source.Read(sourceBuf, sizeof(sourceBuf));
+            memstream->Write(sourceBuf, blockSize);
+        } while (blockSize == sizeof(sourceBuf));
+
+        memstream->SeekToBegin();
+
+        reader = std::make_unique<CReadSRecord>(std::move(memstream), TRUE);
+    }
 
     constexpr std::size_t buffer_sz = 1024;
     unsigned char buffer[buffer_sz];
@@ -33,7 +61,7 @@ TEST_CASE("CReadSRecord Get")
 
 
     // first record
-    std::size_t sz = reader.Get(buffer, buffer_sz, address);
+    std::size_t sz = reader->Get(buffer, buffer_sz, address);
     REQUIRE(sz == 28);
     const std::uint8_t expectedRecord1[28] =
     {
@@ -47,7 +75,7 @@ TEST_CASE("CReadSRecord Get")
 
 
     // second record
-    sz = reader.Get(buffer, buffer_sz, address);
+    sz = reader->Get(buffer, buffer_sz, address);
     REQUIRE(sz == 28);
     const std::uint8_t expectedRecord2[28] =
     {
@@ -61,7 +89,7 @@ TEST_CASE("CReadSRecord Get")
 
 
     // third record
-    sz = reader.Get(buffer, buffer_sz, address);
+    sz = reader->Get(buffer, buffer_sz, address);
     REQUIRE(sz == 14);
     const std::uint8_t expectedRecord3[14] =
     {
@@ -73,15 +101,15 @@ TEST_CASE("CReadSRecord Get")
 
 
     // record count (S5) record
-    sz = reader.Get(buffer, buffer_sz, address);
+    sz = reader->Get(buffer, buffer_sz, address);
     CHECK(sz == 0);
     CHECK(address == 0x0003);
 
 
     // S9 (skipped) and EOF
-    sz = reader.Get(buffer, buffer_sz, address);
+    sz = reader->Get(buffer, buffer_sz, address);
     CHECK(sz == 0);
-    CHECK(reader.Error() == "WARNING: No S5 record found");
+    CHECK(reader->Error() == "WARNING: No S5 record found");
 }
 
 // TODO tests:
@@ -94,8 +122,3 @@ TEST_CASE("CReadSRecord Get")
 //  - pass/fail with non-contiguous records disabled.
 //  - No S1/S2/S3 records
 //  - S5 record count does not match.
-//
-// It would be nice to refactor CReadSRecord's ctor to take the CFile& instead of the file
-// path, so I can just pass in a CMemFile or something. The only thing that's kept me from
-// doing this so far is that CStdioFile declares the ReadString method used to read lines,
-// so I'd need to modify the code in a significant way...

@@ -152,16 +152,17 @@ int CWriteSRecord::put_hex(char *pstart, unsigned long val, int bytes)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CReadSRecord::CReadSRecord(const char *filename, BOOL allow_discon /*= FALSE*/)
+CReadSRecord::CReadSRecord(const char *filename, BOOL allow_discon /*= FALSE*/) :
+	file_{ std::make_unique<CStdioFile>() },
+	addr_{ ~0UL },
+	line_no_{ 0 },
+	error_{},
+	recs_in_{ 0 },
+	allow_discon_{ allow_discon }
 {
-	addr_ = -1;                         // Signal that we haven't actually read anything yet
-	line_no_ = 0;
-	recs_in_ = 0;
-	allow_discon_ = allow_discon;
-	CFileException fe;                      // Stores file exception info
-
 	// Open the file
-	if (!file_.Open(filename,
+	CFileException fe;                      // Stores file exception info
+	if (!file_->Open(filename,
 		CFile::modeRead|CFile::shareDenyWrite|CFile::typeText,
 					  &fe))
 	{
@@ -169,6 +170,9 @@ CReadSRecord::CReadSRecord(const char *filename, BOOL allow_discon /*= FALSE*/)
 		return;
 	}
 
+	//TODO: Wow, rude. The S0 does look important though, so can we peek the first record (...)
+	// and if it's not an S0, rewind and set the initial error message to that without breaking
+	// things too much? I'd need to update CHexEditView::do_motorola to not fail.
 #if 0  // Some idiots do not put out an S0 record
 	// Get S0 record
 	int stype;
@@ -188,6 +192,15 @@ CReadSRecord::CReadSRecord(const char *filename, BOOL allow_discon /*= FALSE*/)
 #endif
 }
 
+CReadSRecord::CReadSRecord(std::unique_ptr<CFile> stream, BOOL allow_discon /*= FALSE*/) :
+	file_{ std::move(stream) },
+	addr_{ ~0UL },
+	line_no_{ 0 },
+	error_{},
+	recs_in_{ 0 },
+	allow_discon_{ allow_discon }
+{ }
+
 // Returns the length of the data read or zero on error or EOF
 // data is a pointer to where the bytes should be stored
 // max is the size of the buffer - no more than that many bytes are returned
@@ -196,7 +209,6 @@ size_t CReadSRecord::Get(void *data, size_t max_len, unsigned long &address)
 {
 	int stype;                          // Record type read, 0, 1, 5 etc
 	size_t len;
-//    unsigned long address;
 
 	// Get next S1, S2 or S3 record
 	while ((stype = get_rec(data, max_len, len, address)) != 1 && stype != 2 && stype != 3 &&
@@ -258,7 +270,43 @@ int CReadSRecord::get_rec(void *data, size_t max_len, size_t &len, unsigned long
 
 	try
 	{
-		pp = file_.ReadString(buffer, sizeof(buffer)-1);
+		char* psz = std::begin(buffer);
+		char* const end = std::end(buffer);
+		UINT readCount = 0;
+
+		while (psz < end)
+		{
+			readCount = file_->Read(psz, 1);
+
+			if (readCount == 0)
+			{
+				// hit EOF
+				break;
+			}
+			else if (*psz == '\n')
+			{
+				// hit new line
+				// note: psz not incremented here as we don't want the new line char.
+				break;
+			}
+
+			// if the source stream was opened in binary mode, then discard the CR from CRLF sequences.
+			if (*psz != '\r')
+			{
+				psz++;
+			}
+		}
+
+		if (readCount > 0 && psz < end)
+		{
+			*psz = '\0';
+			pp = &buffer[0];
+		}
+		else
+		{
+			pp = nullptr;
+		}
+
 		++line_no_;
 	}
 	catch (CFileException *pfe)
