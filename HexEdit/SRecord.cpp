@@ -212,10 +212,10 @@ size_t CReadSRecord::Get(void *data, size_t max_len, unsigned long &address)
 
 	// Get next S1, S2 or S3 record
 	while ((stype = get_rec(data, max_len, len, address)) != 1 && stype != 2 && stype != 3 &&
-			stype != 5 && stype != -1)
+		stype != 5 && stype != -1)
 	{
-		if (!error_.IsEmpty())
-			return 0;
+		// if we have an error, then get_rec should have returned -1
+		ASSERT(error_.IsEmpty());
 	}
 
 	if (allow_discon_ && stype >= 1 && stype <= 3)
@@ -242,13 +242,19 @@ size_t CReadSRecord::Get(void *data, size_t max_len, unsigned long &address)
 	else if (stype == 5)
 	{
 		// Check that number of records read matches S5 record
-	   if (recs_in_ == 0)
-			error_ = "No S1/S2/S3 records founds";
-	   else if (address != (recs_in_&0xFFFF))
+		if (recs_in_ == 0)
+		{
+			error_ = "No S1/S2/S3 records found";
+		}
+		else if (address != (recs_in_ & 0xFFFF))
+		{
 			error_.Format("ERROR: Mismatch in number of records (S5 record) at line %ld", long(line_no_));
+		}
 	}
 	else if (error_.IsEmpty())
+	{
 		error_ = "WARNING: No S5 record found";
+	}
 
 	return 0;
 }
@@ -317,17 +323,32 @@ int CReadSRecord::get_rec(void *data, size_t max_len, size_t &len, unsigned long
 	}
 
 	// Simple validity check
-	if (pp == NULL) return -1;
+	if (pp == NULL)
+	{
+		return -1;
+	}
+
 	slen = strlen(pp);
-	if (slen < 8 || pp[0] != 'S') return 99;
+	if (slen < 8 || pp[0] != 'S')
+	{
+		return 99;
+	}
 
 	// Get S record type and check it's valid
 	stype = *++pp - '0';
-	if (stype < 0 || stype > 9 || addr_size[stype] == -1) return 99;
+	if (stype < 0 || stype > 9 || addr_size[stype] == -1)
+	{
+		return 99;
+	}
 	++pp;
 
 	// Get length of data and the address
 	byte_count = get_hex(pp, 1, checksum);
+	if (!error_.IsEmpty())
+	{
+		return -1;
+	}
+
 	len = byte_count - addr_size[stype] - 1;     // Number of actual data bytes
 	if (len > max_len)
 	{
@@ -336,6 +357,7 @@ int CReadSRecord::get_rec(void *data, size_t max_len, size_t &len, unsigned long
 	}
 
 	// Make sure we have the indicated number of bytes
+	//TODO: should this also signal an error if the record is too long?
 	if (byte_count*2 + 4 > (int)slen)
 	{
 		error_.Format("ERROR: Short S record at line %ld", long(line_no_));
@@ -343,6 +365,11 @@ int CReadSRecord::get_rec(void *data, size_t max_len, size_t &len, unsigned long
 	}
 	pp += 2;
 	address = get_hex(pp, addr_size[stype], checksum);
+	if (!error_.IsEmpty())
+	{
+		return -1;
+	}
+
 	pp += addr_size[stype]*2;
 
 	// If S1, S2, S3 convert the hex digits to binary data
@@ -350,10 +377,16 @@ int CReadSRecord::get_rec(void *data, size_t max_len, size_t &len, unsigned long
 	{
 		for (size_t ii = 0; ii < len; ++ii, pp+=2)
 		{
+			//TODO: the buffer cannot be null on any normal path. Can I remove this condition?
 			if (data != NULL)
 				*((char *)data + ii) = (char)get_hex(pp, 1, checksum);
 			else
 				(void)get_hex(pp, 1, checksum);
+
+			if (!error_.IsEmpty())
+			{
+				return -1;
+			}
 		}
 	}
 
@@ -364,7 +397,10 @@ int CReadSRecord::get_rec(void *data, size_t max_len, size_t &len, unsigned long
 	int dummy = 0;
 	if (get_hex(pp, 1, dummy) != 255-(checksum&0xFF))
 	{
-		error_.Format("ERROR: Checksum mismatch at line %ld", long(line_no_));
+		if (error_.IsEmpty())
+		{
+			error_.Format("ERROR: Checksum mismatch at line %ld", long(line_no_));
+		}
 		return -1;
 	}
 
@@ -381,7 +417,16 @@ unsigned long CReadSRecord::get_hex(char *pstart, int bytes, int &checksum)
 	memcpy(buf, pstart, bytes*2);
 	buf[bytes*2] = '\0';
 
-	unsigned long retval = strtoul(buf, NULL, 16);
+	char* endptr = nullptr;
+	unsigned long retval = strtoul(buf, &endptr, 16);
+
+	if (endptr != &buf[bytes * 2]
+		|| (retval == 0 && strspn(buf, "0") != bytes * 2))
+	{
+		// something did not parse successfully
+		error_.Format("ERROR: Invalid hexadecimal at line %ld", long(line_no_));
+		return 0;
+	}
 
 	// Add bytes to checksum
 	for (unsigned long ul = retval; bytes > 0; bytes--)
