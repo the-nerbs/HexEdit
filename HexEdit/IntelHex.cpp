@@ -141,16 +141,17 @@ int CWriteIntelHex::put_hex(char *pstart, unsigned long val, int bytes)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-CReadIntelHex::CReadIntelHex(const char *filename, BOOL allow_discon /*= FALSE*/)
+CReadIntelHex::CReadIntelHex(const char *filename, BOOL allow_discon /*= FALSE*/) :
+	file_{ std::make_unique<CStdioFile>() },
+	addr_{ ~0UL },
+	line_no_{ 0 },
+	error_{},
+	recs_in_{ 0 },
+	allow_discon_{ allow_discon }
 {
-	addr_ = -1;                         // Signal that we haven't actually read anything yet
-	line_no_ = 0;
-	recs_in_ = 0;
-	allow_discon_ = allow_discon;
-	CFileException fe;                      // Stores file exception info
-
 	// Open the file
-	if (!file_.Open(filename,
+	CFileException fe;                      // Stores file exception info
+	if (!file_->Open(filename,
 		CFile::modeRead|CFile::shareDenyWrite|CFile::typeText,
 					  &fe))
 	{
@@ -159,18 +160,26 @@ CReadIntelHex::CReadIntelHex(const char *filename, BOOL allow_discon /*= FALSE*/
 	}
 }
 
+CReadIntelHex::CReadIntelHex(std::unique_ptr<CFile> stream, BOOL allow_discon /*= FALSE*/) :
+	file_{ std::move(stream) },
+	addr_{ ~0UL },
+	line_no_{ 0 },
+	error_{},
+	recs_in_{ 0 },
+	allow_discon_{ allow_discon }
+{ }
+
 // Returns the length of the data read or zero on error or EOF
 size_t CReadIntelHex::Get(void *data, size_t max_len, unsigned long &address)
 {
 	int stype;
 	size_t len;
-//    unsigned long address;
 
 	// Get next data (00) record
 	while ((stype = get_rec(data, max_len, len, address)) != 0 && stype != 1 && stype != -1)
 	{
-		if (!error_.IsEmpty())
-			return 0;
+		// if we have an error, then get_rec should have returned -1
+		ASSERT(error_.IsEmpty());
 	}
 
 	if (allow_discon_ && stype == 0)
@@ -194,8 +203,13 @@ size_t CReadIntelHex::Get(void *data, size_t max_len, unsigned long &address)
 		addr_ += len;
 		return len;
 	}
+	// TODO: CReadSRecord warns on no data records, should this class warn too?
+	// both already existed in the initial source dump, and didn't have any
+	// relevant updates afterwards...
 	else if (stype == -1 && error_.IsEmpty())
+	{
 		error_ = "WARNING: No Intel hex EOF record found";
+	}
 
 	return 0;
 }
@@ -216,7 +230,43 @@ int CReadIntelHex::get_rec(void *data, size_t max_len, size_t &len, unsigned lon
 
 	try
 	{
-		pp = file_.ReadString(buffer, sizeof(buffer)-1);
+		char* psz = std::begin(buffer);
+		char* const end = std::end(buffer);
+		UINT readCount = 0;
+
+		while (psz < end)
+		{
+			readCount = file_->Read(psz, 1);
+
+			if (readCount == 0)
+			{
+				// hit EOF
+				break;
+			}
+			else if (*psz == '\n')
+			{
+				// hit new line
+				// note: psz not incremented here as we don't want the new line char.
+				break;
+			}
+
+			// if the source stream was opened in binary mode, then discard the CR from CRLF sequences.
+			if (*psz != '\r')
+			{
+				psz++;
+			}
+		}
+
+		if (readCount > 0 && psz < end)
+		{
+			*psz = '\0';
+			pp = &buffer[0];
+		}
+		else
+		{
+			pp = nullptr;
+		}
+
 		++line_no_;
 	}
 	catch (CFileException *pfe)
@@ -227,13 +277,24 @@ int CReadIntelHex::get_rec(void *data, size_t max_len, size_t &len, unsigned lon
 	}
 
 	// Simple validity check
-	if (pp == NULL) return -1;
+	if (pp == NULL)
+	{
+		return -1;
+	}
+
 	slen = strlen(pp);
-	if (slen < 10 || pp[0] != ':') return 99;
+	if (slen < 10 || pp[0] != ':')
+	{
+		return 99;
+	}
 	++pp;
 
 	// Get the data length and make sure we have enough bytes
 	len = get_hex(pp, 1, checksum);
+	if (!error_.IsEmpty())
+	{
+		return -1;
+	}
 	if (len > max_len)
 	{
 		error_.Format("ERROR: Record too long at line %ld", long(line_no_));
@@ -248,11 +309,25 @@ int CReadIntelHex::get_rec(void *data, size_t max_len, size_t &len, unsigned lon
 
 	// Get address and record type
 	address = get_hex(pp, 2, checksum);
+	if (!error_.IsEmpty())
+	{
+		return -1;
+	}
 	pp += 4;
+
 	stype = get_hex(pp, 1, checksum);
+	if (!error_.IsEmpty())
+	{
+		// ignore errors parsing the record type and just skip the record.
+		error_.Empty();
+		return 99;
+	}
 	pp += 2;
 
-	if (stype != 0 && stype != 1) return 99;
+	if (stype != 0 && stype != 1)
+	{
+		return 99;
+	}
 
 
 	// If data  convert the hex digits to binary data
@@ -261,15 +336,29 @@ int CReadIntelHex::get_rec(void *data, size_t max_len, size_t &len, unsigned lon
 		for (size_t ii = 0; ii < len; ++ii, pp+=2)
 		{
 			if (data != NULL)
-				*((char *)data + ii) = (char)get_hex(pp, 1, checksum);
+			{
+				*((char*)data + ii) = (char)get_hex(pp, 1, checksum);
+			}
 			else
+			{
 				(void)get_hex(pp, 1, checksum);
+			}
+
+			if (!error_.IsEmpty())
+			{
+				return -1;
+			}
 		}
 		++recs_in_;                     // Keep track of number of data records read
 	}
 
 	// Verify checksum
 	(void)get_hex(pp, 1, checksum);
+	if (!error_.IsEmpty())
+	{
+		return -1;
+	}
+
 	if ((checksum&0xFF) != 0)
 	{
 		error_.Format("ERROR: Checksum mismatch at line %ld", long(line_no_));
@@ -289,7 +378,16 @@ unsigned long CReadIntelHex::get_hex(char *pstart, int bytes, int &checksum)
 	memcpy(buf, pstart, bytes*2);
 	buf[bytes*2] = '\0';
 
-	unsigned long retval = strtoul(buf, NULL, 16);
+	char* endptr = nullptr;
+	unsigned long retval = strtoul(buf, &endptr, 16);
+
+	if (endptr != &buf[bytes * 2]
+		|| (retval == 0 && strspn(buf, "0") != bytes * 2))
+	{
+		// something did not parse successfully
+		error_.Format("ERROR: Invalid hexadecimal at line %ld", long(line_no_));
+		return 0;
+	}
 
 	// Add bytes to checksum
 	for (unsigned long ul = retval; bytes > 0; bytes--)

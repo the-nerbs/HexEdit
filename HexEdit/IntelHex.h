@@ -3,6 +3,8 @@
 #ifndef INTELHEX_INCLUDED
 #define INTELHEX_INCLUDED  1
 
+#include <memory>
+
 // Can be used to create an Intel hex file
 class CWriteIntelHex
 {
@@ -28,13 +30,16 @@ class CReadIntelHex
 {
 public:
 	CReadIntelHex(const char *filename, BOOL allow_discon = FALSE);
+	CReadIntelHex(std::unique_ptr<CFile> stream, BOOL allow_discon = FALSE);
 	size_t Get(void *data, size_t max, unsigned long &address); // Get a line of data from the file
 	CString Error() const { return error_; }
 
 private:
 	int get_rec(void *data, size_t max_len, size_t &len, unsigned long &address);
 	unsigned long get_hex(char *pstart, int bytes, int &checksum);
-	CStdioFile file_;
+
+
+	std::unique_ptr<CFile> file_;
 	unsigned long addr_;                // Address of next record to be read or -1 if at start
 	unsigned long line_no_;             // Line number of last line of text read
 	CString error_;                     // Error message for last error (if any)

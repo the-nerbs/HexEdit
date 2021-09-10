@@ -76,9 +76,17 @@ namespace TestFiles
             _path = GetTestFilesDir() + "\\srecords.srec";
         }
 
-        // make sure it's not read only.
-        file_attrs attrs = File::GetAttributes(_path);
-        File::SetAttributes(_path, attrs & ~file_attrs::readonly);
+        return _path;
+    }
+
+    CString GetIntelHexFilePath()
+    {
+        static CString _path;
+
+        if (_path.IsEmpty())
+        {
+            _path = GetTestFilesDir() + "\\intel.hex";
+        }
 
         return _path;
     }

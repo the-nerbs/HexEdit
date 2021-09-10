@@ -292,7 +292,6 @@ TEST_CASE("CReadSRecord::Get - bad records")
 
     SECTION("bad checksum")
     {
-        // declared as 32 bytes, only 31
         constexpr char S1[] = "S11F00007C0802A6900100049421FFF07C6C1B787C8C23783C6000003863000027\n";
         memstream->Write(S1, sizeof(S1) - 1);
 

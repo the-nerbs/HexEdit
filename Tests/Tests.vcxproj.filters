@@ -39,6 +39,9 @@
     <ClCompile Include="CReadSRecordTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CReadIntelHexTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils\Garbage.h">
@@ -61,5 +64,6 @@
     <None Include="TestFiles\test_dtd.dtd" />
     <None Include="TestFiles\CXmlTreeTestFile.xml" />
     <None Include="TestFiles\srecords.srec" />
+    <None Include="TestFiles\intel.hex" />
   </ItemGroup>
 </Project>

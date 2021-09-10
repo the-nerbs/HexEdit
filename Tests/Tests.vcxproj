@@ -98,6 +98,7 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
+    <ClCompile Include="CReadIntelHexTests.cpp" />
     <ClCompile Include="CReadSRecordTests.cpp" />
     <ClCompile Include="CXmlTreeTests.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -120,6 +121,10 @@
   <ItemGroup>
     <None Include="TestFiles\CXmlTreeTestFile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\intel.hex">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="TestFiles\srecords.srec">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
