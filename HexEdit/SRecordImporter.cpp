@@ -48,7 +48,15 @@ namespace hex
 
         if (lineLen < MinLineLen)
         {
-            return RecordType::Error;
+            if (lineLen > 0 && line[0] == 'S')
+            {
+                // line is too long for the provided output buffer.
+                CString msg;
+                msg.Format("Short S record at line %d", LineNumber());
+                throw std::exception{ msg };
+            }
+
+            return RecordType::Skip;
         }
 
         if (line[0] != 'S')
@@ -89,7 +97,7 @@ namespace hex
         //TODO: should this also signal an error if the record is too long? (probably yes)
         if (lineLen < (CharsPerByte * (2 + numBytes)))
         {
-            // line is too long for the provided output buffer.
+            // line is shorter than the declared length.
             CString msg;
             msg.Format("Short S record at line %d", LineNumber());
             throw std::exception{ msg };

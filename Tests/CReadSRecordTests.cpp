@@ -219,6 +219,15 @@ TEST_CASE("SRecordImporter::Get - bad records")
     hex::SRecordImporter reader{ std::unique_ptr<CFile>(memstream), false };
     CString expectedError;
 
+    SECTION("record shorter than possible minimum length with start char")
+    {
+        // min is 10 chars. Error because it starts with a colon
+        constexpr char line[] = "S00000000\n";
+        memstream->Write(line, sizeof(line) - 1);
+
+        expectedError = "ERROR: Short S record at line 2";
+    }
+
     SECTION("record length shorter than declared")
     {
         // declared as 32 bytes, only 31
@@ -310,6 +319,13 @@ TEST_CASE("SRecordImporter::Get - skipped records")
 
 
     hex::SRecordImporter reader{ std::unique_ptr<CFile>(memstream), false };
+
+    SECTION("record shorter than possible minimum length without start char")
+    {
+        // min is 10 chars. skipped because it does not start with an S.
+        constexpr char line[] = "000000000\n";
+        memstream->Write(line, sizeof(line) - 1);
+    }
 
     SECTION("record does not start with S")
     {

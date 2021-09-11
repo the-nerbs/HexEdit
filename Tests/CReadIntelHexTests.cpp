@@ -4,7 +4,7 @@
 #include "utils/Garbage.h"
 #include "utils/TestFiles.h"
 
-#include "IntelHex.h"
+#include "IntelHexImporter.h"
 
 #include "catch.hpp"
 
@@ -23,43 +23,29 @@ public:
 };
 
 
-TEST_CASE("CReadIntelHex constructor")
+TEST_CASE("IntelHexImporter constructor")
 {
-    SECTION("Successful open")
-    {
-        CString testFilePath = TestFiles::GetIntelHexFilePath();
-        BOOL allowDiscontiguous = GENERATE(FALSE, TRUE);
+    CString testFilePath = TestFiles::GetIntelHexFilePath();
+    bool allowDiscontiguous = GENERATE(false, true);
 
-        std::unique_ptr<CReadIntelHex> reader = garbage_fill_and_construct_ptr<CReadIntelHex>(
-            static_cast<const char*>(testFilePath),
-            allowDiscontiguous
-        );
+    std::unique_ptr<hex::IntelHexImporter> reader = garbage_fill_and_construct_ptr<hex::IntelHexImporter>(
+        std::make_unique<CFile>(testFilePath, CFile::modeRead),
+        allowDiscontiguous
+    );
 
-        CHECK(reader->Error() == "");
-    }
-
-    SECTION("File not found")
-    {
-        std::unique_ptr<CReadIntelHex> reader = garbage_fill_and_construct_ptr<CReadIntelHex>(
-            "File-Does-Not-Exist",
-            TRUE
-        );
-
-        // actual error message doesn't really matter here, just that we start with the error.
-        CHECK(reader->Error() != "");
-    }
+    CHECK(reader->Error() == "");
 }
 
 
-TEST_CASE("CReadIntelHex::Get")
+TEST_CASE("IntelHexImporter::Get")
 {
-    std::unique_ptr<CReadIntelHex> reader;
+    std::unique_ptr<hex::IntelHexImporter> reader;
 
     SECTION("From file stream")
     {
-        reader = std::make_unique<CReadIntelHex>(
-            static_cast<const char*>(TestFiles::GetIntelHexFilePath()),
-            TRUE
+        reader = std::make_unique<hex::IntelHexImporter>(
+            std::make_unique<CStdioFile>(TestFiles::GetIntelHexFilePath(), CFile::modeRead | CFile::typeText),
+            true
         );
     }
 
@@ -83,7 +69,7 @@ TEST_CASE("CReadIntelHex::Get")
 
         memstream->SeekToBegin();
 
-        reader = std::make_unique<CReadIntelHex>(std::move(memstream), TRUE);
+        reader = std::make_unique<hex::IntelHexImporter>(std::move(memstream), true);
     }
 
     constexpr std::size_t buffer_sz = 1024;
@@ -151,9 +137,9 @@ TEST_CASE("CReadIntelHex::Get")
     CHECK(reader->Error() == "WARNING: No Intel hex EOF record found");
 }
 
-TEST_CASE("CReadIntelHex::Get - read failure")
+TEST_CASE("IntelHexImporter::Get - read failure")
 {
-    CReadIntelHex reader{ std::make_unique<CErrorFile>(), TRUE };
+    hex::IntelHexImporter reader{ std::make_unique<CErrorFile>(), true };
 
     REQUIRE(reader.Error() == "");
 
@@ -173,7 +159,7 @@ TEST_CASE("CReadIntelHex::Get - read failure")
     // record was fully processed prior to the error.
 }
 
-TEST_CASE("CReadIntelHex::Get - output buffer tests")
+TEST_CASE("IntelHexImporter::Get - output buffer tests")
 {
     const char content[] =
         ":10010000214601360121470136007EFE09D2190140\n"
@@ -183,7 +169,7 @@ TEST_CASE("CReadIntelHex::Get - output buffer tests")
     memstream->Write(content, sizeof(content));
     memstream->SeekToBegin();
 
-    CReadIntelHex reader{ std::move(memstream), TRUE };
+    hex::IntelHexImporter reader{ std::move(memstream), true };
     REQUIRE(reader.Error() == "");
 
 
@@ -222,24 +208,23 @@ TEST_CASE("CReadIntelHex::Get - output buffer tests")
         CHECK(sz == 0x10);
         CHECK(reader.Error() == "");
     }
-
-    SECTION("buffer null")
-    {
-        unsigned long address = ~0ul;
-
-        std::size_t sz = reader.Get(nullptr, 1024, address);
-
-        CHECK(sz == 0x10);
-        CHECK(reader.Error() == "");
-    }
 }
 
-TEST_CASE("CReadIntelHex::Get - bad records")
+TEST_CASE("IntelHexImporter::Get - bad records")
 {
     CMemFile* memstream = new CMemFile();
 
-    CReadIntelHex reader{ std::unique_ptr<CFile>(memstream), FALSE };
+    hex::IntelHexImporter reader{ std::unique_ptr<CFile>(memstream), false };
     CString expectedError;
+
+    SECTION("record shorter than possible minimum length with start char")
+    {
+        // min is 11 chars. Error because it starts with a colon
+        constexpr char line[] = ":000000000\n";
+        memstream->Write(line, sizeof(line) - 1);
+
+        expectedError = "ERROR: Short record at line 1";
+    }
 
     SECTION("record length shorter than declared")
     {
@@ -319,7 +304,7 @@ TEST_CASE("CReadIntelHex::Get - bad records")
     CHECK(reader.Error() == expectedError);
 }
 
-TEST_CASE("CReadIntelHex::Get - skipped records")
+TEST_CASE("IntelHexImporter::Get - skipped records")
 {
     CMemFile* memstream = new CMemFile();
 
@@ -330,7 +315,14 @@ TEST_CASE("CReadIntelHex::Get - skipped records")
     memstream->Write(Record1, sizeof(Record1) - 1);
 
 
-    CReadIntelHex reader{ std::unique_ptr<CFile>(memstream), FALSE };
+    hex::IntelHexImporter reader{ std::unique_ptr<CFile>(memstream), false };
+
+    SECTION("record shorter than possible minimum length without start char")
+    {
+        // min is 11 chars. skipped because it does not start with a colon.
+        constexpr char line[] = "0000000000\n";
+        memstream->Write(line, sizeof(line) - 1);
+    }
 
     SECTION("record does not start with colon")
     {
@@ -388,7 +380,7 @@ TEST_CASE("CReadIntelHex::Get - skipped records")
     CHECK(reader.Error() == "");
 }
 
-TEST_CASE("CReadIntelHex::Get - non-contiguous records")
+TEST_CASE("IntelHexImporter::Get - non-contiguous records")
 {
     // 1 byte gap between first and second S1 records
     const char content[] =
@@ -406,7 +398,7 @@ TEST_CASE("CReadIntelHex::Get - non-contiguous records")
 
     SECTION("Non-contiguous records allowed")
     {
-        CReadIntelHex reader{ std::move(memstream), TRUE };
+        hex::IntelHexImporter reader{ std::move(memstream), true };
         REQUIRE(reader.Error() == "");
 
         // both records should read OK
@@ -423,7 +415,7 @@ TEST_CASE("CReadIntelHex::Get - non-contiguous records")
 
     SECTION("Non-contiguous records disallowed")
     {
-        CReadIntelHex reader{ std::move(memstream), FALSE };
+        hex::IntelHexImporter reader{ std::move(memstream), false };
         REQUIRE(reader.Error() == "");
 
         // first record should read OK
@@ -440,7 +432,7 @@ TEST_CASE("CReadIntelHex::Get - non-contiguous records")
     }
 }
 
-TEST_CASE("CReadIntelHex::Get - no data records")
+TEST_CASE("IntelHexImporter::Get - no data records")
 {
     const char content[] =
         ":00000001FF\n";
@@ -453,9 +445,9 @@ TEST_CASE("CReadIntelHex::Get - no data records")
     unsigned char buffer[buffer_sz];
     unsigned long address = ~0;
 
-    CReadIntelHex reader{ std::move(memstream), TRUE };
+    hex::IntelHexImporter reader{ std::move(memstream), true };
 
     std::size_t sz = reader.Get(buffer, buffer_sz, address);
     CHECK(sz == 0);
-    CHECK(reader.Error() == "");
+    CHECK(reader.Error() == "No data records found");
 }

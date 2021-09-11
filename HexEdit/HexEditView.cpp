@@ -32,7 +32,8 @@
 #include "BCGMisc.h"
 #include "SRecord.h"          // For export of Motorola S record files
 #include "SRecordImporter.h"  // For import of Motorola S record files
-#include "IntelHex.h"         // For import/export of Intel Hex files
+#include "IntelHex.h"         // For export of Intel Hex files
+#include "IntelHexImporter.h" // For import of Intel Hex files
 #include "CopyCSrc.h"         // For Copy as C Source dialog
 #include <zlib.h>             // For compression
 
@@ -7676,7 +7677,10 @@ void CHexEditView::do_intel(CString file_name)
 			ptoo = TRUE;
 		}
 
-		CReadIntelHex rih(file_name, TRUE);
+		hex::IntelHexImporter rih(
+			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
+			true
+		);
 
 		if (!rih.Error().IsEmpty())
 		{
@@ -7726,7 +7730,10 @@ void CHexEditView::do_intel(CString file_name)
 	}
 	else
 	{
-		CReadIntelHex rih(file_name);
+		hex::IntelHexImporter rih(
+			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText), 
+			false
+		);
 
 		if (!rih.Error().IsEmpty())
 		{

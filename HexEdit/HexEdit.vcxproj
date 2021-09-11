@@ -203,6 +203,7 @@
     <ClCompile Include="HexPrintDialog.cpp" />
     <ClCompile Include="HexViewDraw.cpp" />
     <ClCompile Include="IntelHex.cpp" />
+    <ClCompile Include="IntelHexImporter.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="NavManager.cpp" />
@@ -427,6 +428,7 @@
     <ClInclude Include="HexImporter.h" />
     <ClInclude Include="HexPrintDialog.h" />
     <ClInclude Include="IntelHex.h" />
+    <ClInclude Include="IntelHexImporter.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="NavManager.h" />

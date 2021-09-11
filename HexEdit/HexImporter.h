@@ -107,6 +107,16 @@ namespace hex
         ///                             The exception message will be used as the reader's error.
         std::uint64_t ParseHex(const char* pHex, int numBytes, int* checksum);
 
+        /// \brief  Tries to parse a hex string.
+        /// 
+        /// \param       pHex      A pointer to the string to parse.
+        /// \param       numBytes  The number of bytes to parse, 1 to 4.
+        /// \param       checksum  If not null, the checksum to update with the parsed value.
+        /// \param[out]  parsed    The parsed value.
+        /// 
+        /// \returns  True if successful, or false if not.
+        bool TryParseHex(const char* pHex, int numBytes, int* checksum, std::uint64_t& parsed);
+
     private:
         std::unique_ptr<CFile> _stream;
         std::uint64_t _nextAddress;

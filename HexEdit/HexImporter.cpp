@@ -131,6 +131,21 @@ namespace hex
 
     std::uint64_t HexImporter::ParseHex(const char* pHex, int numBytes, int* checksum)
     {
+        std::uint64_t retval;
+
+        if (!TryParseHex(pHex, numBytes, checksum, retval))
+        {
+            // something did not parse successfully
+            CString msg;
+            msg.Format("Invalid hexadecimal at line %d", _lineNumber);
+            throw std::exception{ msg };
+        }
+
+        return retval;
+    }
+
+    bool HexImporter::TryParseHex(const char* pHex, int numBytes, int* checksum, std::uint64_t& parsed)
+    {
         ASSERT(numBytes <= 8);
 
         char buf[32];
@@ -140,23 +155,21 @@ namespace hex
         buf[numDigits] = '\0';
 
         char* endptr = nullptr;
-        std::uint64_t retval = strtoull(buf, &endptr, 16);
+        parsed = strtoull(buf, &endptr, 16);
 
         if (endptr != &buf[numDigits]
-            || (retval == 0 && strspn(buf, "0") != numDigits))
+            || (parsed == 0 && strspn(buf, "0") != numDigits))
         {
-            // something did not parse successfully
-            CString msg;
-            msg.Format("Invalid hexadecimal at line %d", _lineNumber);
-            throw std::exception{ msg };
+            parsed = 0;
+            return false;
         }
 
         // Add bytes to checksum
         if (checksum)
         {
-            AppendToChecksum(retval, numBytes, *checksum);
+            AppendToChecksum(parsed, numBytes, *checksum);
         }
 
-        return retval;
+        return true;
     }
 }

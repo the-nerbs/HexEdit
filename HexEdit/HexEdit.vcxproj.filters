@@ -343,6 +343,9 @@
     <ClCompile Include="SRecordImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IntelHexImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource.hm">
@@ -979,6 +982,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SRecordImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntelHexImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
