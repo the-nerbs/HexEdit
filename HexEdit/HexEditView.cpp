@@ -30,10 +30,11 @@
 #include "SystemSound.h"
 #include "Misc.h"
 #include "BCGMisc.h"
-#include "SRecord.h"      // For import/export of Motorola S record files
-#include "IntelHex.h"     // For import/export of Intel Hex files
-#include "CopyCSrc.h"     // For Copy as C Source dialog
-#include <zlib.h>         // For compression
+#include "SRecord.h"          // For export of Motorola S record files
+#include "SRecordImporter.h"  // For import of Motorola S record files
+#include "IntelHex.h"         // For import/export of Intel Hex files
+#include "CopyCSrc.h"         // For Copy as C Source dialog
+#include <zlib.h>             // For compression
 
 #pragma warning(push)                      // we need to save an restore warnings because Crypto++ headers muck with some
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1   // allows use of "weak" digests like MD5
@@ -7505,7 +7506,10 @@ void CHexEditView::do_motorola(CString file_name)
 			ptoo = TRUE;
 		}
 
-		CReadSRecord rsr(file_name, TRUE);
+		hex::SRecordImporter rsr{
+			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
+			true
+		};
 
 		if (!rsr.Error().IsEmpty())
 		{
@@ -7555,7 +7559,10 @@ void CHexEditView::do_motorola(CString file_name)
 	}
 	else
 	{
-		CReadSRecord rsr(file_name);
+		hex::SRecordImporter rsr{
+			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
+			false
+		};
 
 		if (!rsr.Error().IsEmpty())
 		{

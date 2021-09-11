@@ -4,7 +4,7 @@
 #include "utils/Garbage.h"
 #include "utils/TestFiles.h"
 
-#include "SRecord.h"
+#include "SRecordImporter.h"
 
 #include "catch.hpp"
 
@@ -23,43 +23,30 @@ public:
 };
 
 
-TEST_CASE("CReadSRecord constructor")
+TEST_CASE("SRecordImporter constructor")
 {
-    SECTION("Successful open")
-    {
-        CString testFilePath = TestFiles::GetSRecordsFilePath();
-        BOOL allowDiscontiguous = GENERATE(FALSE, TRUE);
+    CString testFilePath = TestFiles::GetSRecordsFilePath();
+    bool allowDiscontiguous = GENERATE(false, true);
 
-        std::unique_ptr<CReadSRecord> reader = garbage_fill_and_construct_ptr<CReadSRecord>(
-            static_cast<const char*>(testFilePath),
-            allowDiscontiguous
-        );
+    std::unique_ptr<hex::SRecordImporter> reader = garbage_fill_and_construct_ptr<hex::SRecordImporter>(
+        std::make_unique<CFile>(testFilePath, CFile::modeRead),
+        allowDiscontiguous
+    );
 
-        CHECK(reader->Error() == "");
-    }
-
-    SECTION("File not found")
-    {
-        std::unique_ptr<CReadSRecord> reader = garbage_fill_and_construct_ptr<CReadSRecord>(
-            "File-Does-Not-Exist",
-            TRUE
-        );
-
-        // actual error message doesn't really matter here, just that we start with the error.
-        CHECK(reader->Error() != "");
-    }
+    CHECK(reader->Error() == "");
+    CHECK(reader->RecordsRead() == 0);
 }
 
 
-TEST_CASE("CReadSRecord::Get")
+TEST_CASE("SRecordImporter::Get")
 {
-    std::unique_ptr<CReadSRecord> reader;
+    std::unique_ptr<hex::SRecordImporter> reader;
 
     SECTION("From file stream")
     {
-        reader = std::make_unique<CReadSRecord>(
-            static_cast<const char*>(TestFiles::GetSRecordsFilePath()),
-            TRUE
+        reader = std::make_unique<hex::SRecordImporter>(
+            std::make_unique<CFile>(TestFiles::GetSRecordsFilePath(), CFile::modeRead),
+            true
         );
     }
 
@@ -83,7 +70,7 @@ TEST_CASE("CReadSRecord::Get")
 
         memstream->SeekToBegin();
 
-        reader = std::make_unique<CReadSRecord>(std::move(memstream), TRUE);
+        reader = std::make_unique<hex::SRecordImporter>(std::move(memstream), true);
     }
 
     constexpr std::size_t buffer_sz = 1024;
@@ -103,6 +90,7 @@ TEST_CASE("CReadSRecord::Get")
     };
     CHECK(test::areEqual(expectedRecord1, buffer));
     CHECK(address == 0x0000);
+    CHECK(reader->RecordsRead() == 1);
 
 
     // second record
@@ -117,6 +105,7 @@ TEST_CASE("CReadSRecord::Get")
     };
     CHECK(test::areEqual(expectedRecord2, buffer));
     CHECK(address == 0x001C);
+    CHECK(reader->RecordsRead() == 2);
 
 
     // third record
@@ -129,12 +118,14 @@ TEST_CASE("CReadSRecord::Get")
     };
     CHECK(test::areEqual(expectedRecord3, buffer));
     CHECK(address == 0x0038);
+    CHECK(reader->RecordsRead() == 3);
 
 
     // record count (S5) record
     sz = reader->Get(buffer, buffer_sz, address);
     CHECK(sz == 0);
     CHECK(address == 0x0003);
+    CHECK(reader->RecordsRead() == 3);
 
 
     // S9 (skipped) and EOF
@@ -143,9 +134,9 @@ TEST_CASE("CReadSRecord::Get")
     CHECK(reader->Error() == "WARNING: No S5 record found");
 }
 
-TEST_CASE("CReadSRecord::Get - read failure")
+TEST_CASE("SRecordImporter::Get - read failure")
 {
-    CReadSRecord reader{ std::make_unique<CErrorFile>(), TRUE };
+    hex::SRecordImporter reader{ std::make_unique<CErrorFile>(), true };
 
     REQUIRE(reader.Error() == "");
 
@@ -165,7 +156,7 @@ TEST_CASE("CReadSRecord::Get - read failure")
     // record was fully processed prior to the error.
 }
 
-TEST_CASE("CReadSRecord::Get - output buffer tests")
+TEST_CASE("SRecordImporter::Get - output buffer tests")
 {
     const char content[] =
         "S00F000068656C6C6F202020202000003C\n"
@@ -177,7 +168,7 @@ TEST_CASE("CReadSRecord::Get - output buffer tests")
     memstream->Write(content, sizeof(content));
     memstream->SeekToBegin();
 
-    CReadSRecord reader{ std::move(memstream), TRUE };
+    hex::SRecordImporter reader{ std::move(memstream), true };
     REQUIRE(reader.Error() == "");
 
 
@@ -216,26 +207,16 @@ TEST_CASE("CReadSRecord::Get - output buffer tests")
         CHECK(sz == 0x1C);
         CHECK(reader.Error() == "");
     }
-
-    SECTION("buffer null")
-    {
-        unsigned long address = ~0ul;
-
-        std::size_t sz = reader.Get(nullptr, 1024, address);
-
-        CHECK(sz == 0x1C);
-        CHECK(reader.Error() == "");
-    }
 }
 
-TEST_CASE("CReadSRecord::Get - bad records")
+TEST_CASE("SRecordImporter::Get - bad records")
 {
     CMemFile* memstream = new CMemFile();
 
     constexpr char S0[] = "S00F000068656C6C6F202020202000003C\n";
     memstream->Write(S0, sizeof(S0)-1);
 
-    CReadSRecord reader{ std::unique_ptr<CFile>(memstream), FALSE };
+    hex::SRecordImporter reader{ std::unique_ptr<CFile>(memstream), false };
     CString expectedError;
 
     SECTION("record length shorter than declared")
@@ -317,7 +298,7 @@ TEST_CASE("CReadSRecord::Get - bad records")
     CHECK(reader.Error() == expectedError);
 }
 
-TEST_CASE("CReadSRecord::Get - skipped records")
+TEST_CASE("SRecordImporter::Get - skipped records")
 {
     CMemFile* memstream = new CMemFile();
 
@@ -328,7 +309,7 @@ TEST_CASE("CReadSRecord::Get - skipped records")
     memstream->Write(S1, sizeof(S1) - 1);
 
 
-    CReadSRecord reader{ std::unique_ptr<CFile>(memstream), FALSE };
+    hex::SRecordImporter reader{ std::unique_ptr<CFile>(memstream), false };
 
     SECTION("record does not start with S")
     {
@@ -384,7 +365,7 @@ TEST_CASE("CReadSRecord::Get - skipped records")
     CHECK(reader.Error() == "");
 }
 
-TEST_CASE("CReadSRecord::Get - non-contiguous records")
+TEST_CASE("SRecordImporter::Get - non-contiguous records")
 {
     // 1 byte gap between first and second S1 records
     const char content[] =
@@ -404,7 +385,7 @@ TEST_CASE("CReadSRecord::Get - non-contiguous records")
 
     SECTION("Non-contiguous records allowed")
     {
-        CReadSRecord reader{ std::move(memstream), TRUE };
+        hex::SRecordImporter reader{ std::move(memstream), true };
         REQUIRE(reader.Error() == "");
 
         // both records should read OK
@@ -421,7 +402,7 @@ TEST_CASE("CReadSRecord::Get - non-contiguous records")
 
     SECTION("Non-contiguous records disallowed")
     {
-        CReadSRecord reader{ std::move(memstream), FALSE };
+        hex::SRecordImporter reader{ std::move(memstream), false };
         REQUIRE(reader.Error() == "");
 
         // first record should read OK
@@ -438,7 +419,7 @@ TEST_CASE("CReadSRecord::Get - non-contiguous records")
     }
 }
 
-TEST_CASE("CReadSRecord::Get - no data records")
+TEST_CASE("SRecordImporter::Get - no data records")
 {
     const char content[] =
         "S00F000068656C6C6F202020202000003C\n"
@@ -453,14 +434,14 @@ TEST_CASE("CReadSRecord::Get - no data records")
     unsigned char buffer[buffer_sz];
     unsigned long address = ~0;
 
-    CReadSRecord reader{ std::move(memstream), TRUE };
+    hex::SRecordImporter reader{ std::move(memstream), true };
 
     std::size_t sz = reader.Get(buffer, buffer_sz, address);
     CHECK(sz == 0);
     CHECK(reader.Error() == "No S1/S2/S3 records found");
 }
 
-TEST_CASE("CReadSRecord::Get - S2/S8 (24 bit) records")
+TEST_CASE("SRecordImporter::Get - S2/S8 (24 bit) records")
 {
     const char content[] =
         "S00F000068656C6C6F202020202000003C\n"
@@ -472,7 +453,7 @@ TEST_CASE("CReadSRecord::Get - S2/S8 (24 bit) records")
     memstream->Write(content, sizeof(content));
     memstream->SeekToBegin();
 
-    CReadSRecord reader{ std::move(memstream), TRUE };
+    hex::SRecordImporter reader{ std::move(memstream), true };
     REQUIRE(reader.Error() == "");
 
     constexpr std::size_t buffer_sz = 1024;
@@ -494,7 +475,7 @@ TEST_CASE("CReadSRecord::Get - S2/S8 (24 bit) records")
     CHECK(reader.Error() == "");
 }
 
-TEST_CASE("CReadSRecord::Get - S3/S7 (32 bit) records")
+TEST_CASE("SRecordImporter::Get - S3/S7 (32 bit) records")
 {
     const char content[] =
         "S00F000068656C6C6F202020202000003C\n"
@@ -506,7 +487,7 @@ TEST_CASE("CReadSRecord::Get - S3/S7 (32 bit) records")
     memstream->Write(content, sizeof(content));
     memstream->SeekToBegin();
 
-    CReadSRecord reader{ std::move(memstream), TRUE };
+    hex::SRecordImporter reader{ std::move(memstream), true };
     REQUIRE(reader.Error() == "");
 
     constexpr std::size_t buffer_sz = 1024;
@@ -528,14 +509,14 @@ TEST_CASE("CReadSRecord::Get - S3/S7 (32 bit) records")
     CHECK(reader.Error() == "");
 }
 
-TEST_CASE("CReadSRecord::Get - S5 data record count")
+TEST_CASE("SRecordImporter::Get - S5 data record count")
 {
     CMemFile* memstream = new CMemFile();
 
     constexpr char S0[] = "S00F000068656C6C6F202020202000003C\n";
     memstream->Write(S0, sizeof(S0) - 1);
 
-    CReadSRecord reader{ std::unique_ptr<CFile>(memstream), FALSE };
+    hex::SRecordImporter reader{ std::unique_ptr<CFile>(memstream), false };
     CString expectedError;
 
     SECTION("Too few data records")

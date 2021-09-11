@@ -337,6 +337,12 @@
     <ClCompile Include="GuiMisc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HexImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SRecordImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource.hm">
@@ -967,6 +973,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GuiMisc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SRecordImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
