@@ -7467,9 +7467,6 @@ void CHexEditView::OnUpdateExportSRecord(CCmdUI* pCmdUI)
 void CHexEditView::OnImportMotorolaS()
 {
 	// Get name of file to import
-//    CFileDialog dlgFile(TRUE, NULL, theApp.current_import_,
-//                        OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR,
-//                        theApp.GetCurrentFilters(), this);
 	CImportDialog dlgFile(theApp.current_import_, HIDD_FILE_IMPORT_MOTOROLA,
 						OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
 						"Motorola S Files (*.s)|*.s|"+theApp.GetCurrentFilters(), this);
@@ -7487,147 +7484,12 @@ void CHexEditView::OnImportMotorolaS()
 
 void CHexEditView::do_motorola(CString file_name)
 {
-	// Can't import we are in RO or INS modes
-	if (check_ro("import a file") || !theApp.import_discon_ && check_ovr("import (non-adjoining)"))
-		return;
+	hex::SRecordImporter importer{
+		std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
+		!!theApp.import_discon_
+	};
 
-	num_entered_ = num_del_ = num_bs_ = 0;      // Stop any editing
-
-	CWaitCursor wait;                           // Turn on wait cursor (hourglass)
-
-	if (theApp.import_discon_)
-	{
-		BOOL ptoo = FALSE;              // First change is new undo op, thence merged with it
-		if (theApp.import_highlight_ && !hl_set_.empty())
-		{
-			undo_.push_back(view_undo(undo_highlight));
-			undo_.back().phl = new range_set<FILE_ADDRESS>(hl_set_);
-			hl_set_.clear();
-			DoInvalidate();
-			ptoo = TRUE;
-		}
-
-		hex::SRecordImporter rsr{
-			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
-			true
-		};
-
-		if (!rsr.Error().IsEmpty())
-		{
-			TaskMessageBox("Import Error", rsr.Error());
-			theApp.mac_error_ = 10;
-			return;
-		}
-
-		// Read
-		int count, skipped;             // Total records read and ignored
-		size_t data_len = 1024;
-		unsigned char *file_data = new unsigned char[data_len];  // one S record
-		unsigned long address;
-		int len;                        // length of data from one S record
-
-		for (count = skipped = 0; (len = rsr.Get(file_data, data_len, address)) > 0; ++count)
-		{
-			if (address + len > GetDocument()->length())
-			{
-				++skipped;
-				continue;
-			}
-			if (theApp.import_highlight_)
-			{
-				// Highlight the record
-				add_highlight(address, address+len, ptoo);
-				ptoo = TRUE;
-			}
-			GetDocument()->Change(mod_replace, FILE_ADDRESS(address), FILE_ADDRESS(len), file_data, 0, this, ptoo);
-			ptoo = TRUE;  // force subsequent changes to be merged into same undo operation
-		}
-		delete[] file_data;
-
-		if (!rsr.Error().IsEmpty())
-			TaskMessageBox("Import Error", rsr.Error());
-		CString mess;
-		if (skipped > 0)
-			mess.Format("Wrote %ld records\nIgnored %ld records\nimporting \"%s\"",
-						long(count - skipped),
-						long(skipped),
-						file_name);
-		else
-			mess.Format("Wrote %ld records importing \"%s\"", long(count), file_name);
-		AvoidableTaskDialog(IDS_IMPORT_RESULT, mess, NULL, NULL, 0, MAKEINTRESOURCE(IDI_INFO));
-
-		theApp.SaveToMacro(km_import_motorola, file_name);
-	}
-	else
-	{
-		hex::SRecordImporter rsr{
-			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
-			false
-		};
-
-		if (!rsr.Error().IsEmpty())
-		{
-			TaskMessageBox("Import Error", rsr.Error());
-			theApp.mac_error_ = 10;
-			return;
-		}
-
-		// We need to store the data in fairly large chunks otherwise the doc undo
-		// stack becomes very full and slows things down
-		size_t data_len = 32768;
-		unsigned char *file_data = new unsigned char[data_len];  // work buffer
-		unsigned char *pp = file_data;  // Ptr into file_data where we are currently storing
-		unsigned long address;          // Import S record address (ignored)
-		int len;                        // length of data from one S record
-		bool first(true);               // is this the first S record read from the file
-		FILE_ADDRESS start_addr, end_addr, curr_addr = -1;
-
-		GetSelAddr(start_addr, end_addr);  // Get the current selection
-
-		for (;;)
-		{
-			len = rsr.Get(pp, data_len - (pp - file_data), address);
-
-			if (len <= 0 || (pp - file_data) + len > (int(data_len) - 256))
-			{
-				// The buffer is almost full or we're finished reading the file - so save buffer
-				if (first)
-				{
-					curr_addr = start_addr;
-					if (start_addr < end_addr)
-					{
-						// Delete current selection and insert new data
-						GetDocument()->Change(mod_delforw, start_addr, end_addr-start_addr, NULL, 0, this);
-						GetDocument()->Change(mod_insert, curr_addr, pp - file_data + len, file_data, 0, this, TRUE);
-					}
-					else
-						GetDocument()->Change(mod_insert, curr_addr, pp - file_data + len, file_data, 0, this);
-					first = false;
-				}
-				else
-				{
-					ASSERT(curr_addr != -1);
-					GetDocument()->Change(mod_insert, curr_addr, pp - file_data + len, file_data, 0, this, TRUE);
-				}
-				curr_addr += pp - file_data + len;
-				pp = file_data;
-			}
-			else
-				pp += len;
-
-			if (len <= 0)
-				break;
-		}
-		delete[] file_data;
-
-		if (!rsr.Error().IsEmpty())
-			TaskMessageBox("Import Error", rsr.Error());
-
-		theApp.SaveToMacro(km_import_motorola, file_name);
-
-		SetSel(addr2pos(start_addr), addr2pos(curr_addr));
-		DisplayCaret();
-	}
+	do_import(importer, km_import_motorola);
 }
 
 void CHexEditView::OnUpdateImportMotorolaS(CCmdUI* pCmdUI)
@@ -7638,12 +7500,9 @@ void CHexEditView::OnUpdateImportMotorolaS(CCmdUI* pCmdUI)
 void CHexEditView::OnImportIntel()
 {
 	// Get name of file to import
-//    CFileDialog dlgFile(TRUE, NULL, theApp.current_import_,
-//                        OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR,
-//                        theApp.GetCurrentFilters(), this);
 	CImportDialog dlgFile(theApp.current_import_, HIDD_FILE_IMPORT_INTEL,
 						OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
-						"Intel Hex Files (*,hex, *.ihx)|*.hex;*.ihx|"+theApp.GetCurrentFilters(), this);
+						"Intel Hex Files (*.hex, *.ihx)|*.hex;*.ihx|"+theApp.GetCurrentFilters(), this);
 
 	// Set up the title of the dialog
 	dlgFile.m_ofn.lpstrTitle = "Import Intel Hex File";
@@ -7658,11 +7517,23 @@ void CHexEditView::OnImportIntel()
 
 void CHexEditView::do_intel(CString file_name)
 {
-	if (check_ro("import an Intel hex file") || !theApp.import_discon_ && check_ovr("import (non-adjoining)"))
+	hex::IntelHexImporter importer{
+		std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
+		!!theApp.import_discon_
+	};
+
+	do_import(importer, km_import_intel);
+}
+
+void CHexEditView::do_import(hex::HexImporter& importer, km_type macro_type)
+{
+	// Can't import we are in RO or INS modes
+	if (check_ro("import a file") || !theApp.import_discon_ && check_ovr("import (non-adjoining)"))
 		return;
 
 	num_entered_ = num_del_ = num_bs_ = 0;      // Stop any editing
 
+	CString file_name = theApp.current_import_;
 	CWaitCursor wait;                           // Turn on wait cursor (hourglass)
 
 	if (theApp.import_discon_)
@@ -7677,26 +7548,21 @@ void CHexEditView::do_intel(CString file_name)
 			ptoo = TRUE;
 		}
 
-		hex::IntelHexImporter rih(
-			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText),
-			true
-		);
-
-		if (!rih.Error().IsEmpty())
+		if (!importer.Error().IsEmpty())
 		{
-			TaskMessageBox("Import Error", rih.Error());
+			TaskMessageBox("Import Error", importer.Error());
 			theApp.mac_error_ = 10;
 			return;
 		}
 
 		// Read
 		int count, skipped;             // Total records read and ignored
-		size_t data_len = 1024;
-		unsigned char *file_data = new unsigned char[data_len];  // one S record
+		static constexpr std::size_t data_len = 1024;
+		std::uint8_t file_data[data_len]; // one record
 		unsigned long address;
-		int len;                        // length of data from one S record
+		int len;                        // length of data from one record
 
-		for (count = skipped = 0; (len = rih.Get(file_data, data_len, address)) > 0; ++count)
+		for (count = skipped = 0; (len = importer.Get(file_data, data_len, address)) > 0; ++count)
 		{
 			if (address + len > GetDocument()->length())
 			{
@@ -7712,53 +7578,56 @@ void CHexEditView::do_intel(CString file_name)
 			GetDocument()->Change(mod_replace, FILE_ADDRESS(address), FILE_ADDRESS(len), file_data, 0, this, ptoo);
 			ptoo = TRUE;  // force subsequent changes to be merged into same undo operation
 		}
-		delete[] file_data;
 
-		if (!rih.Error().IsEmpty())
-			TaskMessageBox("Import Error", rih.Error());
+		if (!importer.Error().IsEmpty())
+		{
+			TaskMessageBox("Import Error", importer.Error());
+		}
+
 		CString mess;
 		if (skipped > 0)
+		{
 			mess.Format("Wrote %ld records\nIgnored %ld records\nimporting \"%s\"",
 						long(count - skipped),
 						long(skipped),
 						file_name);
+		}
 		else
+		{
 			mess.Format("Wrote %ld records importing \"%s\"", long(count), file_name);
+		}
 		AvoidableTaskDialog(IDS_IMPORT_RESULT, mess, NULL, NULL, 0, MAKEINTRESOURCE(IDI_INFO));
 
-		theApp.SaveToMacro(km_import_intel, file_name);
+		theApp.SaveToMacro(macro_type, file_name);
 	}
 	else
 	{
-		hex::IntelHexImporter rih(
-			std::make_unique<CStdioFile>(file_name, CFile::modeRead | CFile::shareDenyWrite | CFile::typeText), 
-			false
-		);
-
-		if (!rih.Error().IsEmpty())
+		if (!importer.Error().IsEmpty())
 		{
-			TaskMessageBox("Import Error", rih.Error());
+			TaskMessageBox("Import Error", importer.Error());
 			theApp.mac_error_ = 10;
 			return;
 		}
 
 		// We need to store the data in fairly large chunks otherwise the doc undo
 		// stack becomes very full and slows things down
-		size_t data_len = 32768;
-		unsigned char *file_data = new unsigned char[data_len];  // work buffer
-		unsigned char *pp = file_data;  // Ptr into file_data where we are currently storing
-		int len;                        // length of data from one S record
-		unsigned long address;          // Import record address (ignored)
-		bool first(true);               // is this the first S record read from the file
+		static constexpr size_t data_len = 32768;
+		auto file_data = std::make_unique<std::uint8_t[]>(data_len);  // work buffer
+		unsigned char *pp = file_data.get();  // Ptr into file_data where we are currently storing
+		unsigned long address;                // Import record address (ignored)
+		int len;                              // length of data from one record
+		bool first = true;                    // is this the first record read from the file
 		FILE_ADDRESS start_addr, end_addr, curr_addr = -1;
 
 		GetSelAddr(start_addr, end_addr);  // Get the current selection
 
 		for (;;)
 		{
-			len = rih.Get(pp, data_len - (pp - file_data), address);
+			const std::size_t prev_len = pp - file_data.get();
 
-			if (len <= 0 || (pp - file_data) + len > (int(data_len) - 256))
+			len = importer.Get(pp, data_len - prev_len, address);
+
+			if (len <= 0 || prev_len + len > (int(data_len) - 256))
 			{
 				// The buffer is almost full or we're finished reading the file - so save buffer
 				if (first)
@@ -7768,32 +7637,39 @@ void CHexEditView::do_intel(CString file_name)
 					{
 						// Delete current selection and insert new data
 						GetDocument()->Change(mod_delforw, start_addr, end_addr-start_addr, NULL, 0, this);
-						GetDocument()->Change(mod_insert, curr_addr, pp - file_data + len, file_data, 0, this, TRUE);
+						GetDocument()->Change(mod_insert, curr_addr, prev_len + len, file_data.get(), 0, this, TRUE);
 					}
 					else
-						GetDocument()->Change(mod_insert, curr_addr, pp - file_data + len, file_data, 0, this);
+					{
+						GetDocument()->Change(mod_insert, curr_addr, prev_len + len, file_data.get(), 0, this);
+					}
 					first = false;
 				}
 				else
 				{
 					ASSERT(curr_addr != -1);
-					GetDocument()->Change(mod_insert, curr_addr, pp - file_data + len, file_data, 0, this, TRUE);
+					GetDocument()->Change(mod_insert, curr_addr, prev_len + len, file_data.get(), 0, this, TRUE);
 				}
-				curr_addr += pp - file_data + len;
-				pp = file_data;
+				curr_addr += prev_len + len;
+				pp = file_data.get();
 			}
 			else
+			{
 				pp += len;
+			}
 
 			if (len <= 0)
+			{
 				break;
+			}
 		}
-		delete[] file_data;
 
-		if (!rih.Error().IsEmpty())
-			TaskMessageBox("Import Error", rih.Error());
+		if (!importer.Error().IsEmpty())
+		{
+			TaskMessageBox("Import Error", importer.Error());
+		}
 
-		theApp.SaveToMacro(km_import_intel, file_name);
+		theApp.SaveToMacro(macro_type, file_name);
 
 		SetSel(addr2pos(start_addr), addr2pos(curr_addr));
 		DisplayCaret();
