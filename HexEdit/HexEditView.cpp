@@ -7469,7 +7469,7 @@ void CHexEditView::OnImportMotorolaS()
 	// Get name of file to import
 	CImportDialog dlgFile(theApp.current_import_, HIDD_FILE_IMPORT_MOTOROLA,
 						OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
-						"Motorola S Files (*.s)|*.s|"+theApp.GetCurrentFilters(), this);
+						"Motorola S Files (*.s;*.srec)|*.s;*.srec|"+theApp.GetCurrentFilters(), this);
 
 	// Set up the title of the dialog
 	dlgFile.m_ofn.lpstrTitle = "Import Motorola S Records";
