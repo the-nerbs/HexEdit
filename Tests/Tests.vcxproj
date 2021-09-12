@@ -98,8 +98,8 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
-    <ClCompile Include="CReadIntelHexTests.cpp" />
-    <ClCompile Include="CReadSRecordTests.cpp" />
+    <ClCompile Include="IntelHexImporterTests.cpp" />
+    <ClCompile Include="SRecordImporterTests.cpp" />
     <ClCompile Include="CXmlTreeTests.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RangeSetTests.cpp" />

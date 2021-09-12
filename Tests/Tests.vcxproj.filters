@@ -36,10 +36,10 @@
     <ClCompile Include="utils\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CReadSRecordTests.cpp">
+    <ClCompile Include="SRecordImporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CReadIntelHexTests.cpp">
+    <ClCompile Include="IntelHexImporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
