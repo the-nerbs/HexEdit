@@ -10,6 +10,7 @@ class CWriteSRecord
 {
 public:
 	CWriteSRecord(const char *filename, unsigned long base_addr = 0L, int stype = 3, size_t reclen = 32);
+	CWriteSRecord(std::unique_ptr<CFile> stream, unsigned long base_addr = 0L, int stype = 3, size_t reclen = 32);
 	~CWriteSRecord();
 	void Put(const void *data, size_t len, unsigned long address = UINT_MAX);
 	CString Error() const { return error_; }
@@ -18,7 +19,7 @@ private:
 	void put_rec(int stype, unsigned long addr, void *data, size_t len);
 	int put_hex(char *pstart, unsigned long val, int bytes);
 
-	CStdioFile file_;
+	std::unique_ptr<CFile> file_;
 	int stype_;                         // preferred record type: 1 = S1, 2 = S2, 3 = S3
 	unsigned long addr_;                // Address of next S record to write
 	size_t reclen_;                     // Preferred output record size

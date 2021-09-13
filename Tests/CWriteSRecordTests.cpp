@@ -25,9 +25,18 @@ public:
 
 TEST_CASE("CWriteSRecord constructors")
 {
-    CString path = TestFiles::GetMutableFilePath();
+    std::unique_ptr<CWriteSRecord> writer;
 
-    auto writer = garbage_fill_and_construct_ptr<CWriteSRecord>(static_cast<const char*>(path));
+    SECTION("from file path");
+    {
+        CString path = TestFiles::GetMutableFilePath();
+        writer = garbage_fill_and_construct_ptr<CWriteSRecord>(static_cast<const char*>(path));
+    }
+
+    SECTION("from memory stream")
+    {
+        writer = std::make_unique<CWriteSRecord>(std::make_unique<CMemFile>());
+    }
 
     CHECK(writer->Error() == "");
 }

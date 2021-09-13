@@ -19,17 +19,18 @@ static size_t addr_size[10] = { 2, 2, 3, 4, -1, 2, -1, 4, 3, 2 };
 CWriteSRecord::CWriteSRecord(const char *filename,
 							 unsigned long base_addr /*= 0L*/,
 							 int stype /*= 3*/,
-							 size_t reclen /*= 32*/)
+							 size_t reclen /*= 32*/) :
+	file_{ std::make_unique<CStdioFile>()},
+	stype_{ stype },
+	addr_{ base_addr },
+	reclen_{ reclen },
+	error_{},
+	recs_out_{ 0 }
 {
-	stype_ = stype;                         // Keep type of recs to output
-	addr_ = base_addr;                      // Init addr_ to base address
-	reclen_ = reclen;
-	recs_out_ = 0;                          // Init output record count
-
 	CFileException fe;                      // Stores file exception info
 
 	// Open the file
-	if (!file_.Open(filename,
+	if (!file_->Open(filename,
 		CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeText,
 					  &fe))
 	{
@@ -41,13 +42,24 @@ CWriteSRecord::CWriteSRecord(const char *filename,
 	put_rec(0, 0L, "HDR", 3);
 }
 
+CWriteSRecord::CWriteSRecord(std::unique_ptr<CFile> stream, unsigned long base_addr, int stype, size_t reclen) :
+	file_{ std::move(stream) },
+	stype_{ stype },
+	addr_{ base_addr },
+	reclen_{ reclen },
+	error_{},
+	recs_out_{ 0 }
+{
+	// Write S0 record
+	put_rec(0, 0L, "HDR", 3);
+}
 
 CWriteSRecord::~CWriteSRecord()
 {
 	put_rec(5, recs_out_, "", 0);       // For S5 the number of records read is stored in address field
 	try
 	{
-		file_.Close();
+		file_->Close();
 	}
 	catch (CFileException *pfe)
 	{
@@ -115,7 +127,8 @@ void CWriteSRecord::put_rec(int stype, unsigned long addr, void *data, size_t le
 
 	try
 	{
-		file_.WriteString(buffer);
+		UINT writeLen = pp - buffer;
+		file_->Write(buffer, writeLen);
 	}
 	catch (CFileException *pfe)
 	{
