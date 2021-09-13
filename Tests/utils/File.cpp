@@ -8,9 +8,16 @@
 
 namespace File
 {
-    CString ReadAllText(CString path)
+    CString ReadAllText(CString path, bool normalizeEOLs)
     {
-        std::fstream in{ path, std::ios::in | std::ios::binary };
+        std::ios::openmode mode = std::ios::in;
+
+        if (!normalizeEOLs)
+        {
+            mode |= std::ios::binary;
+        }
+
+        std::fstream in{ path, mode };
 
         if (!in)
         {
@@ -24,7 +31,8 @@ namespace File
         CString str;
         LPSTR pdata = str.GetBuffer(length + 1);
         in.read(pdata, length);
-        pdata[length] = '\0';
+        int readCount = static_cast<int>(in.gcount());
+        pdata[readCount] = '\0';
         str.ReleaseBuffer();
 
         return str;

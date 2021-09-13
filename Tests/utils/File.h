@@ -22,8 +22,9 @@ namespace File
 {
     /// \brief  Reads the entirety of the given file as text.
     ///
-    /// \param  path  The path to the file to read.
-    CString ReadAllText(CString path);
+    /// \param  path           The path to the file to read.
+    /// \param  normalizeEOLs  If true, EOL sequences will be normalized to just LF.
+    CString ReadAllText(CString path, bool normalizeEOLs = false);
 
     file_attrs GetAttributes(CString path);
     void SetAttributes(CString path, file_attrs attrs);
