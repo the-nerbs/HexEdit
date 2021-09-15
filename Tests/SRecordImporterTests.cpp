@@ -1,5 +1,6 @@
 #include "Stdafx.h"
 #include "utils/AssertHelpers.h"
+#include "utils/ErrorFile.h"
 #include "utils/File.h"
 #include "utils/Garbage.h"
 #include "utils/TestFiles.h"
@@ -7,20 +8,6 @@
 #include "SRecordImporter.h"
 
 #include "catch.hpp"
-
-
-class CErrorFile : public CMemFile
-{
-public:
-    using CMemFile::CMemFile;
-
-    ~CErrorFile() = default;
-
-    UINT Read(void* lpBuf, UINT nCount) override
-    {
-        AfxThrowFileException(CFileException::genericException);
-    }
-};
 
 
 TEST_CASE("SRecordImporter constructor")
@@ -136,7 +123,7 @@ TEST_CASE("SRecordImporter::Get")
 
 TEST_CASE("SRecordImporter::Get - read failure")
 {
-    hex::SRecordImporter reader{ std::make_unique<CErrorFile>(), true };
+    hex::SRecordImporter reader{ std::make_unique<CErrorFile>(CErrorFile::readError), true };
 
     REQUIRE(reader.Error() == "");
 

@@ -56,15 +56,38 @@ CWriteSRecord::CWriteSRecord(std::unique_ptr<CFile> stream, unsigned long base_a
 
 CWriteSRecord::~CWriteSRecord()
 {
-	put_rec(5, recs_out_, "", 0);       // For S5 the number of records read is stored in address field
-	try
+	// for some reason, MFC's CFile streams have a discrete Open method, but
+	// no way to query if the stream is open from a CFile reference... This
+	// means we have to do a bit of ugly runtime type checking to see if we're
+	// in a valid state to write out the S5 record here. On the off chance an
+	// unrecognized stream type is used, assume it is open.
+	bool isStreamOpen = true;
+
+	if (file_->IsKindOf(RUNTIME_CLASS(CStdioFile)))
 	{
-		file_->Close();
+		isStreamOpen = static_cast<CStdioFile*>(file_.get())->m_pStream;
 	}
-	catch (CFileException *pfe)
+	else if (file_->IsKindOf(RUNTIME_CLASS(CMemFile)))
 	{
-		error_ = ::FileErrorMessage(pfe, CFile::modeWrite);
-		pfe->Delete();
+		// memory stream can only be in a valid state if
+		// we wrote to it in the constructor already.
+		isStreamOpen = file_->GetLength() > 0;
+	}
+
+	if (isStreamOpen)
+	{
+		// For S5 the number of records read is stored in address field
+		put_rec(5, recs_out_, "", 0);
+
+		try
+		{
+			file_->Close();
+		}
+		catch (CFileException* pfe)
+		{
+			error_ = ::FileErrorMessage(pfe, CFile::modeWrite);
+			pfe->Delete();
+		}
 	}
 }
 

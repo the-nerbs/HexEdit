@@ -104,6 +104,8 @@
     <ClCompile Include="CXmlTreeTests.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RangeSetTests.cpp" />
+    <ClCompile Include="utils\ErrorFile.cpp" />
+    <ClCompile Include="utils\ErrorFile.h" />
     <ClCompile Include="utils\File.cpp" />
     <ClCompile Include="utils\TestFiles.cpp" />
   </ItemGroup>

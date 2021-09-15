@@ -38,6 +38,27 @@ namespace File
         return str;
     }
 
+    CString ReadAllText(CFile& stream)
+    {
+        ULONGLONG ullLength = stream.GetLength();
+
+        if (ullLength > INT_MAX)
+        {
+            throw std::exception{ "file too long to read." };
+        }
+
+        int length = static_cast<int>(ullLength);
+
+        CString str;
+
+        LPSTR pdata = str.GetBuffer(length + 1);
+        UINT readCount = stream.Read(pdata, static_cast<UINT>(length));
+        pdata[readCount] = '\0';
+        str.ReleaseBuffer();
+
+        return str;
+    }
+
 
     static const std::pair<file_attrs, DWORD> fileAttrMap[]
     {

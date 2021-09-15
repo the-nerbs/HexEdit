@@ -1,4 +1,5 @@
 #pragma once
+#include <afx.h>
 #include <afxstr.h>
 
 enum file_attrs
@@ -25,6 +26,11 @@ namespace File
     /// \param  path           The path to the file to read.
     /// \param  normalizeEOLs  If true, EOL sequences will be normalized to just LF.
     CString ReadAllText(CString path, bool normalizeEOLs = false);
+
+    /// \brief  Reads the entirety of the given stream as text.
+    ///
+    /// \param  stream  The stream to read.
+    CString ReadAllText(CFile& stream);
 
     file_attrs GetAttributes(CString path);
     void SetAttributes(CString path, file_attrs attrs);

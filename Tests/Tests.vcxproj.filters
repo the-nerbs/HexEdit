@@ -45,6 +45,12 @@
     <ClCompile Include="CWriteSRecordTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="utils\ErrorFile.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ErrorFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils\Garbage.h">
