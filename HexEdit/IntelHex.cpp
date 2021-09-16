@@ -14,36 +14,64 @@
 #include "IntelHex.h"
 
 CWriteIntelHex::CWriteIntelHex(const char *filename,
-							 unsigned long base_addr /*= 0L*/,
-							 size_t reclen /*= 32*/)
+							   unsigned long base_addr /*= 0L*/,
+							   size_t reclen /*= 32*/) :
+	file_{ std::make_unique<CStdioFile>() },
+	addr_{ base_addr },
+	reclen_{ reclen },
+	error_{},
+	recs_out_{ 0 }
 {
-	addr_ = base_addr;                      // Init addr_ to base address
-	reclen_ = reclen;
-	recs_out_ = 0;                          // Init output record count
-
 	CFileException fe;                      // Stores file exception info
 
 	// Open the file
-	if (!file_.Open(filename,
+	if (!file_->Open(filename,
 		CFile::modeCreate|CFile::modeWrite|CFile::shareExclusive|CFile::typeText,
 					  &fe))
 	{
 		error_ = ::FileErrorMessage(&fe, CFile::modeWrite);
-		return;
 	}
 }
 
+CWriteIntelHex::CWriteIntelHex(std::unique_ptr<CFile> stream,
+							   unsigned long base_addr,
+							   size_t reclen) :
+	file_{ std::move(stream) },
+	addr_{ base_addr },
+	reclen_{ reclen },
+	error_{},
+	recs_out_{ 0 }
+{ }
+
 CWriteIntelHex::~CWriteIntelHex()
 {
-	put_rec(1, 0, "", 0);       // Ouput the EOF (01) record
-	try
+	// for some reason, MFC's CFile streams have a discrete Open method, but
+	// no way to query if the stream is open from a CFile reference... This
+	// means we have to do a bit of ugly runtime type checking to see if we're
+	// in a valid state to write out the S5 record here. On the off chance an
+	// unrecognized stream type is used, assume it is open.
+	bool isStreamOpen = true;
+
+	if (file_->IsKindOf(RUNTIME_CLASS(CStdioFile)))
 	{
-		file_.Close();
+		isStreamOpen = static_cast<CStdioFile*>(file_.get())->m_pStream;
 	}
-	catch (CFileException *pfe)
+
+	// since we don't have a prologue record, file_->GetLength can still be 0 here,
+	// so the check that SREC writer makes for CMemFile cannot be done here.
+
+	if (isStreamOpen)
 	{
-		error_ = ::FileErrorMessage(pfe, CFile::modeWrite);
-		pfe->Delete();
+		put_rec(1, 0, "", 0);       // Output the EOF (01) record
+		try
+		{
+			file_->Close();
+		}
+		catch (CFileException* pfe)
+		{
+			error_ = ::FileErrorMessage(pfe, CFile::modeWrite);
+			pfe->Delete();
+		}
 	}
 }
 
@@ -104,7 +132,8 @@ void CWriteIntelHex::put_rec(int stype, unsigned long addr, void *data, size_t l
 
 	try
 	{
-		file_.WriteString(buffer);
+		UINT writeLen = pp - buffer;
+		file_->Write(buffer, writeLen);
 	}
 	catch (CFileException *pfe)
 	{

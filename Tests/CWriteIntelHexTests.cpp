@@ -20,41 +20,38 @@ TEST_CASE("CWriteIntelHex constructors")
         writer = garbage_fill_and_construct_ptr<CWriteIntelHex>(static_cast<const char*>(path));
     }
 
-    //TODO: needs stream ctor
-    //SECTION("from memory stream")
-    //{
-    //    writer = std::make_unique<CWriteIntelHex>(std::make_unique<CMemFile>());
-    //}
+    SECTION("from memory stream")
+    {
+        writer = std::make_unique<CWriteIntelHex>(std::make_unique<CMemFile>());
+    }
 
     CHECK(writer->Error() == "");
 }
 
-//TODO: dtor needs that hacky mess to detect if the stream is open.
-//TEST_CASE("CWriteIntelHex constructor errors")
-//{
-//    SECTION("Cannot open file")
-//    {
-//        CString path = TestFiles::GetMutableFilePath();
-//        CStdioFile denyWrite{ path, CFile::modeCreate | CFile::shareDenyWrite };
-//
-//        CWriteIntelHex reader{ path, TRUE };
-//
-//        // actual error message doesn't really matter here, just that we start with the error.
-//        CHECK(reader.Error() != "");
-//    }
-//}
+TEST_CASE("CWriteIntelHex constructor errors")
+{
+    SECTION("Cannot open file")
+    {
+        CString path = TestFiles::GetMutableFilePath();
+        CStdioFile denyWrite{ path, CFile::modeCreate | CFile::shareDenyWrite };
 
-//TODO: after adding stream ctor
-//TEST_CASE("CWriteIntelHex destructor CFileException does not propagate")
-//{
-//    auto stream = std::make_unique<CErrorFile>(CErrorFile::closeError);
-//
-//    {
-//        CWriteIntelHex reader{ std::move(stream), TRUE };
-//    }
-//
-//    // no exception thrown by destructor.
-//}
+        CWriteIntelHex reader{ path, TRUE };
+
+        // actual error message doesn't really matter here, just that we start with the error.
+        CHECK(reader.Error() != "");
+    }
+}
+
+TEST_CASE("CWriteIntelHex destructor CFileException does not propagate")
+{
+    auto stream = std::make_unique<CErrorFile>(CErrorFile::closeError);
+
+    {
+        CWriteIntelHex reader{ std::move(stream), TRUE };
+    }
+
+    // no exception thrown by destructor.
+}
 
 
 TEST_CASE("CWriteIntelHex::Put - no data")
@@ -183,28 +180,27 @@ TEST_CASE("CWriteIntelHex::Put - partial record after full record")
 }
 
 
-//TODO: needs stream ctor
-//TEST_CASE("CWriteIntelHex::Put - write error")
-//{
-//    auto stream = std::make_unique<CErrorFile>(CErrorFile::noError);
-//
-//    // need to play some games with the stream references
-//    // here since the constructor writes some data as well.
-//    CErrorFile* pStream = stream.get();
-//
-//    const std::uint8_t data[16]{};
-//
-//    CWriteIntelHex writer{ std::move(stream), 0x0000, 16 };
-//
-//    pStream->writeThrows = true;
-//    writer.Put(data, sizeof(data));
-//
-//    // actual error message doesn't really matter here, just that we start with the error.
-//    CHECK(writer.Error() != "");
-//
-//    // make sure the dtor doesn't throw
-//    pStream->writeThrows = false;
-//}
+TEST_CASE("CWriteIntelHex::Put - write error")
+{
+    auto stream = std::make_unique<CErrorFile>(CErrorFile::noError);
+
+    // need to play some games with the stream references
+    // here since the constructor writes some data as well.
+    CErrorFile* pStream = stream.get();
+
+    const std::uint8_t data[16]{};
+
+    CWriteIntelHex writer{ std::move(stream), 0x0000, 16 };
+
+    pStream->writeThrows = true;
+    writer.Put(data, sizeof(data));
+
+    // actual error message doesn't really matter here, just that we start with the error.
+    CHECK(writer.Error() != "");
+
+    // make sure the dtor doesn't throw
+    pStream->writeThrows = false;
+}
 
 
 //TODO: intel export does not support the export addresses?
