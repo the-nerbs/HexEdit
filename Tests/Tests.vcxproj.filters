@@ -51,6 +51,9 @@
     <ClCompile Include="utils\ErrorFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CWriteIntelHexTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils\Garbage.h">
