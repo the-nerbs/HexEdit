@@ -346,6 +346,15 @@
     <ClCompile Include="IntelHexImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HexExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SRecordExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IntelHexExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource.hm">
@@ -985,6 +994,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IntelHexImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HexExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SRecordExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IntelHexExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

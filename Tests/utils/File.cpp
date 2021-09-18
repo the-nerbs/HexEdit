@@ -38,8 +38,13 @@ namespace File
         return str;
     }
 
-    CString ReadAllText(CFile& stream)
+    CString ReadAllText(CFile& stream, bool seekToStart)
     {
+        if (seekToStart)
+        {
+            stream.SeekToBegin();
+        }
+
         ULONGLONG ullLength = stream.GetLength();
 
         if (ullLength > INT_MAX)

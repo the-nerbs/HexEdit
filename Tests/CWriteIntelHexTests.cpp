@@ -5,68 +5,112 @@
 #include "utils/Garbage.h"
 #include "utils/TestFiles.h"
 
-#include "IntelHex.h"
+#include "IntelHexExporter.h"
 
 #include "catch.hpp"
 
 
-TEST_CASE("CWriteIntelHex constructors")
+TEST_CASE("IntelHexExporter constructors")
 {
-    std::unique_ptr<CWriteIntelHex> writer;
+    std::unique_ptr<hex::IntelHexExporter> writer;
 
     SECTION("from file path")
     {
         CString path = TestFiles::GetMutableFilePath();
-        writer = garbage_fill_and_construct_ptr<CWriteIntelHex>(static_cast<const char*>(path));
+        writer = garbage_fill_and_construct_ptr<hex::IntelHexExporter>(
+            std::make_unique<CStdioFile>(path, CFile::modeCreate | CFile::modeWrite | CFile::shareExclusive | CFile::typeText)
+        );
     }
 
     SECTION("from memory stream")
     {
-        writer = std::make_unique<CWriteIntelHex>(std::make_unique<CMemFile>());
+        writer = std::make_unique<hex::IntelHexExporter>(std::make_unique<CMemFile>());
     }
 
     CHECK(writer->Error() == "");
 }
 
-TEST_CASE("CWriteIntelHex constructor errors")
-{
-    SECTION("Cannot open file")
-    {
-        CString path = TestFiles::GetMutableFilePath();
-        CStdioFile denyWrite{ path, CFile::modeCreate | CFile::shareDenyWrite };
-
-        CWriteIntelHex reader{ path, TRUE };
-
-        // actual error message doesn't really matter here, just that we start with the error.
-        CHECK(reader.Error() != "");
-    }
-}
-
-TEST_CASE("CWriteIntelHex destructor CFileException does not propagate")
+TEST_CASE("IntelHexExporter destructor CFileException does not propagate")
 {
     auto stream = std::make_unique<CErrorFile>(CErrorFile::closeError);
 
     {
-        CWriteIntelHex reader{ std::move(stream), TRUE };
+        hex::IntelHexExporter writer{ std::move(stream) };
     }
 
     // no exception thrown by destructor.
 }
 
 
-TEST_CASE("CWriteIntelHex::Put - no data")
+TEST_CASE("IntelHexExporter::WritePrologue")
 {
-    CString path = TestFiles::GetMutableFilePath();
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
+
+    hex::IntelHexExporter exporter{ std::move(stream) };
+
+    exporter.WritePrologue();
+
+    CString written = File::ReadAllText(*pStream);
+
+    // Intel Hex format has no prologue record
+    CString expected = "";
+
+    CHECK(written == expected);
+}
+
+
+TEST_CASE("IntelHexExporter::WriteEpilogue")
+{
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
+
+    hex::IntelHexExporter exporter{ std::move(stream) };
+
+    CString expected;
+
+    SECTION("No data records")
+    {
+        expected = ":00000001FF\n";
+    }
+
+    SECTION("Yes data records")
+    {
+        // write a few records out so we have a 
+        const std::uint8_t data[1]{ 0xCC };
+        exporter.WriteData(data, sizeof(data));
+        exporter.WriteData(data, sizeof(data));
+        exporter.WriteData(data, sizeof(data));
+
+        expected =
+            ":01000000CC33\n"
+            ":01000100CC32\n"
+            ":01000200CC31\n"
+            ":00000001FF\n";
+    }
+
+    exporter.WriteEpilogue();
+
+    CString written = File::ReadAllText(*pStream);
+
+    CHECK(written == expected);
+}
+
+
+TEST_CASE("IntelHexExporter::Put - no data")
+{
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
 
     const std::uint8_t data[1] = { 0x00 };
 
-    {
-        CWriteIntelHex writer{ path, 0x0000, 16 };
+    hex::IntelHexExporter writer{ std::move(stream), 0x0000, 16 };
 
-        writer.Put(data, 0);
-    }
+    writer.WritePrologue();
+    writer.WriteData(data, 0);
+    writer.WriteEpilogue();
 
-    CString written = File::ReadAllText(path, true);
+    CString written = File::ReadAllText(*pStream);
 
     CString expected =
         ":00000001FF\n";
@@ -74,9 +118,10 @@ TEST_CASE("CWriteIntelHex::Put - no data")
     CHECK(written == expected);
 }
 
-TEST_CASE("CWriteIntelHex::Put - 1 full record")
+TEST_CASE("IntelHexExporter::Put - 1 full record")
 {
-    CString path = TestFiles::GetMutableFilePath();
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
 
     const std::uint8_t data[16] =
     {
@@ -84,13 +129,13 @@ TEST_CASE("CWriteIntelHex::Put - 1 full record")
         0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
     };
 
-    {
-        CWriteIntelHex writer{ path, 0x0000, 16 };
+    hex::IntelHexExporter writer{ std::move(stream), 0x0000, 16 };
 
-        writer.Put(data, sizeof(data));
-    }
+    writer.WritePrologue();
+    writer.WriteData(data, sizeof(data));
+    writer.WriteEpilogue();
 
-    CString written = File::ReadAllText(path, true);
+    CString written = File::ReadAllText(*pStream);
 
     CString expected =
         ":1000000000112233445566778899AABBCCDDEEFFF8\n"
@@ -99,9 +144,10 @@ TEST_CASE("CWriteIntelHex::Put - 1 full record")
     CHECK(written == expected);
 }
 
-TEST_CASE("CWriteIntelHex::Put - multiple full records")
+TEST_CASE("IntelHexExporter::Put - multiple full records")
 {
-    CString path = TestFiles::GetMutableFilePath();
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
 
     const std::uint8_t data[16] =
     {
@@ -109,13 +155,13 @@ TEST_CASE("CWriteIntelHex::Put - multiple full records")
         0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
     };
 
-    {
-        CWriteIntelHex writer{ path, 0x0000, 4 };
+    hex::IntelHexExporter writer{ std::move(stream), 0x0000, 4};
 
-        writer.Put(data, sizeof(data));
-    }
+    writer.WritePrologue();
+    writer.WriteData(data, sizeof(data));
+    writer.WriteEpilogue();
 
-    CString written = File::ReadAllText(path, true);
+    CString written = File::ReadAllText(*pStream);
 
     CString expected =
         ":040000000011223396\n"
@@ -128,9 +174,10 @@ TEST_CASE("CWriteIntelHex::Put - multiple full records")
 }
 
 
-TEST_CASE("CWriteIntelHex::Put - 1 partial record")
+TEST_CASE("IntelHexExporter::Put - 1 partial record")
 {
-    CString path = TestFiles::GetMutableFilePath();
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
 
     const std::uint8_t data[15] =
     {
@@ -138,13 +185,12 @@ TEST_CASE("CWriteIntelHex::Put - 1 partial record")
         0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE
     };
 
-    {
-        CWriteIntelHex writer{ path, 0x0000, 16 };
+    hex::IntelHexExporter writer{ std::move(stream), 0x0000, 16 };
+    writer.WritePrologue();
+    writer.WriteData(data, sizeof(data));
+    writer.WriteEpilogue();
 
-        writer.Put(data, sizeof(data));
-    }
-
-    CString written = File::ReadAllText(path, true);
+    CString written = File::ReadAllText(*pStream);
 
     CString expected =
         ":0F00000000112233445566778899AABBCCDDEEF8\n"
@@ -153,9 +199,10 @@ TEST_CASE("CWriteIntelHex::Put - 1 partial record")
     CHECK(written == expected);
 }
 
-TEST_CASE("CWriteIntelHex::Put - partial record after full record")
+TEST_CASE("IntelHexExporter::Put - partial record after full record")
 {
-    CString path = TestFiles::GetMutableFilePath();
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
 
     const std::uint8_t data[9] =
     {
@@ -163,13 +210,13 @@ TEST_CASE("CWriteIntelHex::Put - partial record after full record")
         0x88,
     };
 
-    {
-        CWriteIntelHex writer{ path, 0x0000, 8 };
+    hex::IntelHexExporter writer{ std::move(stream), 0x0000, 8 };
 
-        writer.Put(data, sizeof(data));
-    }
+    writer.WritePrologue();
+    writer.WriteData(data, sizeof(data));
+    writer.WriteEpilogue();
 
-    CString written = File::ReadAllText(path, true);
+    CString written = File::ReadAllText(*pStream);
 
     CString expected =
         ":0800000000112233445566771C\n"
@@ -180,20 +227,17 @@ TEST_CASE("CWriteIntelHex::Put - partial record after full record")
 }
 
 
-TEST_CASE("CWriteIntelHex::Put - write error")
+TEST_CASE("IntelHexExporter::Put - write error")
 {
     auto stream = std::make_unique<CErrorFile>(CErrorFile::noError);
-
-    // need to play some games with the stream references
-    // here since the constructor writes some data as well.
     CErrorFile* pStream = stream.get();
 
     const std::uint8_t data[16]{};
 
-    CWriteIntelHex writer{ std::move(stream), 0x0000, 16 };
+    hex::IntelHexExporter writer{ std::move(stream), 0x0000, 16 };
 
     pStream->writeThrows = true;
-    writer.Put(data, sizeof(data));
+    writer.WriteData(data, sizeof(data));
 
     // actual error message doesn't really matter here, just that we start with the error.
     CHECK(writer.Error() != "");
@@ -203,52 +247,50 @@ TEST_CASE("CWriteIntelHex::Put - write error")
 }
 
 
-//TODO: intel export does not support the export addresses?
-//TEST_CASE("CWriteIntelHex::Put - addresses")
-//{
-//    const bool overridePutAddress = GENERATE(false, true);
-//
-//    auto stream = std::make_unique<CMemFile>();
-//    CMemFile* pStream = stream.get();
-//
-//    CWriteIntelHex writer{ std::move(stream), 0x8000, 1, 8 };
-//
-//    const std::uint8_t data[8] =
-//    {
-//        0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88
-//    };
-//
-//    writer.Put(data, sizeof(data));
-//
-//    CString expectedSecondRecord;
-//
-//    if (overridePutAddress)
-//    {
-//        writer.Put(data, sizeof(data), 0xFFFF);
-//
-//        // we overrode the address, so use that as the record address.
-//        expectedSecondRecord =
-//            "S10BFFFF112233445566778892\n";
-//    }
-//    else
-//    {
-//        writer.Put(data, sizeof(data));
-//
-//        // did not override the address, so the second record
-//        // is immediately after the first
-//        expectedSecondRecord =
-//            "S10B8008112233445566778808\n";
-//    }
-//
-//    // note: we can't expect the S5 record here since that's written
-//    // by the destructor, and letting that run would close the stream.
-//    CString expected =
-//        "S00600004844521B\n"
-//        "S10B8000112233445566778810\n"
-//        + expectedSecondRecord;
-//
-//    pStream->SeekToBegin();
-//    CString actual = File::ReadAllText(*pStream);
-//
-//    REQUIRE(expected == actual);
-//}
+TEST_CASE("IntelHexExporter::Put - addresses")
+{
+    const bool overridePutAddress = GENERATE(false, true);
+
+    auto stream = std::make_unique<CMemFile>();
+    CMemFile* pStream = stream.get();
+
+    hex::IntelHexExporter writer{ std::move(stream), 0x8000, 8 };
+
+    const std::uint8_t data[8] =
+    {
+        0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88
+    };
+
+    writer.WriteData(data, sizeof(data));
+
+    CString expectedSecondRecord;
+
+    if (overridePutAddress)
+    {
+        writer.WriteData(data, sizeof(data), 0xFFFF);
+
+        // we overrode the address, so use that as the record address.
+        expectedSecondRecord =
+            ":08FFFF00112233445566778896\n";
+    }
+    else
+    {
+        writer.WriteData(data, sizeof(data));
+
+        // did not override the address, so the second record
+        // is immediately after the first
+        expectedSecondRecord =
+            ":0880080011223344556677880C\n";
+    }
+
+    // note: we can't expect the S5 record here since that's written
+    // by the destructor, and letting that run would close the stream.
+    CString expected =
+        ":08800000112233445566778814\n"
+        + expectedSecondRecord;
+
+    pStream->SeekToBegin();
+    CString actual = File::ReadAllText(*pStream);
+
+    REQUIRE(expected == actual);
+}

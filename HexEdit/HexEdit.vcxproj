@@ -198,11 +198,13 @@
     <ClCompile Include="HexEditMacro.cpp" />
     <ClCompile Include="HexEditSplitter.cpp" />
     <ClCompile Include="HexEditView.cpp" />
+    <ClCompile Include="HexExporter.cpp" />
     <ClCompile Include="HexFileList.cpp" />
     <ClCompile Include="HexImporter.cpp" />
     <ClCompile Include="HexPrintDialog.cpp" />
     <ClCompile Include="HexViewDraw.cpp" />
     <ClCompile Include="IntelHex.cpp" />
+    <ClCompile Include="IntelHexExporter.cpp" />
     <ClCompile Include="IntelHexImporter.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -227,6 +229,7 @@
     <ClCompile Include="SpecialList.cpp" />
     <ClCompile Include="Splasher.cpp" />
     <ClCompile Include="SRecord.cpp" />
+    <ClCompile Include="SRecordExporter.cpp" />
     <ClCompile Include="SRecordImporter.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -424,10 +427,12 @@
     <ClInclude Include="HexEditMacro.h" />
     <ClInclude Include="HexEditSplitter.h" />
     <ClInclude Include="HexEditView.h" />
+    <ClInclude Include="HexExporter.h" />
     <ClInclude Include="HexFileList.h" />
     <ClInclude Include="HexImporter.h" />
     <ClInclude Include="HexPrintDialog.h" />
     <ClInclude Include="IntelHex.h" />
+    <ClInclude Include="IntelHexExporter.h" />
     <ClInclude Include="IntelHexImporter.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Misc.h" />
@@ -456,6 +461,7 @@
     <ClInclude Include="SpecialList.h" />
     <ClInclude Include="Splasher.h" />
     <ClInclude Include="SRecord.h" />
+    <ClInclude Include="SRecordExporter.h" />
     <ClInclude Include="SRecordImporter.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="SystemSound.h" />

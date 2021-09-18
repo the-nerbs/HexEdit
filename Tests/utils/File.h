@@ -29,8 +29,9 @@ namespace File
 
     /// \brief  Reads the entirety of the given stream as text.
     ///
-    /// \param  stream  The stream to read.
-    CString ReadAllText(CFile& stream);
+    /// \param  stream       The stream to read.
+    /// \param  seekToStart  If true, the stream will be seeked to the beginning.
+    CString ReadAllText(CFile& stream, bool seekToStart = true);
 
     file_attrs GetAttributes(CString path);
     void SetAttributes(CString path, file_attrs attrs);

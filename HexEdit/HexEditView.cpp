@@ -5898,14 +5898,6 @@ void CHexEditView::add_highlight(FILE_ADDRESS start, FILE_ADDRESS end, BOOL ptoo
 			hl_set_.swap(tt);                   // else add it to highlight
 		invalidate_addr_range(start, end);
 	}
-
-#ifdef _DEBUG
-	for (range_set<FILE_ADDRESS>::range_t::iterator pr = hl_set_.range_.begin(); pr != hl_set_.range_.end(); ++pr)
-	{
-		FILE_ADDRESS fa = pr->sfirst;
-		fa = pr->slast;
-	}
-#endif
 }
 
 void CHexEditView::OnHighlightHide()
