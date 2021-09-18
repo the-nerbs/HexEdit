@@ -42,7 +42,7 @@
     <ClCompile Include="IntelHexImporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CWriteSRecordTests.cpp">
+    <ClCompile Include="SRecordExporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\ErrorFile.h">
@@ -51,7 +51,7 @@
     <ClCompile Include="utils\ErrorFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CWriteIntelHexTests.cpp">
+    <ClCompile Include="IntelHexExporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
