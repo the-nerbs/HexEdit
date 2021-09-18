@@ -36,13 +36,13 @@
     <ClCompile Include="utils\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SRecordImporterTests.cpp">
+    <ClCompile Include="Serialization\SRecordImporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntelHexImporterTests.cpp">
+    <ClCompile Include="Serialization\IntelHexImporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SRecordExporterTests.cpp">
+    <ClCompile Include="Serialization\SRecordExporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="utils\ErrorFile.h">
@@ -51,7 +51,7 @@
     <ClCompile Include="utils\ErrorFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntelHexExporterTests.cpp">
+    <ClCompile Include="Serialization\IntelHexExporterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

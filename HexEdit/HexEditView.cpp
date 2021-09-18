@@ -31,9 +31,9 @@
 #include "Misc.h"
 #include "BCGMisc.h"
 #include "SRecord.h"          // For export of Motorola S record files
-#include "SRecordImporter.h"  // For import of Motorola S record files
+#include "Serialization/SRecordImporter.h"  // For import of Motorola S record files
 #include "IntelHex.h"         // For export of Intel Hex files
-#include "IntelHexImporter.h" // For import of Intel Hex files
+#include "Serialization/IntelHexImporter.h" // For import of Intel Hex files
 #include "CopyCSrc.h"         // For Copy as C Source dialog
 #include <zlib.h>             // For compression
 

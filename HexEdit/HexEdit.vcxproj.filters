@@ -337,22 +337,22 @@
     <ClCompile Include="GuiMisc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HexImporter.cpp">
+    <ClCompile Include="Serialization\HexImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SRecordImporter.cpp">
+    <ClCompile Include="Serialization\SRecordImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntelHexImporter.cpp">
+    <ClCompile Include="Serialization\IntelHexImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HexExporter.cpp">
+    <ClCompile Include="Serialization\HexExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SRecordExporter.cpp">
+    <ClCompile Include="Serialization\SRecordExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntelHexExporter.cpp">
+    <ClCompile Include="Serialization\IntelHexExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -987,22 +987,25 @@
     <ClInclude Include="GuiMisc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HexImporter.h">
+    <ClInclude Include="Serialization\HexImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SRecordImporter.h">
+    <ClInclude Include="Serialization\SRecordImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IntelHexImporter.h">
+    <ClInclude Include="Serialization\IntelHexImporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HexExporter.h">
+    <ClInclude Include="Serialization\HexExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SRecordExporter.h">
+    <ClInclude Include="Serialization\SRecordExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IntelHexExporter.h">
+    <ClInclude Include="Serialization\IntelHexExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization\Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

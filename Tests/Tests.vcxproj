@@ -98,10 +98,10 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
-    <ClCompile Include="IntelHexExporterTests.cpp" />
-    <ClCompile Include="SRecordExporterTests.cpp" />
-    <ClCompile Include="IntelHexImporterTests.cpp" />
-    <ClCompile Include="SRecordImporterTests.cpp" />
+    <ClCompile Include="Serialization\IntelHexExporterTests.cpp" />
+    <ClCompile Include="Serialization\SRecordExporterTests.cpp" />
+    <ClCompile Include="Serialization\IntelHexImporterTests.cpp" />
+    <ClCompile Include="Serialization\SRecordImporterTests.cpp" />
     <ClCompile Include="CXmlTreeTests.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RangeSetTests.cpp" />

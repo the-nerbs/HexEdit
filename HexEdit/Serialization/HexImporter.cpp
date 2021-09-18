@@ -1,7 +1,7 @@
 #include "Stdafx.h"
 #include "HexImporter.h"
 
-#include "Misc.h"
+#include "../Misc.h"
 
 namespace hex
 {

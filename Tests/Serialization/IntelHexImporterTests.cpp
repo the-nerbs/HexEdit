@@ -1,11 +1,11 @@
 #include "Stdafx.h"
-#include "utils/AssertHelpers.h"
-#include "utils/ErrorFile.h"
-#include "utils/File.h"
-#include "utils/Garbage.h"
-#include "utils/TestFiles.h"
+#include "../utils/AssertHelpers.h"
+#include "../utils/ErrorFile.h"
+#include "../utils/File.h"
+#include "../utils/Garbage.h"
+#include "../utils/TestFiles.h"
 
-#include "IntelHexImporter.h"
+#include "Serialization/IntelHexImporter.h"
 
 #include "catch.hpp"
 

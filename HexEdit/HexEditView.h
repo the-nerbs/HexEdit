@@ -14,7 +14,7 @@
 #include "optypes.h"
 // #include "Partition.h" // no longer used when schemes added
 #include "range_set.h"
-#include "HexImporter.h"
+#include "Serialization/HexImporter.h"
 #include "TipWnd.h"
 #include "Expr.h"
 #include "misc.h"   // struct crc_params
