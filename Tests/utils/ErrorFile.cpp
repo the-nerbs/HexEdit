@@ -9,6 +9,13 @@ CErrorFile::CErrorFile(int errorFlags) :
     closeThrows{ (errorFlags & closeError) != 0 }
 { }
 
+CErrorFile::~CErrorFile()
+{
+    // don't throw from dtor, it tends to lead to std::terminate
+    closeThrows = false;
+    Close();
+}
+
 BOOL CErrorFile::Open(
     LPCTSTR lpszFileName,
     UINT nOpenFlags,

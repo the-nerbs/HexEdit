@@ -23,7 +23,7 @@ namespace hex
             int recordLength = 32);
 
     public:
-        virtual ~HexExporter() = default;
+        virtual ~HexExporter();
 
 
         /// \brief  Gets the last error message.

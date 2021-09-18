@@ -24,6 +24,17 @@ TEST_CASE("SRecordImporter constructor")
     CHECK(reader->RecordsRead() == 0);
 }
 
+TEST_CASE("SRecordImporter destructor CFileException does not propagate")
+{
+    auto stream = std::make_unique<CErrorFile>(CErrorFile::closeError);
+
+    {
+        hex::SRecordImporter reader{ std::move(stream), TRUE };
+    }
+
+    // no exception thrown by destructor.
+}
+
 
 TEST_CASE("SRecordImporter::Get")
 {

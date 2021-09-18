@@ -1,6 +1,8 @@
 #include "Stdafx.h"
 #include "HexExporter.h"
 
+#include "Misc.h"
+
 
 namespace hex
 {
@@ -11,6 +13,21 @@ namespace hex
         _error{},
         _recordsWritten{ 0 }
     { }
+
+    HexExporter::~HexExporter()
+    {
+        try
+        {
+            if (_stream)
+            {
+                _stream->Close();
+            }
+        }
+        catch (CFileException* ex)
+        {
+            ex->Delete();
+        }
+    }
 
 
     void HexExporter::WriteData(const std::uint8_t* data, std::size_t count, unsigned long address)

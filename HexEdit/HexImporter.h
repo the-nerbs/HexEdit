@@ -16,7 +16,7 @@ namespace hex
 
 
     public:
-        virtual ~HexImporter() = default;
+        virtual ~HexImporter();
 
         /// \brief  Reads a hex record.
         /// 

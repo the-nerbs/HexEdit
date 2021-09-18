@@ -23,6 +23,17 @@ TEST_CASE("IntelHexImporter constructor")
     CHECK(reader->Error() == "");
 }
 
+TEST_CASE("IntelHexImporter destructor CFileException does not propagate")
+{
+    auto stream = std::make_unique<CErrorFile>(CErrorFile::closeError);
+
+    {
+        hex::IntelHexImporter reader{ std::move(stream), TRUE };
+    }
+
+    // no exception thrown by destructor.
+}
+
 
 TEST_CASE("IntelHexImporter::Get")
 {

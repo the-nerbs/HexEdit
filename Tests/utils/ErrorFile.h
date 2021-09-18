@@ -16,7 +16,7 @@ public:
 
     explicit CErrorFile(int errorFlags);
 
-    ~CErrorFile() = default;
+    ~CErrorFile();
 
     BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags, CAtlTransactionManager* pTM, CFileException* pError) override;
     void Close() override;

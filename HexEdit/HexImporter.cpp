@@ -14,6 +14,21 @@ namespace hex
         _allowNoncontiguous{ allowNoncontiguous }
     { }
 
+    HexImporter::~HexImporter()
+    {
+        try
+        {
+            if (_stream)
+            {
+                _stream->Close();
+            }
+        }
+        catch (CFileException* ex)
+        {
+            ex->Delete();
+        }
+    }
+
 
     std::size_t HexImporter::Get(
         std::uint8_t* buffer,
