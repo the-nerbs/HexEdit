@@ -115,6 +115,9 @@ extern CHexEditApp theApp;
 											  // anything -> force initial rebuild of the font list
 static bool in_recalc_display = false;
 
+static const CString srec_file_filter_frag = "Motorola S Files (*.s;*.srec)|*.s;*.srec|";
+static const CString ihex_file_filter_frag = "Intel Hex Files (*.hex, *.ihx)|*.hex;*.ihx|";
+
 /////////////////////////////////////////////////////////////////////////////
 // CHexEditView
 
@@ -7255,7 +7258,7 @@ void CHexEditView::OnExportSRecord(UINT nID)
 	// Get the file name to write to (plus discontinuous setting)
 	CExportDialog dlgFile(theApp.current_export_, HIDD_FILE_EXPORT_MOTOROLA,
 						OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_SHOWHELP | OFN_NOCHANGEDIR,
-						"Motorola S Files (*.s)|*.s|"+theApp.GetCurrentFilters(), this);
+						srec_file_filter_frag+theApp.GetCurrentFilters(), this);
 
 	// Set up the title of the dialog
 	dlgFile.m_ofn.lpstrTitle = "Export S Records";
@@ -7356,7 +7359,7 @@ void CHexEditView::OnImportMotorolaS()
 	// Get name of file to import
 	CImportDialog dlgFile(theApp.current_import_, HIDD_FILE_IMPORT_MOTOROLA,
 						OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
-						"Motorola S Files (*.s;*.srec)|*.s;*.srec|"+theApp.GetCurrentFilters(), this);
+						srec_file_filter_frag+theApp.GetCurrentFilters(), this);
 
 	// Set up the title of the dialog
 	dlgFile.m_ofn.lpstrTitle = "Import Motorola S Records";
@@ -7389,7 +7392,7 @@ void CHexEditView::OnImportIntel()
 	// Get name of file to import
 	CImportDialog dlgFile(theApp.current_import_, HIDD_FILE_IMPORT_INTEL,
 						OFN_HIDEREADONLY | OFN_SHOWHELP | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_DONTADDTORECENT,
-						"Intel Hex Files (*.hex, *.ihx)|*.hex;*.ihx|"+theApp.GetCurrentFilters(), this);
+						ihex_file_filter_frag+theApp.GetCurrentFilters(), this);
 
 	// Set up the title of the dialog
 	dlgFile.m_ofn.lpstrTitle = "Import Intel Hex File";
@@ -7721,7 +7724,7 @@ void CHexEditView::OnExportIntel()
 	// Get the file name to write the selection to
 	CExportDialog dlgFile(theApp.current_export_, HIDD_FILE_EXPORT_INTEL,
 						OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT | OFN_SHOWHELP | OFN_NOCHANGEDIR,
-						theApp.GetCurrentFilters(), this);
+						ihex_file_filter_frag + theApp.GetCurrentFilters(), this);
 
 	// Set up the title of the dialog
 	dlgFile.m_ofn.lpstrTitle = "Export Intel Hex";
