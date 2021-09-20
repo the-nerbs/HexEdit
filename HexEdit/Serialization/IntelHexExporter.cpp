@@ -8,6 +8,12 @@ namespace hex
     { }
 
 
+    unsigned long IntelHexExporter::MaxAddress() const
+    {
+        // record type 4 (extended linear address) not supported.
+        return 0xFFFFu;
+    }
+
     void IntelHexExporter::WriteEpilogue()
     {
         WriteHexRecord(1, "", 0, 0x0000);

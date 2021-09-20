@@ -14,6 +14,7 @@
 #include "optypes.h"
 // #include "Partition.h" // no longer used when schemes added
 #include "range_set.h"
+#include "Serialization/HexExporter.h"
 #include "Serialization/HexImporter.h"
 #include "TipWnd.h"
 #include "Expr.h"
@@ -303,6 +304,7 @@ public:
 	void do_motorola(CString file_name);
 	void do_intel(CString file_name);
 	void do_import(hex::HexImporter& importer, km_type macro_type);
+	bool do_export(hex::HexExporter& exporter);
 	void do_hex_text(CString file_name);
 	void do_font(LOGFONT *plf);
 	void do_replace(FILE_ADDRESS start, FILE_ADDRESS end, unsigned char *pp, size_t len);

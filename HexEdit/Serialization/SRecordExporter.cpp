@@ -16,6 +16,20 @@ namespace hex
     { }
 
 
+    unsigned long SRecordExporter::MaxAddress() const
+    {
+        switch (_stype)
+        {
+        case SType::S1: return 0xFFFFu;
+        case SType::S2: return 0xFFFFFFu;
+        case SType::S3: return 0xFFFFFFFFu;
+
+        default:
+            ASSERT(0);
+            return 0;
+        }
+    }
+
     void SRecordExporter::WritePrologue()
     {
         WriteSRecord(0, "HDR", 3, 0x0000);

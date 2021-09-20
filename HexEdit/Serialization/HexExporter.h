@@ -32,6 +32,9 @@ namespace hex
         /// \brief  Gets the number of records that have been written.
         int RecordsWritten() const { return _recordsWritten; }
 
+        /// \brief  Gets the maximum exportable address.
+        virtual unsigned long MaxAddress() const = 0;
+
 
         /// \brief  Writes any prologue needed by this exporter.
         virtual void WritePrologue() {}

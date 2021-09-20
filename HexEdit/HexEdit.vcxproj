@@ -203,7 +203,6 @@
     <ClCompile Include="Serialization\HexImporter.cpp" />
     <ClCompile Include="HexPrintDialog.cpp" />
     <ClCompile Include="HexViewDraw.cpp" />
-    <ClCompile Include="IntelHex.cpp" />
     <ClCompile Include="Serialization\IntelHexExporter.cpp" />
     <ClCompile Include="Serialization\IntelHexImporter.cpp" />
     <ClCompile Include="MainFrm.cpp" />
@@ -228,7 +227,6 @@
     <ClCompile Include="SimpleSplitter.cpp" />
     <ClCompile Include="SpecialList.cpp" />
     <ClCompile Include="Splasher.cpp" />
-    <ClCompile Include="SRecord.cpp" />
     <ClCompile Include="Serialization\SRecordExporter.cpp" />
     <ClCompile Include="Serialization\SRecordImporter.cpp" />
     <ClCompile Include="StdAfx.cpp">
@@ -431,7 +429,6 @@
     <ClInclude Include="HexFileList.h" />
     <ClInclude Include="Serialization\HexImporter.h" />
     <ClInclude Include="HexPrintDialog.h" />
-    <ClInclude Include="IntelHex.h" />
     <ClInclude Include="Serialization\IntelHexExporter.h" />
     <ClInclude Include="Serialization\IntelHexImporter.h" />
     <ClInclude Include="MainFrm.h" />
@@ -461,7 +458,6 @@
     <ClInclude Include="SimpleSplitter.h" />
     <ClInclude Include="SpecialList.h" />
     <ClInclude Include="Splasher.h" />
-    <ClInclude Include="SRecord.h" />
     <ClInclude Include="Serialization\SRecordExporter.h" />
     <ClInclude Include="Serialization\SRecordImporter.h" />
     <ClInclude Include="StdAfx.h" />

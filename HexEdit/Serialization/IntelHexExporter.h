@@ -17,6 +17,10 @@ namespace hex
             unsigned long baseAddress = 0,
             int recordLength = 32);
 
+
+        /// \brief  Gets the maximum exportable address.
+        unsigned long MaxAddress() const override;
+
         /// \brief  Writes the EOF record.
         void WriteEpilogue() override;
 
