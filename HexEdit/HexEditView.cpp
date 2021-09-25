@@ -16265,89 +16265,98 @@ void CHexEditView::OnAsr64bit()
 
 template<class T> void ProcUnary(CHexEditView *pv, T val, T *buf, int count, unary_type op)
 {
-	int ii = 0;
-#ifdef USE_SSE2
-	// This speeds up NOT operation somewhat (though disk is normally limiting factor).
-	// Note that we can only do this easily for NOT as it is the only operation
-	// that does not need byte order reversal for big-endian and has an SSE2 instruction.
-	// Note 2. if the selection length is not divisible by 16 then the last few bytes 
-	// are handled by the old code (see case unary_not: below).
-	// Note 3. speed of SSE2 relies on 1st address being on 16-byte boundary (see _aligned_malloc).
 	if (op == unary_not)
 	{
-		__m128i all_on = _mm_set1_epi8 ('\xFF');
-		for ( ; ii < count - 16; ii += 16)
+		// This speeds up NOT operation somewhat (though disk is normally limiting factor).
+		// Note that we can only do this easily for NOT as it is the only operation that
+		// does not need byte order reversal for big-endian. MSVC's codegen does a pretty
+		// good job of vectorizing this loop as well.
+		T* p = buf;
+		T *const end = p + count;
+		while (p < end)
 		{
-			// There is no SSE2 for NOT so XOR with FFFFffffFFFFffffFFFFffffFFFFffffFFFFffffFFFFffffFFFFffffFFFFffff
-			*((__m128i *)&buf[ii]) = _mm_xor_si128(*((__m128i *)&buf[ii]), all_on);
+			*p = ~(*p);
+			p++;
 		}
 	}
-#endif
-	// Operate on all the (remaining) values
-	for ( ; ii < count; ++ii)
+	else
 	{
-		// Reverse if big endian and the operation calls for it.
-		if (pv->BigEndian() && op != unary_flip)
-			::flip_bytes((unsigned char *)&buf[ii], sizeof(T));
-		switch (op)
+		// Operate on all the (remaining) values
+		for (int ii = 0; ii < count; ++ii)
 		{
-		case unary_at:
-			buf[ii] = val;
-			break;
-		case unary_sign:
-			buf[ii] = -buf[ii];
-			break;
-		case unary_inc:
-			++buf[ii];
-			if (buf[ii] == 0)
+			// Reverse if big endian and the operation calls for it.
+			if (pv->BigEndian() && op != unary_flip)
 			{
-				((CMainFrame *)AfxGetMainWnd())->StatusBarText("Warning: Increment wrapped around to zero");
-				theApp.mac_error_ = 1;            // Signal warning on wrap
+				::flip_bytes((unsigned char*)&buf[ii], sizeof(T));
 			}
-			break;
-		case unary_dec:
-			buf[ii]--;
-			if (buf[ii] == -1)
+
+			switch (op)
 			{
-				((CMainFrame *)AfxGetMainWnd())->StatusBarText("Warning: Decrement wrapped past zero");
-				theApp.mac_error_ = 1;            // Signal warning on wrap
-			}
-			break;
-		case unary_not:
-			ASSERT(sizeof(T) == 1);  // Only need to perform NOT on bytes
-			buf[ii] = ~buf[ii];
-			break;
-		case unary_flip:
-			ASSERT(sizeof(T) > 1);   // No point in flipping a single byte
-			// Do nothing here (let ::flip_bytes below handle it)
-			break;
-		case unary_rev:
-			{
-				T result = 0;
-				T tmp = buf[ii];
-				for (int jj = 0; jj < sizeof(T)*8; ++jj)
+			case unary_at:
+				buf[ii] = val;
+				break;
+
+			case unary_sign:
+				buf[ii] = -buf[ii];
+				break;
+
+			case unary_inc:
+				++buf[ii];
+				if (buf[ii] == 0)
 				{
-					result <<= 1;                      // Make room for the next bit
-					if (tmp & 0x1)
-						result |= 0x1;
-					tmp >>= 1;                         // Move bits down to test the next
+					((CMainFrame*)AfxGetMainWnd())->StatusBarText("Warning: Increment wrapped around to zero");
+					theApp.mac_error_ = 1;            // Signal warning on wrap
 				}
-				buf[ii] = result;
+				break;
+
+			case unary_dec:
+				buf[ii]--;
+				if (buf[ii] == -1)
+				{
+					((CMainFrame*)AfxGetMainWnd())->StatusBarText("Warning: Decrement wrapped past zero");
+					theApp.mac_error_ = 1;            // Signal warning on wrap
+				}
+				break;
+
+			case unary_flip:
+				ASSERT(sizeof(T) > 1);   // No point in flipping a single byte
+				// Do nothing here (let ::flip_bytes below handle it)
+				break;
+
+			case unary_rev:
+				{
+					T result = 0;
+					T tmp = buf[ii];
+					for (int jj = 0; jj < sizeof(T) * 8; ++jj)
+					{
+						result <<= 1;                      // Make room for the next bit
+						if (tmp & 0x1)
+							result |= 0x1;
+						tmp >>= 1;                         // Move bits down to test the next
+					}
+					buf[ii] = result;
+				}
+				break;
+
+			case unary_rand:
+				ASSERT(sizeof(T) == 1);  // Only really need random bytes
+				buf[ii] = T(::rand_good() >> 16);
+				break;
+
+			case unary_rand_fast:
+				ASSERT(sizeof(T) == 1);  // Only really need random bytes
+				buf[ii] = T(::rand() >> 7);
+				break;
+
+			default:
+				ASSERT(0);
 			}
-			break;
-		case unary_rand:
-			ASSERT(sizeof(T) == 1);  // Only really need random bytes
-			buf[ii] = T(::rand_good()>>16);
-			break;
-		case unary_rand_fast:
-			ASSERT(sizeof(T) == 1);  // Only really need random bytes
-			buf[ii] = T(::rand()>>7);
-			break;
-		default:
-			ASSERT(0);
+
+			if (pv->BigEndian() || op == unary_flip)
+			{
+				::flip_bytes((unsigned char*)&buf[ii], sizeof(T));
+			}
 		}
-		if (pv->BigEndian() || op == unary_flip)
-			::flip_bytes((unsigned char *)&buf[ii], sizeof(T));
 	}
 }
 
@@ -16361,7 +16370,7 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 {
 	(void)dummy;  // The dummy param. makes sure we get the right template (VC++ 6 bug)
 	CMainFrame *mm = (CMainFrame *)AfxGetMainWnd();
-	unsigned char *buf = NULL;
+	std::unique_ptr<std::uint8_t[]> buf;
 
 	ASSERT(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4 || sizeof(T) == 8);
 	if (pv->check_ro(desc))
@@ -16435,17 +16444,13 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 		// Get data buffer
 		size_t len, buflen = size_t(std::min<FILE_ADDRESS>(4096, end_addr - start_addr));
 
-#ifdef USE_SSE2
-		// Need 16 byte alignment for SSE2 instructions
-		if ((buf = (unsigned char *)_aligned_malloc(buflen, 16)) == NULL)
-#else
 		try
 		{
-			buf = new unsigned char[buflen];
+			buf.reset(new std::uint8_t[buflen]);
 		}
-		catch (std::bad_alloc)
-#endif
+		catch (CMemoryException* pex)
 		{
+			pex->Delete();
 			AfxMessageBox("Insufficient memory");
 			theApp.mac_error_ = 10;
 			goto func_return;
@@ -16460,11 +16465,11 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 				// Get the next buffer full from the document
 				len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
 				if (op != unary_at)      // We don't need to get old value if assigning
-					VERIFY(pv->GetDocument()->GetData(buf, len, curr) == len);
+					VERIFY(pv->GetDocument()->GetData(buf.get(), len, curr) == len);
 
-				ProcUnary(pv, val, (T *)buf, len/sizeof(T), op);
+				ProcUnary(pv, val, (T *)buf.get(), len/sizeof(T), op);
 
-				ff.Write(buf, len);
+				ff.Write(buf.get(), len);
 
 				if (AbortKeyPress())
 				{
@@ -16538,33 +16543,30 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 
 		CWaitCursor wait;                           // Turn on wait cursor (hourglass)
 
-#ifdef USE_SSE2
-		// Need better alignment for SSE2 instructions
-		if ((buf = (unsigned char *)_aligned_malloc(size_t(end_addr - start_addr), 16)) == NULL)
-#else
 		try
 		{
-			buf = new unsigned char[size_t(end_addr - start_addr)];
+			buf.reset(new std::uint8_t[static_cast<std::size_t>(end_addr - start_addr)]);
 		}
-		catch (std::bad_alloc)
-#endif
+		catch (CMemoryException* pex)
 		{
+			pex->Delete();
 			AfxMessageBox("Insufficient memory");
 			theApp.mac_error_ = 10;
 			goto func_return;
 		}
+
 		size_t got;
 		if (op != unary_at)      // We don't need to get old value if assigning
 		{
-			got = pv->GetDocument()->GetData(buf, size_t(end_addr - start_addr), start_addr);
+			got = pv->GetDocument()->GetData(buf.get(), size_t(end_addr - start_addr), start_addr);
 			ASSERT(got == size_t(end_addr - start_addr));
 		}
 		else
 			got = size_t(end_addr - start_addr);
 
-		ProcUnary(pv, val, (T *)buf, got/sizeof(T), op);
+		ProcUnary(pv, val, (T *)buf.get(), got/sizeof(T), op);
 
-		pv->GetDocument()->Change(mod_replace, start_addr, got, (unsigned char *)buf, 0, pv);
+		pv->GetDocument()->Change(mod_replace, start_addr, got, buf.get(), 0, pv);
 	}
 
 	pv->DisplayCaret();
@@ -16577,13 +16579,6 @@ template<class T> void OnOperateUnary(CHexEditView *pv, unary_type op, LPCSTR de
 
 func_return:
 	mm->Progress(-1);  // disable progress bar
-
-	if (buf != NULL)
-#ifdef USE_SSE2
-		_aligned_free(buf);
-#else
-		delete[] buf;
-#endif
 }
 
 void CHexEditView::OnIncByte()
