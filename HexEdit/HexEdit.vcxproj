@@ -198,10 +198,13 @@
     <ClCompile Include="HexEditMacro.cpp" />
     <ClCompile Include="HexEditSplitter.cpp" />
     <ClCompile Include="HexEditView.cpp" />
+    <ClCompile Include="Serialization\HexExporter.cpp" />
     <ClCompile Include="HexFileList.cpp" />
+    <ClCompile Include="Serialization\HexImporter.cpp" />
     <ClCompile Include="HexPrintDialog.cpp" />
     <ClCompile Include="HexViewDraw.cpp" />
-    <ClCompile Include="IntelHex.cpp" />
+    <ClCompile Include="Serialization\IntelHexExporter.cpp" />
+    <ClCompile Include="Serialization\IntelHexImporter.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="NavManager.cpp" />
@@ -224,7 +227,8 @@
     <ClCompile Include="SimpleSplitter.cpp" />
     <ClCompile Include="SpecialList.cpp" />
     <ClCompile Include="Splasher.cpp" />
-    <ClCompile Include="SRecord.cpp" />
+    <ClCompile Include="Serialization\SRecordExporter.cpp" />
+    <ClCompile Include="Serialization\SRecordImporter.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -421,9 +425,12 @@
     <ClInclude Include="HexEditMacro.h" />
     <ClInclude Include="HexEditSplitter.h" />
     <ClInclude Include="HexEditView.h" />
+    <ClInclude Include="Serialization\HexExporter.h" />
     <ClInclude Include="HexFileList.h" />
+    <ClInclude Include="Serialization\HexImporter.h" />
     <ClInclude Include="HexPrintDialog.h" />
-    <ClInclude Include="IntelHex.h" />
+    <ClInclude Include="Serialization\IntelHexExporter.h" />
+    <ClInclude Include="Serialization\IntelHexImporter.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="NavManager.h" />
@@ -446,11 +453,13 @@
     <ClInclude Include="SaveDffd.h" />
     <ClInclude Include="Scheme.h" />
     <ClInclude Include="ScrView.h" />
+    <ClInclude Include="Serialization\Stdafx.h" />
     <ClInclude Include="SimpleGraph.h" />
     <ClInclude Include="SimpleSplitter.h" />
     <ClInclude Include="SpecialList.h" />
     <ClInclude Include="Splasher.h" />
-    <ClInclude Include="SRecord.h" />
+    <ClInclude Include="Serialization\SRecordExporter.h" />
+    <ClInclude Include="Serialization\SRecordImporter.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="SystemSound.h" />
     <ClInclude Include="TabView.h" />

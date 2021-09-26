@@ -990,3 +990,21 @@ TEST_CASE("range_set - equality operators")
         CHECK(set1 == set2);
     }
 }
+
+TEST_CASE("range_set - reverse iterators")
+{
+    range_set<int> set{ 0, 1, 2, 7, 8, 9 };
+
+    SECTION("rbegin can be dereferenced")
+    {
+        CHECK(9 == *set.rbegin());
+    }
+
+    SECTION("rend minus 1 can be dereferenced")
+    {
+        auto itr = set.rend();
+        --itr;
+        CHECK(0 == *itr);
+    }
+}
+

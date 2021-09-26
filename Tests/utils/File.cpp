@@ -8,9 +8,16 @@
 
 namespace File
 {
-    CString ReadAllText(CString path)
+    CString ReadAllText(CString path, bool normalizeEOLs)
     {
-        std::fstream in{ path, std::ios::in | std::ios::binary };
+        std::ios::openmode mode = std::ios::in;
+
+        if (!normalizeEOLs)
+        {
+            mode |= std::ios::binary;
+        }
+
+        std::fstream in{ path, mode };
 
         if (!in)
         {
@@ -24,7 +31,34 @@ namespace File
         CString str;
         LPSTR pdata = str.GetBuffer(length + 1);
         in.read(pdata, length);
-        pdata[length] = '\0';
+        int readCount = static_cast<int>(in.gcount());
+        pdata[readCount] = '\0';
+        str.ReleaseBuffer();
+
+        return str;
+    }
+
+    CString ReadAllText(CFile& stream, bool seekToStart)
+    {
+        if (seekToStart)
+        {
+            stream.SeekToBegin();
+        }
+
+        ULONGLONG ullLength = stream.GetLength();
+
+        if (ullLength > INT_MAX)
+        {
+            throw std::exception{ "file too long to read." };
+        }
+
+        int length = static_cast<int>(ullLength);
+
+        CString str;
+
+        LPSTR pdata = str.GetBuffer(length + 1);
+        UINT readCount = stream.Read(pdata, static_cast<UINT>(length));
+        pdata[readCount] = '\0';
         str.ReleaseBuffer();
 
         return str;

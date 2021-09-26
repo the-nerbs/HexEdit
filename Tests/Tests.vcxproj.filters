@@ -36,6 +36,24 @@
     <ClCompile Include="utils\File.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Serialization\SRecordImporterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\IntelHexImporterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\SRecordExporterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ErrorFile.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\ErrorFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization\IntelHexExporterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils\Garbage.h">
@@ -50,9 +68,14 @@
     <ClInclude Include="utils\File.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\AssertHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="TestFiles\test_dtd.dtd" />
     <None Include="TestFiles\CXmlTreeTestFile.xml" />
+    <None Include="TestFiles\srecords.srec" />
+    <None Include="TestFiles\intel.hex" />
   </ItemGroup>
 </Project>

@@ -53,7 +53,7 @@ namespace TestFiles
 
         if (_path.IsEmpty())
         {
-            _path = GetTestFilesDir() + "\\" + "testfile.writable";
+            _path = GetTestFilesDir() + "\\testfile.writable";
 
             std::ofstream stream{ _path, std::ios::binary };
             stream.write("TEST", 4);
@@ -62,6 +62,31 @@ namespace TestFiles
         // make sure it's not read only.
         file_attrs attrs = File::GetAttributes(_path);
         File::SetAttributes(_path, attrs & ~file_attrs::readonly);
+
+        return _path;
+    }
+
+
+    CString GetSRecordsFilePath()
+    {
+        static CString _path;
+
+        if (_path.IsEmpty())
+        {
+            _path = GetTestFilesDir() + "\\srecords.srec";
+        }
+
+        return _path;
+    }
+
+    CString GetIntelHexFilePath()
+    {
+        static CString _path;
+
+        if (_path.IsEmpty())
+        {
+            _path = GetTestFilesDir() + "\\intel.hex";
+        }
 
         return _path;
     }

@@ -227,7 +227,7 @@ public:
 	// Iterators
 	class const_iterator :
 		public std::iterator<std::bidirectional_iterator_tag,
-							 T, difference_type>
+							 const T, difference_type>
 	{
 	private:
 		// Since the container does not "contain" all the actual
