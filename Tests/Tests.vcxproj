@@ -98,6 +98,7 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
+    <ClCompile Include="ExprEvalTests.cpp" />
     <ClCompile Include="Serialization\IntelHexExporterTests.cpp" />
     <ClCompile Include="Serialization\SRecordExporterTests.cpp" />
     <ClCompile Include="Serialization\IntelHexImporterTests.cpp" />
@@ -106,7 +107,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="RangeSetTests.cpp" />
     <ClCompile Include="utils\ErrorFile.cpp" />
-    <ClCompile Include="utils\ErrorFile.h" />
+    <ClInclude Include="utils\ErrorFile.h" />
     <ClCompile Include="utils\File.cpp" />
     <ClCompile Include="utils\TestFiles.cpp" />
   </ItemGroup>

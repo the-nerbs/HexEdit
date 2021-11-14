@@ -22,7 +22,7 @@ class expr_eval
 {
 public:
 	// Types that an expression can have
-	enum type_t
+	enum type_t : unsigned char
 	{
 		TYPE_NONE,
 		TYPE_BOOLEAN, TYPE_INT, TYPE_DATE, TYPE_REAL,
@@ -136,8 +136,8 @@ public:
 
 		ExprStringType GetDataString(CString strFormat, int size = -1, bool unsgned = false);
 
-		unsigned char typ;      // type of data or TYPE_NONE (eg unknown variable name)
-		bool error;             // allows us to propagate an error but continue parsing
+		type_t typ;      // type of data or TYPE_NONE (eg unknown variable name)
+		bool error;      // allows us to propagate an error but continue parsing
 		union
 		{
 			bool boolean;

@@ -49,6 +49,22 @@
 #include "dialog.h"
 #include "misc.h"
 
+template <class T>
+static constexpr int sign(T x)
+{
+	if (x < T{ 0 })
+	{
+		return -1;
+	}
+
+	if (x > T{ 0 })
+	{
+		return +1;
+	}
+
+	return 0;
+}
+
 expr_eval::expr_eval(int mr /*=10*/, bool csa /*=false*/)
 {
 	p_ = NULL;
@@ -304,17 +320,17 @@ expr_eval::tok_t expr_eval::prec_or(value_t &val, CString &vname)
 		if (error(next_tok = prec_and(op2, vname), "Expected 2nd operand for OR (||)"))
 			return TOK_NONE;
 
-		if (val.boolean)
+		if (val.typ != TYPE_BOOLEAN || op2.typ != TYPE_BOOLEAN)
+		{
+			strcpy(error_buf_, "Operands for OR (||) must be BOOLEAN");
+			return TOK_NONE;
+		}
+		else if (val.boolean)
 		{
 			// If left operand is true then result is true and we don't care about right operand
 			// (even if it gets and eval error as long as it parses OK).
 			op2.error = false;
 			changes_on_ = saved_changes_on;     // restore old value
-		}
-		else if (val.typ != TYPE_BOOLEAN || op2.typ != TYPE_BOOLEAN)
-		{
-			strcpy(error_buf_, "Operands for OR (||) must be BOOLEAN");
-			return TOK_NONE;
 		}
 		else
 		{
@@ -346,17 +362,17 @@ expr_eval::tok_t expr_eval::prec_and(value_t &val, CString &vname)
 		if (error(next_tok = prec_comp(op2, vname), "Expected 2nd operand for AND (&&)"))
 			return TOK_NONE;
 
-		if (!val.boolean)
+		if (val.typ != TYPE_BOOLEAN || op2.typ != TYPE_BOOLEAN)
+		{
+			strcpy(error_buf_, "Operands for AND (&&) must be BOOLEAN");
+			return TOK_NONE;
+		}
+		else if (!val.boolean)
 		{
 			// If left operand is false then result is false and we don't care about right operand
 			// (even if it gets an eval error as long as it parses OK).
 			op2.error = false;
 			changes_on_ = saved_changes_on;
-		}
-		else if (val.typ != TYPE_BOOLEAN || op2.typ != TYPE_BOOLEAN)
-		{
-			strcpy(error_buf_, "Operands for AND (&&) must be BOOLEAN");
-			return TOK_NONE;
 		}
 		else
 		{
@@ -383,6 +399,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 		if (error(next_tok2 = prec_bitor(op2, vname), "Expected 2nd operand for comparison"))
 			return TOK_NONE;
 
+		//TODO: what about booleans?
 		if ((val.typ != TYPE_STRING || op2.typ != TYPE_STRING) &&
 			(val.typ != TYPE_DATE   || op2.typ != TYPE_DATE) &&
 			(val.typ != TYPE_REAL && val.typ != TYPE_INT || 
@@ -413,6 +430,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			}
 			else
 			{
+				ASSERT(val.typ == TYPE_INT && op2.typ == TYPE_INT);
 				val.boolean = val.int64 == op2.int64;
 			}
 			break;
@@ -827,6 +845,7 @@ expr_eval::tok_t expr_eval::prec_mul(value_t &val, CString &vname)
 			if (error(next_tok = prec_prim(op2, vname), "Expected 2nd operand of modulus"))
 				return TOK_NONE;
 
+			//TODO(6.0): floating point remainders
 			if (val.typ != TYPE_INT || op2.typ != TYPE_INT)
 			{
 				strcpy(error_buf_, "Modulus operands must be integers");
@@ -875,12 +894,9 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		return get_next();
 	case TOK_SIZEOF:
 		// Get opening bracket and first symbol within
-		if (error(next_tok = get_next(), "Expected opening parenthesis after SIZEOF"))
-			return TOK_NONE;
-
-		if (next_tok != TOK_LPAR)
+		if ((next_tok = get_next()) != TOK_LPAR)
 		{
-			strcpy(error_buf_, "Expected opening parenthesis after SIZEOF");
+			strcpy(error_buf_, "Opening parenthesis expected after \"sizeof\"");
 			return TOK_NONE;
 		}
 		if (error(next_tok = get_next(), "Expected symbol name"))
@@ -899,6 +915,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else if (next_tok == TOK_CHAR)
 		{
+			//TODO: is TOK_CHAR ever actually emitted? i.e.: can this be reached?
 			val = find_symbol("char", tmp, 0, pac_, sym_size, sym_address, sym_str);
 		}
 		else
@@ -1000,7 +1017,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Expected closing parenthesis after SIZEOF");
+			strcpy(error_buf_, "Closing parenthesis expected for \"sizeof\"");
 			return TOK_NONE;
 		}
 		val.typ = TYPE_INT;
@@ -1008,7 +1025,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		val.int64 = sym_size;
 		return get_next();
 	case TOK_DEFINED:
-		if (error(next_tok = get_next(), "Expected identifier after DEFINED"))
+		if (error(next_tok = get_next(), "Expected identifier after \"defined\""))
 			return TOK_NONE;
 		else
 		{
@@ -1016,9 +1033,10 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 			if (next_tok == TOK_LPAR)
 			{
 				in_paren = true;
-				if (error(next_tok = get_next(), "Expected identifier for DEFINED"))
+				if (error(next_tok = get_next(), "Expected identifier after \"defined\""))
 					return TOK_NONE;
 			}
+
 			if (next_tok != TOK_SYMBOL)
 			{
 				strcpy(error_buf_, "Symbol expected");
@@ -1044,7 +1062,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 			{
 				if (next_tok != TOK_RPAR)
 				{
-					strcpy(error_buf_, "Expected closing parenthesis after DEFINED");
+					strcpy(error_buf_, "Closing parenthesis expected for \"defined\"");
 					return TOK_NONE;
 				}
 				next_tok = get_next();
@@ -1053,12 +1071,9 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		return next_tok;
 	case TOK_STR:
 		// Get opening bracket and first symbol within
-		if (error(next_tok = get_next(), "Expected opening parenthesis after STRING"))
-			return TOK_NONE;
-
-		if (next_tok != TOK_LPAR)
+		if ((next_tok = get_next()) != TOK_LPAR)
 		{
-			strcpy(error_buf_, "Expected opening parenthesis after STRING");
+			strcpy(error_buf_, "Opening parenthesis expected after \"string\"");
 			return TOK_NONE;
 		}
 		if (error(next_tok = get_next(), "Expected symbol name"))
@@ -1095,7 +1110,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 			case TYPE_STRING:
 				sym_str = CString(*(val.pstr));  // xxx sym_str should be Unicode
 				break;
-			// xxx handle TYPE_DATE?
+			// TODO: handle TYPE_DATE?
 			default:
 				sym_str.Empty();
 				val.typ = TYPE_NONE;
@@ -1162,7 +1177,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Expected closing parenthesis after STRING");
+			strcpy(error_buf_, "Closing parenthesis expected for \"string\"");
 			return TOK_NONE;
 		}
 		if (val.typ == TYPE_NONE)
@@ -1425,12 +1440,9 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 	case TOK_ADDRESSOF:
 		// Get opening bracket and first symbol within
-		if (error(next_tok = get_next(), "Expected opening parenthesis after ADDRESSOF"))
-			return TOK_NONE;
-
-		if (next_tok != TOK_LPAR)
+		if ((next_tok = get_next()) != TOK_LPAR)
 		{
-			strcpy(error_buf_, "Expected opening parenthesis after ADDRESSOF");
+			strcpy(error_buf_, "Opening parenthesis expected after \"addressof\"");
 			return TOK_NONE;
 		}
 		if (error(next_tok = get_next(), "Expected symbol name"))
@@ -1504,7 +1516,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Expected closing parenthesis after ADDRESSOF");
+			strcpy(error_buf_, "Closing parenthesis expected for \"addressof\"");
 			return TOK_NONE;
 		}
 
@@ -1677,6 +1689,9 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else if (val.typ == TYPE_INT)
 		{
+			// TODO: 64 bits (signed or unsigned) can hold up to fact(20). Why is this check <=99?
+			// fact(99) requires >=519 bits of unsigned integer to store the value... Maybe there was
+			// some plans to use a big-int type instead of a fixed 64-bit int?
 			if (val.int64 < 100)
 			{
 				__int64 temp = 1;
@@ -1691,6 +1706,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 				return TOK_NONE;
 			}
 		}
+		// TODO: We _can_ handle TYPE_REAL here using std::lgamma(x+1). Would this be worthwhile? Is there a really compelling reason not to?
 		else
 		{
 			strcpy(error_buf_, "Parameter for \"fact\" must be an integer");
@@ -1761,7 +1777,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 		if (val.typ != TYPE_INT)
 		{
-			strcpy(error_buf_, "First parameter for \"reverse\" must be integer");
+			strcpy(error_buf_, "First parameter for \"reverse\" must be an integer");
 			return TOK_NONE;
 		}
 
@@ -1775,12 +1791,15 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "Bits (2nd) parameter for \"reverse\" must be integer");
+				strcpy(error_buf_, "Bits (2nd) parameter for \"reverse\" must be an integer");
 				return TOK_NONE;
 			}
 
 			num_bits = (int)tmp.int64;
-			if (num_bits > 64) num_bits = 64;
+			if (num_bits > 64)
+			{
+				num_bits = 64;
+			}
 		}
 
 		if (next_tok != TOK_RPAR)
@@ -1818,6 +1837,12 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		const_sep_allowed_ = saved_const_sep_allowed;
 
+		if (val.typ != TYPE_INT)
+		{
+			strcpy(error_buf_, "1st parameter for \"rol\" must be an integer");
+			return TOK_NONE;
+		}
+
 		// Get (optional) 2nd parameter = number of bits to rotate
 		num_bits = 1;
 		if (next_tok == TOK_COMMA)
@@ -1827,12 +1852,15 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "2nd parameter for \"rol\" must be integer");
+				strcpy(error_buf_, "2nd parameter for \"rol\" must be an integer");
 				return TOK_NONE;
 			}
 
 			num_bits = (int)tmp.int64;
-			if (num_bits > 64) num_bits = 0;
+			if (num_bits > 64)
+			{
+				num_bits = 0;
+			}
 		}
 
 
@@ -1844,10 +1872,14 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "3rd parameter for \"rol\" must be integer");
+				strcpy(error_buf_, "3rd parameter for \"rol\" must be an integer");
 				return TOK_NONE;
 			}
-			if (tmp.int64 > 64) tmp.int64 = 64;
+
+			if (tmp.int64 > 64)
+			{
+				tmp.int64 = 64;
+			}
 		}
 		else
 			tmp.int64 = 64;
@@ -1859,6 +1891,9 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else
 		{
+			// TODO: should this use unsigned integers so we don't get sign extension?
+			// Note that before C++20, right-shift of signed values is implementation defined.
+			// C++20 locks this behavior down to an arithmetic right-shift.
 			__int64 mask = (1LL << tmp.int64) - 1;
 			val.int64 = ((val.int64 << num_bits) | (val.int64 >> (tmp.int64 - num_bits))) & mask;
 		}
@@ -1880,6 +1915,12 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		const_sep_allowed_ = saved_const_sep_allowed;
 
+		if (val.typ != TYPE_INT)
+		{
+			strcpy(error_buf_, "1st parameter for \"ror\" must be an integer");
+			return TOK_NONE;
+		}
+
 		// Get (optional) 2nd parameter = number of bits to rotate
 		num_bits = 1;
 		if (next_tok == TOK_COMMA)
@@ -1889,12 +1930,15 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "2nd parameter for \"ror\" must be integer");
+				strcpy(error_buf_, "2nd parameter for \"ror\" must be an integer");
 				return TOK_NONE;
 			}
 
 			num_bits = (int)tmp.int64;
-			if (num_bits > 64) num_bits = 0;
+			if (num_bits > 64)
+			{
+				num_bits = 0;
+			}
 		}
 
 
@@ -1906,10 +1950,14 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "3rd parameter for \"ror\" must be integer");
+				strcpy(error_buf_, "3rd parameter for \"ror\" must be an integer");
 				return TOK_NONE;
 			}
-			if (tmp.int64 > 64) tmp.int64 = 64;
+
+			if (tmp.int64 > 64)
+			{
+				tmp.int64 = 64;
+			}
 		}
 		else
 			tmp.int64 = 64;
@@ -1921,6 +1969,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else
 		{
+			//TODO: same as TOK_ROL case - should this use unsigned to avoid sign-extension?
 			__int64 mask = (1LL << tmp.int64) - 1;
 			val.int64 = ((val.int64 >> num_bits) | (val.int64 << (tmp.int64 - num_bits))) & mask;
 		}
@@ -1942,6 +1991,12 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		const_sep_allowed_ = saved_const_sep_allowed;
 
+		if (val.typ != TYPE_INT)
+		{
+			strcpy(error_buf_, "1st parameter for \"asr\" must be an integer");
+			return TOK_NONE;
+		}
+
 		// Get (optional) 2nd parameter = number of bits to shift
 		num_bits = 1;
 		if (next_tok == TOK_COMMA)
@@ -1951,38 +2006,46 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "2nd parameter for \"asr\" must be integer");
+				strcpy(error_buf_, "2nd parameter for \"asr\" must be an integer");
 				return TOK_NONE;
 			}
 
 			num_bits = (int)tmp.int64;
-			if (num_bits > 64) num_bits = 0;
+			if (num_bits > 64)
+			{
+				num_bits = 0;
+			}
 		}
 
 
 		// Get (optional) 3nd parameters = size in bits
 		if (next_tok == TOK_COMMA)
 		{
-			if (error(next_tok = prec_assign(tmp), "Expected 3rd parameter to \"ror\""))
+			if (error(next_tok = prec_assign(tmp), "Expected 3rd parameter to \"asr\""))
 				return TOK_NONE;
 
 			else if (tmp.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "3rd parameter for \"ror\" must be integer");
+				strcpy(error_buf_, "3rd parameter for \"asr\" must be an integer");
 				return TOK_NONE;
 			}
-			if (tmp.int64 > 64) tmp.int64 = 64;
+
+			if (tmp.int64 > 64)
+			{
+				tmp.int64 = 64;
+			}
 		}
 		else
 			tmp.int64 = 64;
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Closing parenthesis expected for \"ror\"");
+			strcpy(error_buf_, "Closing parenthesis expected for \"asr\"");
 			return TOK_NONE;
 		}
 		else
 		{
+			//TODO: similar to TOK_ROL/TOK_ROR case - this seems to assume right-shift is arithmetic for signed values?
 			__int64 mask = (1LL << tmp.int64) - 1;
 			val.int64 = (val.int64 >> num_bits) & mask;   // xxx does this handle high-bit on?
 		}
@@ -2091,9 +2154,12 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else if (val.typ == TYPE_INT && tmp.typ == TYPE_INT)
 		{
-			__int64 factor = val.int64;
-			for (int ii = 1; ii < tmp.int64; ++ii)
-				val.int64 *= factor;
+			__int64 result = tmp.int64 >= 0 ? 1 : 0;
+			for (int ii = 0; ii < tmp.int64; ++ii)
+			{
+				result *= val.int64;
+			}
+			val.int64 = result;
 		}
 		else
 		{
@@ -2133,7 +2199,9 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 				return TOK_NONE;
 			}
 			else
-			val.real64 = sqrt(val.real64);
+			{
+				val.real64 = sqrt(val.real64);
+			}
 		}
 		else if (val.typ == TYPE_INT)
 		{
@@ -2144,7 +2212,10 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 				return TOK_NONE;
 			}
 			else
+			{
+				//TODO: is this still accurate for all integers > pow(2,53)
 				val.int64 = (__int64)sqrt((double)val.int64);
+			}
 		}
 		else
 		{
@@ -2363,6 +2434,10 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		return get_next();
 
+		// TODO(6.0): Add base-10 logarithm (LOG10)
+		// This was incorrectly documented in the help as the base-10 logarithm when it is
+		// actually base-e. It's easy enough to compute the base-10 log (log(x)/log(10)) now,
+		// but I feel like since it was documented to exist, users might want it.
 	case TOK_LOG:
 		if ((next_tok = get_next()) != TOK_LPAR)
 		{
@@ -2883,12 +2958,12 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Closing parenthesis expected for \"strlen\"");
+			strcpy(error_buf_, "Closing parenthesis expected for \"ltrim\"");
 			return TOK_NONE;
 		}
 		else if (val.typ != TYPE_STRING)
 		{
-			strcpy(error_buf_, "Parameter for \"strlen\" must be a string");
+			strcpy(error_buf_, "Parameter for \"ltrim\" must be a string");
 			return TOK_NONE;
 		}
 		else
@@ -2907,12 +2982,12 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Closing parenthesis expected for \"strlen\"");
+			strcpy(error_buf_, "Closing parenthesis expected for \"rtrim\"");
 			return TOK_NONE;
 		}
 		else if (val.typ != TYPE_STRING)
 		{
-			strcpy(error_buf_, "Parameter for \"strlen\" must be a string");
+			strcpy(error_buf_, "Parameter for \"rtrim\" must be a string");
 			return TOK_NONE;
 		}
 		else
@@ -3052,7 +3127,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else
 		{
-			__int64 retval = val.pstr->Compare(*(tmp.pstr));
+			__int64 retval = sign(val.pstr->Compare(*(tmp.pstr)));
 			delete val.pstr;
 			val.int64 = retval;
 			val.typ = TYPE_INT;
@@ -3092,7 +3167,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		}
 		else
 		{
-			__int64 retval = val.pstr->CompareNoCase(*(tmp.pstr));
+			__int64 retval = sign(val.pstr->CompareNoCase(*(tmp.pstr)));
 			delete val.pstr;
 			val.int64 = retval;
 			val.typ = TYPE_INT;
@@ -3159,7 +3234,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 				if (pp[ii] < sizeof(e2a_tab) && e2a_tab[pp[ii]] != 0)
 					pp[ii] = e2a_tab[pp[ii]];
 				else
-					pp[ii] = e2a_tab['?'];
+					pp[ii] = '?';
 			}
 		}
 		else
@@ -3321,7 +3396,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		{
 			if (vname.IsEmpty() || val.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "Post-decrement (++) requires an integer variable");
+				strcpy(error_buf_, "Post-decrement (--) requires an integer variable");
 				return TOK_NONE;
 			}
 			// Only change the value if side effects allowed
@@ -3433,7 +3508,11 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		val.int64 = ~val.int64;
 		return next_tok;
 	default:
-        strcpy(error_buf_, "Not implemented");
+		// only set the error if there is none yet
+		if (error_buf_[0] == '\0')
+		{
+			strcpy(error_buf_, "Not implemented");
+		}
 		return TOK_NONE;
 	}
 	ASSERT(0);
@@ -3445,6 +3524,7 @@ expr_eval::tok_t expr_eval::get_var(expr_eval::value_t & retval, CString &vname)
 	value_t tmp;
 	std::map<CString, value_t>::const_iterator pv;
 
+	// note: this loop handles indexing into array variables
 	retval.typ = TYPE_NONE;
 	tok_t next_tok = get_next();
 	while (next_tok == TOK_LBRA)   // for each index [1][2]...
@@ -3511,7 +3591,7 @@ DATE expr_eval::get_date(const char * ss)
 	memset(&tm, 0, sizeof(tm));
 
 	// Skip leading whitespace
-	while (*pp == ' ')
+	while (pp != eos && *pp == ' ')
 		++pp;
 
 	// Parse out date part
@@ -3533,12 +3613,16 @@ DATE expr_eval::get_date(const char * ss)
 	if (pp != eos)
 		pp = std::use_facet<std::time_get<char> >(loc).get_time(pp, eos, pszGetF, st, &tm);
 
+	// If we couldn't even parse out a date part then return an error value
+	if (st & std::ios_base::failbit)
+		return -1e30;
+
 	// Convert tm structure to DATE (using COleDateTime constructor)
 	COleDateTime odt(tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 	if (odt.m_status == 0)
 		return odt.m_dt;
-	else
-		return -1e30;
+	
+	return -1e30;
 }
 
 DATE expr_eval::get_time(const char * ss)
@@ -3562,18 +3646,22 @@ DATE expr_eval::get_time(const char * ss)
 	tm.tm_mday = 30;
 
 	// Skip leading whitespace
-	while (*pp == ' ')
+	while (pp != eos && *pp == ' ')
 		++pp;
 
 	// Parse out time part
 	pp = std::use_facet<std::time_get<char> >(loc).get_time(pp, eos, pszGetF, st, &tm);
 
+	// If we couldn't parse out the time, then return an error value
+	if (st & std::ios_base::failbit)
+		return -1e30;
+
 	// Convert tm structure to DATE (using COleDateTime constructor)
 	COleDateTime odt(tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 	if (odt.m_status == 0)
 		return odt.m_dt;
-	else
-		return -1e30;
+	
+	return -1e30;
 }
 
 bool expr_eval::error(expr_eval::tok_t tt, const char *mess)
@@ -3930,7 +4018,7 @@ expr_eval::tok_t expr_eval::get_next()
 		// Get string constant
 		for (++p_; *p_ != '"' && *p_ != '\0' ; ++p_)
 		{
-			if (*p_ == '\\' && strchr("abtnvfrx\"", *(p_+1)) != NULL)
+			if (*p_ == '\\' && strchr("abtnvfr0x\"", *(p_+1)) != NULL)
 			{
 				++p_;
 				switch(*p_)
@@ -3972,12 +4060,17 @@ expr_eval::tok_t expr_eval::get_next()
 						ss += (char)cc;
 					}
 					else
+					{
+						//TODO: why not fail here?
 						ss += '\0';
+					}
 					break;
 				case '"':
 					ss += '"';
 					break;
 				default:
+					// due to the strchr in the if condition above, this cannot be hit.
+					ASSERT(0);
 					sprintf(error_buf_, "Unexpected character escape sequence \\%c in string", *p_);
 					return TOK_NONE;
 				}
@@ -3986,6 +4079,7 @@ expr_eval::tok_t expr_eval::get_next()
 				ss += *p_;
 		}
 
+		//TODO: this doesn't work for embedded NUL characters!
 		last_val_ = (const char *)ss;
 		if (*p_ != '"')
 		{
@@ -4006,6 +4100,7 @@ expr_eval::tok_t expr_eval::get_next()
 		++p_;
 		if (last_val_.int64 == '\\')
 		{
+			//TODO: this looks like it's missing a few things compared to the string sequences
 			switch(*p_)
 			{
 			case 'a':
@@ -4292,6 +4387,9 @@ ExprStringType expr_eval::value_t::GetDataString(CString strFormat, int size /* 
 		}
 		else
 		{
+			// TODO: The user can set this sprintf format at least from the defaults - is it validated there at all?
+			//	This will crash if the user puts something like "%sd" as the format.
+			//	This check turns it into "%sI64d", which is still a string format specifier.
 			if (strchr("diouxX", *(const char *)strFormat.Right(1)) != NULL)
 				strFormat.Insert(strFormat.GetLength()-1, "I64");
 			sprintf(disp, strFormat, int64, int64, int64, int64);  // Add 4 times in case strFormat contains multiple format strings
