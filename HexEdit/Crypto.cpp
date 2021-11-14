@@ -24,6 +24,7 @@ void CCrypto::init()
 		return;
 
 	// Get the CryptoAPI routines we need
+	//TODO(6.0): MSDocs says the Crypto APIs are deprecated, and to use the BCrypt functions instead. Do they support the use here?
 	if ((pAcquireContext_ = (PFAcquireContext)GetProcAddress(hdll_, "CryptAcquireContextA")) == 0 ||
 		(pReleaseContext_ = (PFReleaseContext)GetProcAddress(hdll_, "CryptReleaseContext")) == 0 ||
 		(pEnumProviders_ = (PFEnumProviders)GetProcAddress(hdll_, "CryptEnumProvidersA")) == 0 ||
@@ -143,7 +144,7 @@ CCrypto::~CCrypto()
 	hdll_ = HINSTANCE(0);
 }
 
-// Get algorith name (includes CSP name)
+// Get algorithm name (includes CSP name)
 const char *CCrypto::GetName(size_t alg)
 {
 	if (hdll_ == HINSTANCE(0)) init();
@@ -176,7 +177,8 @@ void CCrypto::SetPassword(size_t alg, const char *password /*=NULL*/)
 	{
 		HCRYPTHASH hh;
 
-		// CryptCreateHash (try CALG_SHA or CALG_MD5 hask algorithms only)
+		// CryptCreateHash (try CALG_SHA or CALG_MD5 hash algorithms only)
+		//TODO(6.0): Let the user select an algorithm? Allow MD5 for compatibility, but mark it not secure!
 		if (!pCreateHash_(csp_[alg], CALG_SHA, 0, 0, &hh) &&
 			!pCreateHash_(csp_[alg], CALG_MD5, 0, 0, &hh) )
 		{

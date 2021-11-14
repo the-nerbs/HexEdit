@@ -1429,6 +1429,9 @@ void CDataFormatView::InitDataCol(int ii, GV_ITEM & item)
 	CHexEditDoc *pdoc = GetDocument();
 	signed char df_type = abs(pdoc->df_type_[ii]);      // Data types may be -ve to indicate big endian
 	bool big_endian = pdoc->df_type_[ii] < 0;
+
+	//TODO: the template `display` attribute can be a custom printf-style format string.
+	// Is there anywhere that checks that this isn't eg "%s" for an integer?
 	CString strFormat = pdoc->df_elt_[ii].GetAttr("display");
 
 	char disp[128];                     // Holds output of sprintf

@@ -733,10 +733,12 @@ void AddCommas(CString &str)
 //	struct lconv *plconv = localeconv(); // Locale settings (grouping etc) are now just read once in InitInstance
 
 	// Allocate enough space (allowing for space padding)
+	//TODO(???): this math doesn't seem right to me, but I think it only *over*-allocates, so this may not be a problem?
 	char *out = new char[(str.GetLength()*(theApp.dec_group_+1))/theApp.dec_group_ + 2]; // Result created here
 	char *dd = out;                     // Ptr to current output char
 
 	// Skip leading whitespace
+	//TODO(bug?): CString::ReleaseBuffer not called. This is *probably* harmless though.
 	pp = str.GetBuffer(0);
 	while (isspace(*pp))
 		pp++;
@@ -1816,6 +1818,8 @@ void GetNTAPIFuncs()
 	if ((hNTDLL = ::LoadLibrary("ntdll.dll")) == (HINSTANCE)0)
 		return;
 
+	// TODO(6.0): I feel that I can safely drop support for pre-NT Windows now...
+	// TODO(asap): These are the kernel/driver/internal Windows APIs, not the user-land/public ones.
 	pfInitUnicodeString    = (PFRtlInitUnicodeString)  ::GetProcAddress(hNTDLL, "RtlInitUnicodeString");
 	pfOpenFile             = (PFNtOpenFile)            ::GetProcAddress(hNTDLL, "NtOpenFile");
 	pfClose                = (PFNtClose)               ::GetProcAddress(hNTDLL, "NtClose");
