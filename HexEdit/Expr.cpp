@@ -49,6 +49,8 @@
 #include "dialog.h"
 #include "misc.h"
 
+#include "Expressions/DialogProvider.h"
+
 template <class T>
 static constexpr int sign(T x)
 {
@@ -65,19 +67,58 @@ static constexpr int sign(T x)
 	return 0;
 }
 
-expr_eval::expr_eval(int mr /*=10*/, bool csa /*=false*/)
+// not available until C++17
+template <class T>
+static constexpr T clamp(T value, T min, T max)
+{
+	assert(min <= max);
+
+	if (max < value)
+	{
+		value = max;
+	}
+
+	if (value < min)
+	{
+		value = min;
+	}
+
+	return value;
+}
+
+expr_eval::expr_eval(hex::IDialogProvider& dlgProvider, int max_radix, bool const_sep_allowed)
 {
 	p_ = NULL;
 	psymbol_ = NULL;
 	var_.clear();
 	var_changed_ = clock();
-	max_radix_ = mr;                // Max radix used in integer literals
-	const_sep_allowed_ = csa;       // Are separators allowed in int constants
+	max_radix_ = max_radix;                 // Max radix used in integer literals
+	const_sep_allowed_ = const_sep_allowed; // Are separators allowed in int constants
 
 	dec_sep_char_ = theApp.dec_sep_char_;
-	dec_point_    = theApp.dec_point_;
+	dec_point_ = theApp.dec_point_;
 
 	changes_on_ = true;
+
+	dlg_provider_ = &dlgProvider;
+}
+
+expr_eval::expr_eval(int max_radix /*=10*/, bool const_sep_allowed /*=false*/)
+{
+	p_ = NULL;
+	psymbol_ = NULL;
+	var_.clear();
+	var_changed_ = clock();
+	max_radix_ = max_radix;                 // Max radix used in integer literals
+	const_sep_allowed_ = const_sep_allowed; // Are separators allowed in int constants
+
+	dec_sep_char_ = theApp.dec_sep_char_;
+	dec_point_ = theApp.dec_point_;
+
+	changes_on_ = true;
+
+	owning_dlg_provider_ = std::make_unique<hex::DialogProvider>();
+	dlg_provider_ = owning_dlg_provider_.get();
 }
 
 // expr is the expression to evaluate, possibly including names (symbols)
@@ -400,8 +441,8 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			return TOK_NONE;
 
 		//TODO: what about booleans?
-		if ((val.typ != TYPE_STRING || op2.typ != TYPE_STRING) &&
-			(val.typ != TYPE_DATE   || op2.typ != TYPE_DATE) &&
+		if ((val.typ != TYPE_STRING  || op2.typ != TYPE_STRING) &&
+			(val.typ != TYPE_DATE    || op2.typ != TYPE_DATE) &&
 			(val.typ != TYPE_REAL && val.typ != TYPE_INT || 
 			 op2.typ != TYPE_REAL && op2.typ != TYPE_INT) )
 		{
@@ -451,6 +492,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			}
 			else
 			{
+				ASSERT(val.typ == TYPE_INT && op2.typ == TYPE_INT);
 				val.boolean = val.int64 != op2.int64;
 			}
 			break;
@@ -471,6 +513,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			}
 			else
 			{
+				ASSERT(val.typ == TYPE_INT && op2.typ == TYPE_INT);
 				val.boolean = val.int64 < op2.int64;
 			}
 			break;
@@ -491,6 +534,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			}
 			else
 			{
+				ASSERT(val.typ == TYPE_INT && op2.typ == TYPE_INT);
 				val.boolean = val.int64 <= op2.int64;
 			}
 			break;
@@ -511,6 +555,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			}
 			else
 			{
+				ASSERT(val.typ == TYPE_INT && op2.typ == TYPE_INT);
 				val.boolean = val.int64 > op2.int64;
 			}
 			break;
@@ -531,6 +576,7 @@ expr_eval::tok_t expr_eval::prec_comp(value_t &val, CString &vname)
 			}
 			else
 			{
+				ASSERT(val.typ == TYPE_INT && op2.typ == TYPE_INT);
 				val.boolean = val.int64 >= op2.int64;
 			}
 			break;
@@ -882,9 +928,6 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 	__int64 sym_size, sym_address;
 	CString sym_str;
 	bool saved_const_sep_allowed;
-	GetInt *pGetIntDlg = NULL;
-	GetStr *pGetStrDlg = NULL;
-	GetBool *pGetBoolDlg = NULL;
 	int num_bits;                // how many bits are used in bit-wise operations (ROL, REVERSE, etc)
 
 	switch (next_tok)
@@ -912,11 +955,6 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		else if (next_tok == TOK_INT)
 		{
 			val = find_symbol("int", tmp, 0, pac_, sym_size, sym_address, sym_str);
-		}
-		else if (next_tok == TOK_CHAR)
-		{
-			//TODO: is TOK_CHAR ever actually emitted? i.e.: can this be reached?
-			val = find_symbol("char", tmp, 0, pac_, sym_size, sym_address, sym_str);
 		}
 		else
 		{
@@ -1110,7 +1148,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 			case TYPE_STRING:
 				sym_str = CString(*(val.pstr));  // xxx sym_str should be Unicode
 				break;
-			// TODO: handle TYPE_DATE?
+				// TODO: handle TYPE_DATE?
 			default:
 				sym_str.Empty();
 				val.typ = TYPE_NONE;
@@ -1191,239 +1229,224 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		val.pstr = new ExprStringType(sym_str);
 		return get_next();
 	case TOK_GETINT:
+	{
 		// Get opening bracket and first symbol within
 		if ((next_tok = get_next()) != TOK_LPAR)
 		{
-			strcpy(error_buf_, "Expected opening parenthesis after GETINT");
+			strcpy(error_buf_, "Opening parenthesis expected after \"getint\"");
 			return TOK_NONE;
 		}
 
-		if (error(next_tok = prec_assign(val), "Expected prompt string for GETINT"))
+		if (error(next_tok = prec_assign(val), "Expected prompt string for \"getint\""))
 		{
 			return TOK_NONE;
 		}
 		if (val.typ != TYPE_STRING)
 		{
-			strcpy(error_buf_, "First parameter for GETINT must be a string");
+			strcpy(error_buf_, "First parameter for \"getint\" must be a string");
 			return TOK_NONE;
 		}
-		pGetIntDlg = new GetInt();
-		pGetIntDlg->prompt_ = CString(*(val.pstr));
-		pGetIntDlg->value_ = 0L;
-		pGetIntDlg->min_ = LONG_MIN;
-		pGetIntDlg->max_ = LONG_MAX;
+
+		CString prompt{ *val.pstr };
+		std::int64_t value = 0;
+		std::int64_t min = INT64_MIN;
+		std::int64_t max = INT64_MAX;
 
 		// Get optional parameters: default value, min, max
 		if (next_tok == TOK_COMMA)
 		{
 			value_t tmp2;
 
-			if (error(next_tok = prec_assign(tmp2), "Expected 2nd parameter to GETINT"))
+			if (error(next_tok = prec_assign(tmp2), "Expected 2nd parameter to \"getint\""))
 			{
-				delete pGetIntDlg;
 				return TOK_NONE;
 			}
 			if (tmp2.typ != TYPE_INT)
 			{
-				strcpy(error_buf_, "2nd parameter for GETINT must be an integer");
-				delete pGetIntDlg;
+				strcpy(error_buf_, "2nd parameter for \"getint\" must be an integer");
 				return TOK_NONE;
 			}
-			pGetIntDlg->value_ = long(tmp2.int64);
+			value = tmp2.int64;
 
 			if (next_tok == TOK_COMMA)
 			{
 				value_t tmp3;
 
-				if (error(next_tok = prec_assign(tmp3), "Expected 3rd parameter to GETINT"))
+				if (error(next_tok = prec_assign(tmp3), "Expected 3rd parameter to \"getint\""))
 				{
-					delete pGetIntDlg;
 					return TOK_NONE;
 				}
 				if (tmp3.typ != TYPE_INT)
 				{
-					strcpy(error_buf_, "3rd parameter for GETINT must be an integer");
-					delete pGetIntDlg;
+					strcpy(error_buf_, "3rd parameter for \"getint\" must be an integer");
 					return TOK_NONE;
 				}
-				pGetIntDlg->min_ = long(tmp3.int64);
+				min = tmp3.int64;
 
 				if (next_tok == TOK_COMMA)
 				{
 					value_t tmp4;
 
-					if (error(next_tok = prec_assign(tmp4), "Expected 4th parameter to GETINT"))
+					if (error(next_tok = prec_assign(tmp4), "Expected 4th parameter to \"getint\""))
 					{
-						delete pGetIntDlg;
 						return TOK_NONE;
 					}
 					if (tmp4.typ != TYPE_INT)
 					{
-						strcpy(error_buf_, "4th parameter for GETINT must be an integer");
-						delete pGetIntDlg;
+						strcpy(error_buf_, "4th parameter for \"getint\" must be an integer");
 						return TOK_NONE;
 					}
-					pGetIntDlg->max_ = long(tmp4.int64);
+					max = tmp4.int64;
 				}
 			}
 		}
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Closing parenthesis expected for GETINT");
-			delete pGetIntDlg;
+			strcpy(error_buf_, "Closing parenthesis expected for \"getint\"");
 			return TOK_NONE;
 		}
 
 		// Make sure the value is within range
-		if (pGetIntDlg->value_ < pGetIntDlg->min_)
-			pGetIntDlg->value_ = pGetIntDlg->min_;
-		if (pGetIntDlg->value_ > pGetIntDlg->max_)
-			pGetIntDlg->value_ = pGetIntDlg->max_;
+		value = clamp(value, min, max);
 
 		ASSERT(val.typ == TYPE_STRING);   // make sure its has a string before freeing the memory
 		delete val.pstr;
 		val.typ = TYPE_INT;
 		if (changes_on_)
 		{
-			if (pGetIntDlg->DoModal() != IDOK)
+			if (!dlg_provider_->GetInteger(prompt, value, min, max))
 			{
-				strcpy(error_buf_, "GETINT cancelled");
-				delete pGetIntDlg;
+				strcpy(error_buf_, "\"getint\" cancelled");
 				return TOK_NONE;
 			}
-			val.int64 = pGetIntDlg->value_;
+			val.int64 = value;
 		}
 		else
 		{
 			val.int64 = 0;
 		}
-		delete pGetIntDlg;
 		return get_next();
+	}
 
 	case TOK_GETSTR:
+	{
 		// Get opening bracket and first symbol within
 		if ((next_tok = get_next()) != TOK_LPAR)
 		{
-			strcpy(error_buf_, "Expected opening parenthesis after GETSTRING");
+			strcpy(error_buf_, "Opening parenthesis expected after \"getstring\"");
 			return TOK_NONE;
 		}
 
-		if (error(next_tok = prec_assign(val), "Expected prompt string for GETSTRING"))
+		if (error(next_tok = prec_assign(val), "Expected prompt string for \"getstring\""))
 		{
 			return TOK_NONE;
 		}
 		if (val.typ != TYPE_STRING)
 		{
-			strcpy(error_buf_, "First parameter for GETSTRING must be a string");
+			strcpy(error_buf_, "First parameter for \"getstring\" must be a string");
 			return TOK_NONE;
 		}
 
-		pGetStrDlg = new GetStr();
-		pGetStrDlg->prompt_ = CString(*(val.pstr));
+		CString prompt{ *val.pstr };
+		CString value;
 
 		// Get optional parameter: default value
 		if (next_tok == TOK_COMMA)
 		{
 			value_t tmp2;
 
-			if (error(next_tok = prec_assign(tmp2), "Expected 2nd parameter to GETSTRING"))
+			if (error(next_tok = prec_assign(tmp2), "Expected 2nd parameter to \"getstring\""))
 			{
-				delete pGetStrDlg;
 				return TOK_NONE;
 			}
 			if (tmp2.typ != TYPE_STRING)
 			{
-				strcpy(error_buf_, "2nd parameter for GETSTRING must be a string");
-				delete pGetStrDlg;
+				strcpy(error_buf_, "2nd parameter for \"getstring\" must be a string");
 				return TOK_NONE;
 			}
-			pGetStrDlg->value_ = CString(*(tmp2.pstr));
+			value = CString{ *tmp2.pstr };
 		}
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Closing parenthesis expected for GETSTRING");
-			delete pGetStrDlg;
+			strcpy(error_buf_, "Closing parenthesis expected for \"getstring\"");
 			return TOK_NONE;
 		}
 
 		ASSERT(val.typ == TYPE_STRING);   // make sure its has a string before freeing the memory
 		if (changes_on_)
 		{
-			if (pGetStrDlg->DoModal() != IDOK)
+			if (!dlg_provider_->GetString(prompt, value))
 			{
-				strcpy(error_buf_, "GETSTRING cancelled");
-				delete pGetStrDlg;
+				strcpy(error_buf_, "\"getstring\" cancelled");
 				return TOK_NONE;
 			}
-			*val.pstr = pGetStrDlg->value_;
+
+			*val.pstr = value;
 		}
 		else
 		{
 			*val.pstr = ExprStringType();
 		}
-		delete pGetStrDlg;
 		return get_next();
+	}
 
 	case TOK_GETBOOL:
+	{
 		// Get opening bracket and first symbol within
 		if ((next_tok = get_next()) != TOK_LPAR)
 		{
-			strcpy(error_buf_, "Expected opening parenthesis after GETBOOL");
+			strcpy(error_buf_, "Opening parenthesis expected after \"getbool\"");
 			return TOK_NONE;
 		}
 
-		if (error(next_tok = prec_assign(val), "Expected prompt string for GETBOOL"))
+		if (error(next_tok = prec_assign(val), "Expected prompt string for \"getbool\""))
 		{
 			return TOK_NONE;
 		}
 		if (val.typ != TYPE_STRING)
 		{
-			strcpy(error_buf_, "First parameter for GETBOOL must be a string");
+			strcpy(error_buf_, "First parameter for \"getbool\" must be a string");
 			return TOK_NONE;
 		}
 
-		pGetBoolDlg = new GetBool();
-		pGetBoolDlg->prompt_ = CString(*(val.pstr));
+		CString prompt{ *val.pstr };
+		CString trueText;
+		CString falseText;
 
 		// Get optional parameters: default value, min, max
 		if (next_tok == TOK_COMMA)
 		{
-			if (error(next_tok = prec_assign(val), "Expected 2nd parameter to GETBOOL"))
+			if (error(next_tok = prec_assign(val), "Expected 2nd parameter to \"getbool\""))
 			{
-				delete pGetBoolDlg;
 				return TOK_NONE;
 			}
 			if (val.typ != TYPE_STRING)
 			{
-				strcpy(error_buf_, "2nd parameter for GETBOOL must be a string");
-				delete pGetBoolDlg;
+				strcpy(error_buf_, "2nd parameter for \"getbool\" must be a string");
 				return TOK_NONE;
 			}
-			pGetBoolDlg->yes_ = CString(*(val.pstr));
+			trueText = CString{ *val.pstr };
 
 			if (next_tok == TOK_COMMA)
 			{
-				if (error(next_tok = prec_assign(val), "Expected 3rd parameter to GETBOOL"))
+				if (error(next_tok = prec_assign(val), "Expected 3rd parameter to \"getbool\""))
 				{
-					delete pGetBoolDlg;
 					return TOK_NONE;
 				}
 				if (val.typ != TYPE_STRING)
 				{
-					strcpy(error_buf_, "3rd parameter for GETBOOL must be a string");
-					delete pGetBoolDlg;
+					strcpy(error_buf_, "3rd parameter for \"getbool\" must be a string");
 					return TOK_NONE;
 				}
-				pGetBoolDlg->no_ = CString(*(val.pstr));
+				falseText = CString{ *val.pstr };
 			}
 		}
 
 		if (next_tok != TOK_RPAR)
 		{
-			strcpy(error_buf_, "Closing parenthesis expected for GETBOOL");
-			delete pGetBoolDlg;
+			strcpy(error_buf_, "Closing parenthesis expected for \"getbool\"");
 			return TOK_NONE;
 		}
 
@@ -1431,12 +1454,16 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		delete val.pstr;
 		val.typ = TYPE_BOOLEAN;
 		if (changes_on_)
-			val.boolean = pGetBoolDlg->DoModal() == IDOK;
+		{
+			val.boolean = dlg_provider_->GetBoolean(prompt, trueText, falseText);
+		}
 		else
+		{
 			val.boolean = false;
+		}
 
-		delete pGetBoolDlg;
 		return get_next();
+	}
 
 	case TOK_ADDRESSOF:
 		// Get opening bracket and first symbol within

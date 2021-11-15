@@ -73,11 +73,89 @@ static value_t empty_value_with_type(expr_eval::type_t type)
     return v;
 }
 
+
+struct GetIntegerCall
+{
+    CString prompt;
+    std::int64_t value;
+    std::int64_t min;
+    std::int64_t max;
+};
+
+struct GetStringCall
+{
+    CString prompt;
+    CString value;
+};
+
+struct GetBooleanCall
+{
+    CString prompt;
+    CString trueText;
+    CString falseText;
+};
+
+class TestDialogProvider : public hex::IDialogProvider
+{
+public:
+    bool cancel = false;
+    std::vector<GetIntegerCall> getIntegerCalls;
+    std::vector<GetStringCall> getStringCalls;
+    std::vector<GetBooleanCall> getBooleanCalls;
+
+    bool GetInteger(const CString& prompt, std::int64_t& result, std::int64_t min = INT64_MIN, std::int64_t max = INT64_MAX) override
+    {
+        getIntegerCalls.push_back(GetIntegerCall{
+            prompt, result, min, max
+        });
+
+        if (!cancel)
+        {
+            // just yield the given value
+            return true;
+        }
+
+        return false;
+    }
+
+    bool GetString(const CString& prompt, CString& result) override
+    {
+        getStringCalls.push_back(GetStringCall{
+            prompt, result
+        });
+
+        if (!cancel)
+        {
+            // just yield the given value
+            return true;
+        }
+
+        return false;
+    }
+
+    bool GetBoolean(const CString& prompt, const CString& trueText, const CString& falseText) override
+    {
+        getBooleanCalls.push_back(GetBooleanCall{
+            prompt, trueText, falseText
+        });
+
+        if (!cancel)
+        {
+            return true;
+        }
+
+        return false;
+    }
+};
+
 class test_expr : public expr_eval
 {
 public:
+    TestDialogProvider dialogs;
+
+
     test_expr(int max_radix = 10, bool const_sep_allowed = false)
-        : expr_eval{ max_radix, const_sep_allowed }
+        : expr_eval{ dialogs, max_radix, const_sep_allowed }
     { }
 
     value_t find_symbol(
@@ -805,7 +883,31 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "string(arrayField[0])", value_t{ "" }},           // string(<array field element>)
         row{ "string(structField.value1)", value_t{ "" }},      // string(<struct field element>)
 
-        // TOK_GETINT, TOK_GETSTR, TOK_GETBOOL - show UIs
+        // getint(prompt [, default [, min [, max]]])
+        row{ "GETINT(\"msg\")", value_t{ 0 } },                 // uppercase, 1-arg
+        row{ "GETINT(\"msg\", 123)", value_t{ 123 } },          // uppercase, 2-arg
+        row{ "GETINT(\"msg\", 123, 0)", value_t{ 123 } },       // uppercase, 3-arg
+        row{ "GETINT(\"msg\", 123, 0, 255)", value_t{ 123 } },  // uppercase, 4-arg
+        row{ "getint(\"msg\")", value_t{ 0 } },                 // 1-arg
+        row{ "getint(\"msg\", 123)", value_t{ 123 } },          // 2-arg
+        row{ "getint(\"msg\", 123, 0)", value_t{ 123 } },       // 3-arg
+        row{ "getint(\"msg\", 123, 0, 255)", value_t{ 123 } },  // 4-arg
+        row{ "getint(\"msg\", -1, 0, 255)", value_t{ 0 } },     // value clamped to [min,max]
+        row{ "getint(\"msg\", 256, 0, 255)", value_t{ 255 } },  // value clamped to [min,max]
+
+        // getstring(prompt [, default])
+        row{ "GETSTRING(\"msg\")", value_t{ "" } },             // uppercase, 1-arg
+        row{ "GETSTRING(\"msg\", \"val\")", value_t{ "val" } }, // uppercase, 2-arg
+        row{ "getstring(\"msg\")", value_t{ "" } },             // 1-arg
+        row{ "getstring(\"msg\", \"val\")", value_t{ "val" } }, // 2-arg
+
+        // getbool(prompt [, trueText [, falseText]])
+        row{ "GETBOOL(\"msg\")", value_t{ true } },                         // uppercase, 1-arg
+        row{ "GETBOOL(\"msg\", \"TRUE\")", value_t{ true } },               // uppercase, 2-arg
+        row{ "GETBOOL(\"msg\", \"TRUE\", \"FALSE\")", value_t{ true } },    // uppercase, 3-arg
+        row{ "getbool(\"msg\")", value_t{ true } },                         // 1-arg
+        row{ "getbool(\"msg\", \"TRUE\")", value_t{ true } },               // 2-arg
+        row{ "getbool(\"msg\", \"TRUE\", \"FALSE\")", value_t{ true } },    // 3-arg
 
         // addressof()
         row{ "ADDRESSOF(intField)", value_t{ 0 } },             // uppercased 'addressof'
@@ -1327,6 +1429,111 @@ TEST_CASE("expr_eval::evaluate - basic tests")
 
     CHECK(actual.error == false);
     CHECK(values_equal(test.expected, actual));
+}
+
+TEST_CASE("expr_eval::evaluate - getint details")
+{
+    test_expr expr;
+
+    int ref_ac = 0;
+    value_t result = expr.evaluate("getint(\"X\", 128, -256, 512)", 0, ref_ac);
+
+    CAPTURE(result, expr.get_error_message());
+
+    CHECK(result.error == false);
+    CHECK(values_equal(value_t{ 128 }, result));
+
+    REQUIRE(expr.dialogs.getIntegerCalls.size() == 1u);
+
+    const auto& callInfo = expr.dialogs.getIntegerCalls[0];
+    CHECK(callInfo.prompt == "X");
+    CHECK(callInfo.value == 128);
+    CHECK(callInfo.min == -256);
+    CHECK(callInfo.max == 512);
+}
+
+TEST_CASE("expr_eval::evaluate - getint with side effects disabled")
+{
+    test_expr expr;
+
+    int ref_ac = 0;
+    value_t result = expr.evaluate("getint(\"X\", 128, -256, 512)", 0, ref_ac, 10, false);
+
+    CAPTURE(result, expr.get_error_message());
+
+    CHECK(result.error == false);
+    CHECK(values_equal(value_t{ 0 }, result));
+
+    CHECK(expr.dialogs.getIntegerCalls.size() == 0u);
+}
+
+TEST_CASE("expr_eval::evaluate - getstring details")
+{
+    test_expr expr;
+
+    int ref_ac = 0;
+    value_t result = expr.evaluate("getstring(\"X\", \"val\")", 0, ref_ac);
+
+    CAPTURE(result, expr.get_error_message());
+
+    CHECK(result.error == false);
+    CHECK(values_equal(value_t{ "val" }, result));
+
+    REQUIRE(expr.dialogs.getStringCalls.size() == 1u);
+
+    const auto& callInfo = expr.dialogs.getStringCalls[0];
+    CHECK(callInfo.prompt == "X");
+    CHECK(callInfo.value == "val");
+}
+
+TEST_CASE("expr_eval::evaluate - getstring with side effects disabled")
+{
+    test_expr expr;
+
+    int ref_ac = 0;
+    value_t result = expr.evaluate("getstring(\"X\", \"val\")", 0, ref_ac, 10, false);
+
+    CAPTURE(result, expr.get_error_message());
+
+    CHECK(result.error == false);
+    CHECK(values_equal(value_t{ "" }, result));
+
+    CHECK(expr.dialogs.getStringCalls.size() == 0u);
+}
+
+TEST_CASE("expr_eval::evaluate - getbool details")
+{
+    test_expr expr;
+
+    int ref_ac = 0;
+    value_t result = expr.evaluate("getbool(\"X\", \"Y\", \"Z\")", 0, ref_ac);
+
+    CAPTURE(result, expr.get_error_message());
+
+    CHECK(result.error == false);
+    CHECK(values_equal(value_t{ true }, result));
+
+    REQUIRE(expr.dialogs.getBooleanCalls.size() == 1u);
+
+    const auto& callInfo = expr.dialogs.getBooleanCalls[0];
+    CHECK(callInfo.prompt == "X");
+    CHECK(callInfo.trueText == "Y");
+    CHECK(callInfo.falseText == "Z");
+}
+
+TEST_CASE("expr_eval::evaluate - getbool with side effects disabled")
+{
+    test_expr expr;
+
+    int ref_ac = 0;
+    value_t result = expr.evaluate("getbool(\"X\", \"Y\", \"Z\")", 0, ref_ac, 10, false);
+
+    CAPTURE(result, expr.get_error_message());
+
+    CHECK(result.error == false);
+    CHECK(values_equal(value_t{ false }, result));
+
+    CHECK(expr.dialogs.getStringCalls.size() == 0u);
 }
 
 TEST_CASE("expr_eval::evaluate - string embedded NUL")
@@ -3244,6 +3451,160 @@ TEST_CASE("expr_eval::evaluate - errors")
              "Symbol \"does_not_exist\" not in file"
         },
 
+        // TOK_GETBOOL
+
+        row{
+            "getstring",
+            "Opening parenthesis expected after \"getstring\""
+        },
+        row{
+            "getstring(",
+            "Not implemented"
+            // should be "Expected prompt string for \"getstring\""; prec_prim, case TOK_GETSTR
+        },
+        row{
+            "getstring(1)",
+            "First parameter for \"getstring\" must be a string"
+        },
+        row{
+            "getstring(\"X\"",
+            "Closing parenthesis expected for \"getstring\""
+        },
+        row{
+            "getstring(\"X\",",
+            "Not implemented"
+            // should be "Expected 2nd parameter to \"getstring\""; prec_prim, case TOK_GETSTR
+        },
+        row{
+            "getstring(\"X\", \"X\"",
+            "Closing parenthesis expected for \"getstring\""
+        },
+        row{
+            "getstring(\"X\", 1)",
+            "2nd parameter for \"getstring\" must be a string"
+        },
+        row{
+            "getstring(\"X\")",
+            "\"getstring\" cancelled"
+        },
+        row{
+            "getstring(\"X\", \"X\")",
+            "\"getstring\" cancelled"
+        },
+
+        row{
+            "getbool",
+            "Opening parenthesis expected after \"getbool\""
+        },
+        row{
+            "getbool(",
+            "Not implemented"
+            // should be "Expected prompt string for \"getbool\""; prec_prim, case TOK_GETBOOL
+        },
+        row{
+            "getbool(2",
+            "First parameter for \"getbool\" must be a string"
+        },
+        row{
+            "getbool(\"X\"",
+            "Closing parenthesis expected for \"getbool\""
+        },
+        row{
+            "getbool(\"X\",",
+            "Not implemented"
+            // should be "Expected prompt string for \"getbool\""; prec_prim, case TOK_GETBOOL
+        },
+        row{
+            "getbool(\"X\", 2)",
+            "2nd parameter for \"getbool\" must be a string"
+        },
+        row{
+            "getbool(\"X\", \"X\"",
+            "Closing parenthesis expected for \"getbool\""
+        },
+        row{
+            "getbool(\"X\", \"X\",",
+            "Not implemented"
+            // should be "Expected prompt string for \"getbool\""; prec_prim, case TOK_GETBOOL
+        },
+        row{
+            "getbool(\"X\", \"X\", 3",
+            "3rd parameter for \"getbool\" must be a string"
+        },
+        row{
+            "getbool(\"X\", \"X\", \"X\"",
+            "Closing parenthesis expected for \"getbool\""
+        },
+
+        row{
+            "getint",
+            "Opening parenthesis expected after \"getint\""
+        },
+        row{
+            "getint(",
+            "Not implemented"
+            // should be "Expected prompt string for \"getint\""; prec_prim, case TOK_GETINT
+        },
+        row{
+            "getint(5",
+            "First parameter for \"getint\" must be a string"
+        },
+        row{
+            "getint(\"X\"",
+            "Closing parenthesis expected for \"getint\""
+        },
+        row{
+            "getint(\"X\",",
+            "Not implemented"
+            // should be "Expected 2nd parameter to \"getint\""; prec_prim, case TOK_GETINT
+        },
+        row{
+            "getint(\"X\", \"x\")",
+            "2nd parameter for \"getint\" must be an integer"
+        },
+        row{
+            "getint(\"X\", 0",
+            "Closing parenthesis expected for \"getint\""
+        },
+        row{
+            "getint(\"X\", 0,",
+            "Not implemented"
+            // should be "Expected 3rd parameter to \"getint\""; prec_prim, case TOK_GETINT
+        },
+        row{
+            "getint(\"X\", 0, \"X\")",
+            "3rd parameter for \"getint\" must be an integer"
+        },
+        row{
+            "getint(\"X\", 0, 1",
+            "Closing parenthesis expected for \"getint\""
+        },
+        row{
+            "getint(\"X\", 0, 1,",
+            "Not implemented"
+            // should be "Expected 4th parameter to \"getint\""; prec_prim, case TOK_GETINT
+        },
+        row{
+            "getint(\"X\", 0, 1, \"X\")",
+            "4th parameter for \"getint\" must be an integer"
+        },
+        row{
+            "getint(\"X\")",
+            "\"getint\" cancelled"
+        },
+        row{
+            "getint(\"X\", 0)",
+            "\"getint\" cancelled"
+        },
+        row{
+            "getint(\"X\", 0, -1)",
+            "\"getint\" cancelled"
+        },
+        row{
+            "getint(\"X\", 0, -1, 1)",
+            "\"getint\" cancelled"
+        },
+
         row{
             "string",
             "Opening parenthesis expected after \"string\""
@@ -3251,7 +3612,7 @@ TEST_CASE("expr_eval::evaluate - errors")
         row{
             "string(",
             "Symbol expected"
-            // should be "Expected member name"; prec_prim, case TOK_SIZEOF
+            // should be "Expected member name"; prec_prim, case TOK_STR
             // This at least makes sense, so maybe just get rid of the `error` call here?
         },
         row{
@@ -3606,6 +3967,8 @@ TEST_CASE("expr_eval::evaluate - errors")
 
     test_expr expr;
 
+    expr.dialogs.cancel = true;
+
     expr.set_variable("INT_VAR", value_t{ 123 });
     expr.set_variable("BOOL_VAR", value_t{ true });
     expr.set_variable("REAL_VAR", value_t{ 123.456 });
@@ -3639,6 +4002,32 @@ TEST_CASE("expr_eval::evaluate - non-decimal integer overflow")
     // check the result value
     CHECK(result.typ == expr_eval::TYPE_NONE);
     CHECK(errorMsg == "Overflow: \"10000000000000000\" too big");
+}
+
+
+TEST_CASE("expr_eval::DeleteVars")
+{
+    test_expr expr;
+
+    expr.set_variable("VAR_1", value_t{ 5 });
+    expr.set_variable("VAR_2", value_t{ 5 });
+    expr.set_variable("VAR_3", value_t{ 5 });
+
+    std::clock_t changed = expr.VarChanged();
+
+    // note: without some sort of delay here, clock() used to set VarChanged
+    // can end up giving the same value before and after the DeleteVars call.
+    Sleep(10);
+
+    expr.DeleteVars();
+
+    value_t value;
+    CHECK(expr.get_variable("VAR_1", value) == false);
+    CHECK(expr.get_variable("VAR_2", value) == false);
+    CHECK(expr.get_variable("VAR_3", value) == false);
+
+    std::clock_t newChanged = expr.VarChanged();
+    CHECK(expr.VarChanged() >= changed);
 }
 
 

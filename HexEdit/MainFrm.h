@@ -31,8 +31,8 @@ class CJumpExpr : public expr_eval
 {
 public:
 	CJumpExpr::CJumpExpr() : expr_eval(16, true) {}
-	virtual value_t find_symbol(const char *sym, value_t parent, size_t index, int *pac,
-		__int64 &sym_size, __int64 &sym_address, CString &sym_str);
+	value_t find_symbol(const char *sym, value_t parent, size_t index, int *pac,
+		__int64 &sym_size, __int64 &sym_address, CString &sym_str) override;
 	bool LoadVars();
 	void SaveVars();
 	std::vector<CString> GetVarNames(CJumpExpr::type_t typ);

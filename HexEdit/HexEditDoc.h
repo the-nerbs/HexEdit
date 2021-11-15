@@ -390,8 +390,8 @@ class CHexExpr : public expr_eval
 {
 public:
 	CHexExpr(CHexEditDoc *pp) { pdoc = pp; }
-	virtual value_t find_symbol(const char *sym, value_t parent, size_t index, int *pac,
-								__int64 &sym_size, __int64 &sym_address, CString &sym_str);
+	value_t find_symbol(const char *sym, value_t parent, size_t index, int *pac,
+						__int64 &sym_size, __int64 &sym_address, CString &sym_str) override;
 	CHexExpr::value_t get_value(int ii, __int64 &sym_size, __int64 &sym_address);
 
 private:

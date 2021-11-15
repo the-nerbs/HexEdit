@@ -19,6 +19,8 @@
 #include "HexEditView.h"
 #include "Preview.h"
 
+#include <cstdint>
+
 class CHexEditApp;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -311,8 +313,8 @@ public:
 	enum { IDD = IDD_GETINT };
 
 	CString prompt_;               // Text to display to the user
-	long value_;                   // value in/out
-	long min_, max_;               // Allowed range
+	std::int64_t value_;           // value in/out
+	std::int64_t min_, max_;       // Allowed range
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

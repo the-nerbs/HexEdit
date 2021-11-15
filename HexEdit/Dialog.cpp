@@ -770,7 +770,7 @@ void GetInt::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_VALUE, value_);
-	DDV_MinMaxLong(pDX, value_, min_, max_);
+	DDV_MinMaxLongLong(pDX, value_, min_, max_);
 	DDX_Text(pDX, IDC_PROMPT, prompt_);
 }
 

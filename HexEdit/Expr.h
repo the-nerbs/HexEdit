@@ -1,8 +1,11 @@
 #ifndef EXPR_INCLUDED
 #define EXPR_INCLUDED
 
+#include "Expressions/IDialogProvider.h"
+
 #include <vector>
 #include <map>
+#include <memory>
 
 #if _MSC_VER >= 1300
 #define UNICODE_TYPE_STRING 1     // Use Unicode strings for TYPE_STRING
@@ -61,7 +64,6 @@ public:
 		TOK_STRCHR, TOK_STRSTR,
 		TOK_STRCMP, TOK_STRICMP,        // String compare: 0, -1, +1
 		TOK_LTRIM, TOK_RTRIM,           // Trim leading/trailing spaces
-		TOK_CHAR,                       // Get single char from string (or -1)
 		TOK_A2E, TOK_E2A,               // Convert between ASCII and EBCDIC
 		TOK_GETINT, TOK_GETSTR, TOK_GETBOOL, // Get a value from the user
 
@@ -149,7 +151,8 @@ public:
 	};
 
 	// Constructor
-	expr_eval(int max_radix = 10, bool const_sep_allowed = false);
+	explicit expr_eval(hex::IDialogProvider& dlgProvider, int max_radix = 10, bool const_sep_allowed = false);
+	explicit expr_eval(int max_radix = 10, bool const_sep_allowed = false);
 	~expr_eval() { free(psymbol_); }
 
 	// Operations
@@ -223,6 +226,9 @@ private:
 	// (but the expression still needs to be parsed since this is an interpreter).
 	// So the expression "FALSE && (AA=1)" will return FALSE but importantly no change AA.
 	bool changes_on_;           // Says whether operands with side effects (just = at the moment) have an effect
+
+	hex::IDialogProvider* dlg_provider_;
+	std::unique_ptr<hex::IDialogProvider> owning_dlg_provider_;
 };
 
 #endif
