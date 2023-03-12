@@ -270,7 +270,7 @@ expr_eval::tok_t expr_eval::prec_assign(value_t &val)
 			if (vname.IsEmpty())
 				sprintf(error_buf_, "Invalid expression");
 			else
-				sprintf(error_buf_, "Unknown variable \"%.200s\"", vname);
+				sprintf(error_buf_, "Unknown variable \"%.200s\"", static_cast<const char*>(vname));
 		}
 		return TOK_NONE;
 	}
@@ -1146,7 +1146,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 				sym_str.Format("%g", val.real64);
 				break;
 			case TYPE_STRING:
-				sym_str = CString(*(val.pstr));  // xxx sym_str should be Unicode
+				sym_str = CString(*(val.pstr));  // TODO: sym_str should be Unicode
 				break;
 				// TODO: handle TYPE_DATE?
 			default:
@@ -2074,7 +2074,7 @@ expr_eval::tok_t expr_eval::prec_prim(value_t &val, CString &vname)
 		{
 			//TODO: similar to TOK_ROL/TOK_ROR case - this seems to assume right-shift is arithmetic for signed values?
 			__int64 mask = (1LL << tmp.int64) - 1;
-			val.int64 = (val.int64 >> num_bits) & mask;   // xxx does this handle high-bit on?
+			val.int64 = (val.int64 >> num_bits) & mask;   // TODO: does this handle high-bit on?
 		}
 		return get_next();
 
@@ -3731,7 +3731,7 @@ __int64 expr_eval::make_int(value_t &val)
 		return val.int64;
 	default:
 		ASSERT(0);
-		// xxx error message?
+		// TODO: error message?
 		return 0;
 	}
 }
@@ -3978,7 +3978,7 @@ expr_eval::tok_t expr_eval::get_next()
 			last_val_ = value_t(::strtoi64(ss, 16, &endptr));
 			if (*endptr != '\0')
 			{
-				sprintf(error_buf_, "Overflow: Hex integer \"%s\" too big", ss);
+				sprintf(error_buf_, "Overflow: Hex integer \"%s\" too big", static_cast<const char*>(ss));
 				return TOK_NONE;
 			}
 		}
@@ -4031,7 +4031,7 @@ expr_eval::tok_t expr_eval::get_next()
 			last_val_ = value_t(::strtoi64(ss, const_radix_, &endptr));
 			if (*endptr != '\0')
 			{
-				sprintf(error_buf_, "Overflow: \"%s\" too big", ss);
+				sprintf(error_buf_, "Overflow: \"%s\" too big", static_cast<const char*>(ss));
 				return TOK_NONE;
 			}
 		}

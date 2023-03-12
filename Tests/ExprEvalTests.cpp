@@ -798,7 +798,8 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         value_t expected;
     };
 
-    row test = GENERATE(
+    static const row testrows[]
+    {
         // literals
         row{ "5", value_t{ 5 } },                   // int
         row{ "5.5", value_t{ 5.5 } },               // real
@@ -836,8 +837,6 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "1 > 2", value_t{ false } },
         row{ "true ? 1 : 0", value_t{ 1 } },
         row{ "false ? 1 : 0", value_t{ 0 } },
-        row{ "true ? 1 : ()", value_t{ 1 } },               // ternary ignores if other
-        row{ "false ? () : 0", value_t{ 0 } },              //  branch's expression is valid
         row{ "1 == 0", value_t{ false } },
         row{ "1 != 0", value_t{ true } },
         row{ "1 <= 2", value_t{ true } },
@@ -848,6 +847,13 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "TRUE && FALSE", value_t{ false } },
         row{ "FALSE || FALSE", value_t{ false } },
         row{ "TRUE || FALSE", value_t{ true } },
+
+        // ternary ignores if other branch's expression is valid
+        row{ "true ? 1 : ()", value_t{ 1 } },
+        row{ "false ? () : 0", value_t{ 0 } },
+
+        // list
+        row{ "1, 2, 3", value_t{ 3 }},                      // last value is returned
 
         // sizeof()
         row{ "sizeof(INT)", value_t{ 4 } },                 // sizeof(<TOK_INT>)
@@ -861,6 +867,7 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "sizeof(REAL_VAR)", value_t{ 8 } },            // sizeof(<real variable>)
         row{ "sizeof(STRING_VAR)", value_t{ 20 } },         // sizeof(<string variable>)
         row{ "sizeof(DATE_VAR)", value_t{ 8 } },            // sizeof(<date variable>)
+        row{ "sizeof(ARR_VAR[0])", value_t{ 8 } },          // sizeof(<date variable>)
 
         // defined
         row{ "defined intField", value_t{ true } },     // no parentheses
@@ -955,32 +962,34 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "flip(0xFF, 5)", value_t{ 0xFF00000000 } },                        // non-zero, 5 bytes
         row{ "flip(0xFF, 6)", value_t{ 0xFF0000000000 } },                      // non-zero, 6 bytes
         row{ "flip(0xFF, 7)", value_t{ 0xFF000000000000 } },                    // non-zero, 7 bytes
-        row{ "flip(0xFF, 8)", value_t{ INT64_C(0xFF00000000000000) } },         // non-zero, 8 bytes
+        row{ "flip(0xFF, 8)", value_t{ (std::int64_t)0xFF00000000000000 } },    // non-zero, 8 bytes
         row{ "flip(0xFEDCBA9876543210, 8)", value_t{ 0x1032547698BADCFE } },    // bit order not affected
         row{ "flip(-1, 8)", value_t{ -1 } },                                    // negative supported
+        row{ "flip(0x5A, 9)", value_t{ 0x5A } },                                // byte count too high (defaulted to 0)
 
         // reverse(value [, #bits])
-        row{ "REVERSE(0)", value_t{ 0 } },                                  // uppercase, 1 arg
-        row{ "REVERSE(0, 0)", value_t{ 0 } },                               // uppercase, 2 arg
-        row{ "reverse(0)", value_t{ 0 } },                                  // zero, 1 arg
-        row{ "reverse(0, 0)", value_t{ 0 } },                               // zero, 2 arg
-        row{ "reverse(1, 0)", value_t{ 0 } },                               // value=1, zero bits
-        row{ "reverse(1, 1)", value_t{ 1 } },                               // value=1, 1 bit
-        row{ "reverse(1, 2)", value_t{ 2 } },                               // value=1, 2 bits
-        row{ "reverse(1, 3)", value_t{ 4 } },                               // value=1, 3 bits
-        row{ "reverse(1, 4)", value_t{ 8 } },                               // value=1, 4 bits
-        row{ "reverse(1, 5)", value_t{ 16 } },                              // value=1, 5 bits
-        row{ "reverse(1, 6)", value_t{ 32 } },                              // value=1, 6 bits
-        row{ "reverse(1, 7)", value_t{ 64 } },                              // value=1, 7 bits
-        row{ "reverse(1, 8)", value_t{ 128 } },                             // value=1, 8 bits
-        row{ "reverse(1, 9)", value_t{ 256 } },                             // value=1, 9 bits
-        row{ "reverse(1, 10)", value_t{ 512 } },                            // value=1, 9 bits
-        row{ "reverse(1, 64)", value_t{ INT64_C(0x8000000000000000) } },    // value=1, max bits
-        row{ "reverse(1, 65)", value_t{ INT64_C(0x8000000000000000) } },    // value=1, over max bits (clamped to max)
-        row{ "reverse(1, -1)", value_t{ 0 } },                              // value=1, negative bits (clamped to 0)
-        row{ "reverse(1)", value_t{ INT64_C(0x8000000000000000) } },        // value=1, default bits (=max)
+        row{ "REVERSE(0)", value_t{ 0 } },                                      // uppercase, 1 arg
+        row{ "REVERSE(0, 0)", value_t{ 0 } },                                   // uppercase, 2 arg
+        row{ "reverse(0)", value_t{ 0 } },                                      // zero, 1 arg
+        row{ "reverse(0, 0)", value_t{ 0 } },                                   // zero, 2 arg
+        row{ "reverse(1, 0)", value_t{ 0 } },                                   // value=1, zero bits
+        row{ "reverse(1, 1)", value_t{ 1 } },                                   // value=1, 1 bit
+        row{ "reverse(1, 2)", value_t{ 2 } },                                   // value=1, 2 bits
+        row{ "reverse(1, 3)", value_t{ 4 } },                                   // value=1, 3 bits
+        row{ "reverse(1, 4)", value_t{ 8 } },                                   // value=1, 4 bits
+        row{ "reverse(1, 5)", value_t{ 16 } },                                  // value=1, 5 bits
+        row{ "reverse(1, 6)", value_t{ 32 } },                                  // value=1, 6 bits
+        row{ "reverse(1, 7)", value_t{ 64 } },                                  // value=1, 7 bits
+        row{ "reverse(1, 8)", value_t{ 128 } },                                 // value=1, 8 bits
+        row{ "reverse(1, 9)", value_t{ 256 } },                                 // value=1, 9 bits
+        row{ "reverse(1, 10)", value_t{ 512 } },                                // value=1, 9 bits
+        row{ "reverse(1, 64)", value_t{ (std::int64_t)0x8000000000000000 } },   // value=1, max bits
+        row{ "reverse(1, 65)", value_t{ (std::int64_t)0x8000000000000000 } },   // value=1, over max bits (clamped to max)
+        row{ "reverse(1, -1)", value_t{ 0 } },                                  // value=1, negative bits (clamped to 0)
+        row{ "reverse(1)", value_t{ (std::int64_t)0x8000000000000000 } },       // value=1, default bits (=max)
         row{ "reverse(0xFEDCBA9876543210)", value_t{ INT64_C(0x084C2A6E195D3B7F) } },
-                                                                            // non-0/1 value, default bits
+                                                                                // non-0/1 value, default bits
+
         // rol(value [, #bits [, size]])
         row{ "ROL(0)", value_t{ 0 } },                                      // uppercase, 1 arg
         row{ "ROL(0, 0)", value_t{ 0 } },                                   // uppercase, 2 args
@@ -1016,17 +1025,17 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "ror(0, 0)", value_t{ 0 } },                                   // zero, 2 arg
         row{ "ror(0, 0, 0)", value_t{ 0 } },                                // zero, 3 args
         row{ "ror(1, 0)", value_t{ 1 } },                                   // value=1, zero bits
-        row{ "ror(1, 1)", value_t{ INT64_C(0x8000000000000000) } },         // value=1, 1 bit
+        row{ "ror(1, 1)", value_t{ (std::int64_t)0x8000000000000000 } },    // value=1, 1 bit
         row{ "ror(1, 2)", value_t{ INT64_C(0x4000000000000000) } },         // value=1, 2 bits
         row{ "ror(1, 63)", value_t{ 2 } },                                  // value=1, max bits
         row{ "ror(1, 64)", value_t{ 1 } },                                  // value=1, max bits (clamped)
         row{ "ror(1, 65)", value_t{ 1 } },                                  // value=1, over max bits (clamped)
-        row{ "ror(1)", value_t{ INT64_C(0x8000000000000000) } },            // value=1, default bits (=1)
+        row{ "ror(1)", value_t{ (std::int64_t)0x8000000000000000 } },       // value=1, default bits (=1)
         row{ "ror(-1)", value_t{ -1 } },                                    // negative value, default bits (=1)
         row{ "ror(-1, 63)", value_t{ -1 } },                                // negative value, max bits
         row{ "ror(0x7FFFFFFFFFFFFFFF, -1)", value_t{ 0 } },                 // negative bits, result filled as sign bit
         row{ "ror(0x8000000000000000, -1)", value_t{ -1 } },                // negative bits, result filled as sign bit
-        row{ "ror(0xFEDCBA9876543210)", value_t{ INT64_C(0xFF6E5D4C3B2A1908) } },
+        row{ "ror(0xFEDCBA9876543210)", value_t{ (std::int64_t)0xFF6E5D4C3B2A1908 } },
                                                                             // non-0/1 value, default bits
         row{ "ror(0x7EDCBA9876543210)", value_t{ INT64_C(0x3F6E5D4C3B2A1908) } },
                                                                             // non-0/1 value, default bits
@@ -1047,22 +1056,22 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "asr(0x80, 2)", value_t{ 0x20 } },                             // value=1, 2 bits
         row{ "asr(0x8000000000000000, 63)", value_t{ -1 } },                // value=1, max bits
         row{ "asr(0x8000000000000000, 64)", value_t{ -1 } },                // value=1, max bits (clamped)
-        row{ "asr(0x8000000000000000, 65)", value_t{ INT64_C(0x8000000000000000) } },
+        row{ "asr(0x8000000000000000, 65)", value_t{ (std::int64_t)0x8000000000000000 } },
                                                                             // value=1, over max bits (clamped to 0)
         row{ "asr(1)", value_t{ INT64_C(0) } },                             // value=1, default bits (=1)
         row{ "asr(-1)", value_t{ -1 } },                                    // negative value, default bits (=1)
         row{ "asr(-1, 63)", value_t{ -1 } },                                // negative value, max bits
         row{ "asr(0x7FFFFFFFFFFFFFFF, -1)", value_t{ 0 } },                 // negative bits, result filled as sign bit
         row{ "asr(0x8000000000000000, -1)", value_t{ -1 } },                // negative bits, result filled as sign bit
-        row{ "asr(0xFEDCBA9876543210)", value_t{ INT64_C(0xFF6E5D4C3B2A1908) } },
+        row{ "asr(0xFEDCBA9876543210)", value_t{ (std::int64_t)0xFF6E5D4C3B2A1908 } },
                                                                             // non-0/1 value, default bits
-        row{ "asr(0x7EDCBA9876543210)", value_t{ INT64_C(0x3F6E5D4C3B2A1908) } },
+        row{ "asr(0x7EDCBA9876543210)", value_t{ (std::int64_t)0x3F6E5D4C3B2A1908 } },
                                                                             // non-0/1 value, default bits
         row{ "asr(8, 3, 4)", value_t{ 1 } },                                // value=1, 3 bits, size=4 bit
         row{ "asr(-1, 3, 4)", value_t{ 15 } },                              // value=-1, 3 bits, size=4 bit
-        row{ "asr(0x8000000000000000, 3, 64)", value_t{ INT64_C(0xF000000000000000) } },
+        row{ "asr(0x8000000000000000, 3, 64)", value_t{ (std::int64_t)0xF000000000000000 } },
                                                                             // value=-1, 3 bits, size=max
-        row{ "asr(0x8000000000000000, 3, 65)", value_t{ INT64_C(0xF000000000000000) } },
+        row{ "asr(0x8000000000000000, 3, 65)", value_t{ (std::int64_t)0xF000000000000000 } },
                                                                             // value=-1, 3 bits, size=over max (clamped)
 
         // TOK_GET - get(address, #bytes) - uses view/doc
@@ -1085,7 +1094,7 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "SQRT(0)", value_t{ 0 } },                                         // uppercase
         row{ "sqrt(0)", value_t{ 0 } },                                         // integer, 0 => 0
         row{ "sqrt(1)", value_t{ 1 } },                                         // integer, 1 => 1
-        row{ "sqrt(4611686018427387904)", value_t{ INT64_C(2147483648) } },     // integer, 2^62 => 2^31
+        row{ "sqrt(4611686018427387904)", value_t{ (std::int64_t)2147483648 } },// integer, 2^62 => 2^31
         row{ "sqrt(0.0)", value_t{ 0.0 } },                                     // real, 0 => 0
         row{ "sqrt(1.0)", value_t{ 1.0 } },                                     // real, 1 => 1
         row{ "sqrt(4611686018427387904.0)", value_t{ 2147483648.0 } },          // real, 2^62 => 2^31
@@ -1305,7 +1314,7 @@ TEST_CASE("expr_eval::evaluate - basic tests")
         row{ "MID(\"\", 0)", value_t{ "" } },                   // uppercase, 2-arg
         row{ "MID(\"\", 0, 0)", value_t{ "" } },                // uppercase, 3-arg
         row{ "mid(\"\", 0)", value_t{ "" } },                   // empty string, 2-arg
-        row{ "MID(\"\", 0, 0)", value_t{ "" } },                // uppercase, 3-arg
+        row{ "mid(\"\", 0, 0)", value_t{ "" } },                // 3-arg
         row{ "mid(\"TEST\", 0)", value_t{ "TEST" } },           // non-empty string
         row{ "mid(\"TEST\", 1)", value_t{ "EST" } },            //  . . .
         row{ "mid(\"TEST\", 2)", value_t{ "ST" } },             //  . . .
@@ -1402,11 +1411,15 @@ TEST_CASE("expr_eval::evaluate - basic tests")
 
         // TOK_NOT
         row{ "!BOOL_VAR", value_t{false} },
+        row{ "!TRUE", value_t{false} },
+        row{ "!FALSE", value_t{true} },
 
         // TOK_BITNOT
-        row{ "~0", value_t{ INT64_C(0xFFFFFFFFFFFFFFFF) } },
+        row{ "~0", value_t{ (std::int64_t)0xFFFFFFFFFFFFFFFF } },
         row{ "~0xFFFFFFFFFFFFFFFF", value_t{ 0 } }
-    );
+    };
+
+    row test = GENERATE(Catch::Generators::from_range(std::begin(testrows), std::end(testrows)));
 
     // TODO: refactor app code so we don't need this global state.
     theApp.dec_point_ = '.';
@@ -1541,7 +1554,6 @@ TEST_CASE("expr_eval::evaluate - string embedded NUL")
     test_expr expr;
 
     int ref_ac = 0;
-    COleDateTime nowTime = COleDateTime::GetCurrentTime();
     value_t actual = expr.evaluate("\"a\\0a\"", 0, ref_ac);
 
     CHECK(actual.error == false);
@@ -2154,7 +2166,8 @@ TEST_CASE("expr_eval::evaluate - errors")
         const char* expected;
     };
 
-    row test = GENERATE(
+    static const row testrows[] =
+    {
         row{
             "1 &| 1",
             "Unexpected characters \"&|\""
@@ -2299,6 +2312,10 @@ TEST_CASE("expr_eval::evaluate - errors")
         row{
             "member",
             "\"member\" is a reserved symbol"
+        },
+        row{
+            "DOES_NOT_EXIST",
+            "Unknown variable \"DOES_NOT_EXIST\""
         },
         row{
             "intField.value1",
@@ -3959,7 +3976,9 @@ TEST_CASE("expr_eval::evaluate - errors")
             "Not implemented"
             // should be "Expected another expression after comma"; prec_assign
         }
-    );
+    };
+
+    const row test = GENERATE(Catch::Generators::from_range(std::begin(testrows), std::end(testrows)));
 
     // TODO: refactor app code so we don't need this global state.
     theApp.dec_point_ = '.';

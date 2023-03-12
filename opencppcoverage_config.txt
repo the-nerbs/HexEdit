@@ -1,0 +1,10 @@
+# OpenCppCoverage configuration file.
+#
+# If using the Visual Studio plugin, this can be set from the settings page's
+# "Miscellaneous" tab.
+
+excluded_sources=*\Tests\*
+
+# this isn't ideal, but there are *a lot* of false negatives on closing
+# curly braces after a flow control statement (break, return, throw).
+excluded_line_regex=\s*[}]\s*
