@@ -352,6 +352,9 @@
     <ClCompile Include="Expressions\DialogProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cryptography\windows\AdvapiCryptographyProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resource.hm">
@@ -1006,6 +1009,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Expressions\DialogProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\ICryptographyAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\ICryptographyProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\windows\AdvapiCryptographyProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\windows\Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
