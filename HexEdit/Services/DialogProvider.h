@@ -6,6 +6,11 @@ namespace hex
     class DialogProvider : public IDialogProvider
     {
     public:
+        MessageBoxResult ShowMessageBox(
+            const CString& message,
+            MessageBoxButtons buttons = MessageBoxButtons::Ok,
+            MessageBoxIcon icon = MessageBoxIcon::None) override;
+
         bool GetInteger(
             const CString& prompt,
             std::int64_t& result,

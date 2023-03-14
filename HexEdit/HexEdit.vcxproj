@@ -190,7 +190,7 @@
     <ClCompile Include="EBCDIC.cpp" />
     <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="Expr.cpp" />
-    <ClCompile Include="Expressions\DialogProvider.cpp" />
+    <ClCompile Include="Services\DialogProvider.cpp" />
     <ClCompile Include="FindDlg.cpp" />
     <ClCompile Include="GenDockablePane.cpp" />
     <ClCompile Include="GeneralCRC.cpp" />
@@ -423,9 +423,9 @@
     <ClInclude Include="DirDialog.h" />
     <ClInclude Include="Explorer.h" />
     <ClInclude Include="Expr.h" />
-    <ClInclude Include="Expressions\DialogProvider.h" />
-    <ClInclude Include="Expressions\IDialogProvider.h" />
-    <ClInclude Include="Expressions\Stdafx.h" />
+    <ClInclude Include="Services\DialogProvider.h" />
+    <ClInclude Include="Services\IDialogProvider.h" />
+    <ClInclude Include="Services\Stdafx.h" />
     <ClInclude Include="FindDlg.h" />
     <ClInclude Include="GenDockablePane.h" />
     <ClInclude Include="GeneralCRC.h" />

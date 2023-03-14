@@ -10,7 +10,17 @@
 #include "stdafx.h"
 #include "crypto.h"
 
+#include "Services/DialogProvider.h"
+
+static hex::DialogProvider DefaultProvider;
+
 CCrypto::CCrypto()
+	: CCrypto{ DefaultProvider }
+{ }
+
+CCrypto::CCrypto(hex::IDialogProvider& dialogProvider) :
+	dialogProvider_{ dialogProvider },
+	hdll_{ 0 }
 {
 	hdll_ = HINSTANCE(0);
 }
@@ -40,7 +50,6 @@ void CCrypto::init()
 		(pDestroyHash_ = (PFDestroyHash)GetProcAddress(hdll_, "CryptDestroyHash")) == 0 ||
 		(pHashData_ = (PFHashData)GetProcAddress(hdll_, "CryptHashData")) == 0 )
 	{
-		ASSERT(0);
 		::FreeLibrary(hdll_);
 		hdll_ = HINSTANCE(0);
 		return;
@@ -61,14 +70,12 @@ void CCrypto::init()
 				break;          // No more CSPs
 			else
 			{
-				ASSERT(0);
 				continue;       // Can't access this CSP for some reason
 			}
 		}
 		// CryptAcquireContext
 		else if (!pAcquireContext_(&hcsp, NULL, provider_name, provider_type, CRYPT_VERIFYCONTEXT))
 		{
-			ASSERT(0);
 			continue;
 		}
 
@@ -94,7 +101,6 @@ void CCrypto::init()
 					break;          // No more CSPs
 				else
 				{
-					ASSERT(0);
 					continue;       // Can't access this alg. for some reason
 				}
 			}
@@ -182,8 +188,7 @@ void CCrypto::SetPassword(size_t alg, const char *password /*=NULL*/)
 		if (!pCreateHash_(csp_[alg], CALG_SHA, 0, 0, &hh) &&
 			!pCreateHash_(csp_[alg], CALG_MD5, 0, 0, &hh) )
 		{
-			ASSERT(0);
-			AfxMessageBox("Could not create hash using\n" + name_[alg]);
+			dialogProvider_.ShowMessageBox("Could not create hash using\n" + name_[alg]);
 			return;
 		}
 
@@ -193,11 +198,30 @@ void CCrypto::SetPassword(size_t alg, const char *password /*=NULL*/)
 			!pDeriveKey_(csp_[alg], algid_[alg], hh, 0, &key_[alg]) ||
 			!pDestroyHash_(hh))
 		{
-			ASSERT(0);
-			AfxMessageBox("Could not create key from password using\n" + name_[alg]);
+			dialogProvider_.ShowMessageBox("Could not create key from password using\n" + name_[alg]);
 			key_[alg] = HCRYPTKEY(0);
 			return;
 		}
+
+		// For diagnostics around the key and IV:
+		// Uncomment the code below, and change the flags passed to the
+		// pDeriveKey_ call above to CRYPT_EXPORTABLE
+		// 
+		//BYTE ivBuf[128];
+		//DWORD ivLen = sizeof(ivBuf);
+		//if (!CryptGetKeyParam(key_[alg], KP_IV, ivBuf, &ivLen, 0))
+		//{
+		//	DWORD err = GetLastError();
+		//	ASSERT(0);
+		//}
+		//
+		//BYTE keyBuf[1024];
+		//DWORD keyLen = sizeof(keyBuf);
+		//if (!CryptExportKey(key_[alg], NULL, PLAINTEXTKEYBLOB, 0, keyBuf, &keyLen))
+		//{
+		//	DWORD err = GetLastError();
+		//	ASSERT(0);
+		//}
 
 		// Check if we have the block size (and key size)
 		if (block_size_[alg] == -1)
@@ -260,7 +284,6 @@ void CCrypto::get_info(size_t alg)
 		if (!(pGenKey_(csp_[alg], algid_[alg], 0, &hkey)) ||
 			!(pGetKeyParam_(hkey, KP_BLOCKLEN, (BYTE *)&block_size_[alg], &len, 0)) )
 		{
-			ASSERT(0);
 			pDestroyKey_(hkey);
 			block_size_[alg] = key_size_[alg] = -1;
 			return;
@@ -304,8 +327,7 @@ size_t CCrypto::needed(size_t alg, size_t len, bool final /*=true*/)
 
 	if (!pEncrypt_(key_[alg], HCRYPTHASH(0), BOOL(final), 0, NULL, &reqd, len))
 	{
-		ASSERT(0);
-		AfxMessageBox("Could not get encryption length needed using\n" + name_[alg]);
+		dialogProvider_.ShowMessageBox("Could not get encryption length needed using\n" + name_[alg]);
 		return -1;
 	}
 
@@ -324,7 +346,6 @@ size_t CCrypto::encrypt(size_t alg, BYTE *buf, size_t len, size_t buflen, bool f
 
 	if (!pEncrypt_(key_[alg], HCRYPTHASH(0), BOOL(final), 0, buf, &reqd, buflen))
 	{
-		ASSERT(0);
 		return -1;
 	}
 

@@ -9,7 +9,10 @@
 
 #pragma once
 
+#include "Services/IDialogProvider.h"
+
 #include <vector>
+
 #if _MSC_VER < 1300
 #define _WIN32_WINNT  0x0400  // To get stuff in wincrypt.h
 #endif
@@ -110,6 +113,7 @@ class CCrypto
 
 public:
 	CCrypto();
+	explicit CCrypto(hex::IDialogProvider& dialogProvider);
 	~CCrypto();
 	void init();
 
@@ -126,6 +130,8 @@ public:
 	size_t decrypt(size_t alg, BYTE *buf, size_t len, bool final = true);
 
 private:
+	hex::IDialogProvider& dialogProvider_;
+
 	HINSTANCE hdll_;                    // Handle to ADVAPI32.DLL (0 if CryptoAPI not implemented)
 	PFAcquireContext pAcquireContext_;  // Get handle to CSP
 	PFReleaseContext pReleaseContext_;  // Free the CSP handle
