@@ -1,5 +1,6 @@
 #include "Stdafx.h"
 #include "AdvapiCryptographyProvider.h"
+#include "../cryptography_error.h"
 
 #include <wincrypt.h>
 
@@ -27,7 +28,7 @@ namespace hex
     public:
         AdvapiAlgorithm(const CString& name, HCRYPTPROV hProvider, ALG_ID id, int blockBits, int keyBits) :
             _name{ name },
-            _hProvider{},
+            _hProvider{ hProvider },
             _algorithmId{ id },
             _key{ NullCryptKey },
             _blockBitLength{ blockBits },
@@ -36,9 +37,23 @@ namespace hex
             CryptContextAddRef(_hProvider, nullptr, 0);
         }
 
+        AdvapiAlgorithm(AdvapiAlgorithm&& other) :
+            _name{ other._name },
+            _hProvider{ other._hProvider },
+            _algorithmId{ other._algorithmId },
+            _key{ other._key },
+            _blockBitLength{ other._blockBitLength },
+            _keyBitLength{ other._keyBitLength }
+        {
+            other._hProvider = 0;
+        }
+
         ~AdvapiAlgorithm()
         {
-            CryptReleaseContext(_hProvider, 0);
+            if (_hProvider != 0)
+            {
+                CryptReleaseContext(_hProvider, 0);
+            }
         }
 
 
@@ -64,17 +79,18 @@ namespace hex
                 if (!CryptCreateHash(_hProvider, CALG_SHA, 0, 0, &hHash)
                     && !CryptCreateHash(_hProvider, CALG_MD5, 0, 0, &hHash))
                 {
-                    throw std::exception{ static_cast<const char*>("Could not create hash using\n" + _name) };
+                    throw cryptography_error{ static_cast<const char*>("Could not create hash using\n" + _name) };
                 }
 
-                if (!CryptHashData(hHash, (const BYTE*)password, std::strlen(password), 0)
-                    || !CryptDeriveKey(_hProvider, _algorithmId, hHash, 0, &_key))
-                {
-                    CryptDestroyHash(hHash);
-                    throw std::exception{ static_cast<const char*>("Could not create key from password using\n" + _name) };
-                }
+                bool failed = !CryptHashData(hHash, (const BYTE*)password, std::strlen(password), 0);
+                failed = failed || !CryptDeriveKey(_hProvider, _algorithmId, hHash, 0, &_key);
 
                 CryptDestroyHash(hHash);
+
+                if (failed)
+                {
+                    throw cryptography_error{ static_cast<const char*>("Could not create key from password using\n" + _name) };
+                }
             }
         }
 
@@ -87,7 +103,7 @@ namespace hex
 
             if (!CryptEncrypt(_key, HCRYPTHASH{ 0 }, finalBlock, 0, nullptr, &size, size))
             {
-                throw std::exception{ static_cast<const char*>("Could not get encryption length needed using\n" + _name) };
+                throw cryptography_error{ static_cast<const char*>("Could not get encryption length needed using\n" + _name) };
             }
 
             return static_cast<std::size_t>(size);
@@ -104,11 +120,10 @@ namespace hex
 
             if (!CryptEncrypt(_key, HCRYPTHASH{ 0 }, finalBlock, 0, buffer, &size, bufferLen))
             {
-                assert(false);
-                return ~0u;
+                throw hex::cryptography_error{ "Failed to encrypt data." };
             }
 
-            assert(size < bufferLen);
+            assert(size <= bufferLen);
             return size;
         }
 
@@ -122,7 +137,7 @@ namespace hex
 
             if (!CryptDecrypt(_key, HCRYPTHASH{ 0 }, finalBlock, 0, buffer, &size))
             {
-                return ~0u;
+                throw hex::cryptography_error{ "Failed to decrypt data." };
             }
 
             return size;
@@ -185,14 +200,17 @@ namespace hex
             DWORD flags = CRYPT_FIRST;
             while (CryptGetProvParam(hProvider, PP_ENUMALGS, (BYTE*)&alginfo, &alginfoLen, flags))
             {
+                flags = CRYPT_NEXT;
+
                 if (GET_ALG_CLASS(alginfo.aiAlgid) == ALG_CLASS_DATA_ENCRYPT)
                 {
-                    CString algorithmName = CString{ alginfo.szName, (int)alginfo.dwNameLen } + ":" + providerName.get();
+                    CString algorithmName = CString{ alginfo.szName, (int)alginfo.dwNameLen-1 } + ":" + providerName.get();
 
                     // get the algorithm block/length sizes via a temporary encryption key.
                     HCRYPTKEY hKey;
                     DWORD blockLen, keyLen;
                     DWORD dataLen = sizeof(blockLen);
+
                     if (!CryptGenKey(hProvider, alginfo.aiAlgid, 0, &hKey)
                         || !CryptGetKeyParam(hKey, KP_BLOCKLEN, (BYTE*)&blockLen, &dataLen, 0)
                         || dataLen != sizeof(blockLen))
@@ -205,7 +223,7 @@ namespace hex
 
                     // note: key length isn't valid for all algorithms, so don't fail when getting that does.
                     dataLen = sizeof(keyLen);
-                    if (!CryptGetKeyParam(hProvider, KP_KEYLEN, (BYTE*)&keyLen, &dataLen, 0))
+                    if (!CryptGetKeyParam(hKey, KP_KEYLEN, (BYTE*)&keyLen, &dataLen, 0))
                     {
                         keyLen = 0;
                     }

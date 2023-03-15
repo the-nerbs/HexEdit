@@ -1,7 +1,6 @@
 #include "Stdafx.h"
-#include "Crypto.h"
-
-#include "utils/TestDialogProvider.h"
+#include "Cryptography/windows/AdvapiCryptographyProvider.h"
+#include "Cryptography/cryptography_error.h"
 
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/aes.h>
@@ -26,49 +25,51 @@ static constexpr const char* TestAlgorithmName = "AES 128:Microsoft Enhanced RSA
 static constexpr const char* TestPassword = "p@ssw0rd1";
 
 
-static std::size_t findTestAlgorithm(CCrypto& crypt)
+static hex::ICryptographyAlgorithm& findTestAlgorithm(hex::AdvapiCryptographyProvider& provider)
 {
-    const std::size_t count = crypt.GetNum();
+    const std::size_t count = provider.AlgorithmCount();
 
     for (size_t id = 0; id < count; id++)
     {
-        if (std::strcmp(crypt.GetName(id), TestAlgorithmName) == 0)
+        hex::ICryptographyAlgorithm& alg = provider.GetAlgorithm(id);
+
+        if (std::strcmp(alg.Name(), TestAlgorithmName) == 0)
         {
-            return id;
+            return alg;
         }
     }
 
     FAIL("Failed to find test algorithm.");
-    return ~0u;
+    throw std::exception{ "test algorithm not found."};
 }
 
 
-TEST_CASE("CCrypto - has algorithms")
+TEST_CASE("AdvapiCryptographyProvider::Name")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
+    hex::AdvapiCryptographyProvider provider;
 
-    std::size_t count = crypto.GetNum();
-
-    // We can't say exactly how many algorithms exist since it depends on
-    // the version of ADVAPI32 (and Windows, more generally), but no matter
-    // what it'll be more than 0.
-    CHECK(count > 0);
+    CHECK(provider.Name() == "ADVAPI32");
 }
 
-TEST_CASE("CCrypto - test algorithm parameters")
+TEST_CASE("AdvapiCryptographyProvider::GetAlgorithm - out of range")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
+    hex::AdvapiCryptographyProvider provider;
 
-    std::size_t id = findTestAlgorithm(crypto);
-
-    CHECK(crypto.NeedsPassword(id));
-    CHECK(crypto.GetBlockLength(id) == 128 /* bits */);
-    CHECK(crypto.GetKeyLength(id) == 128 /* bits */);
+    CHECK_THROWS_AS(provider.GetAlgorithm(~0u), std::range_error);
 }
 
-TEST_CASE("CCrypto::needed")
+TEST_CASE("AdvapiCryptographyProvider - test algorithm parameters")
+{
+    hex::AdvapiCryptographyProvider provider;
+
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+
+    CHECK(algorithm.NeedsPassword());
+    CHECK(algorithm.BlockLength() == 128 /* bits */);
+    CHECK(algorithm.KeyLength() == 128 /* bits */);
+}
+
+TEST_CASE("AdvapiCryptographyProvider::EncryptedSize")
 {
     struct row
     {
@@ -103,18 +104,17 @@ TEST_CASE("CCrypto::needed")
         row { 1024, false, 1024, },
         row { 1024, true,  1024 + 16, },
 
-        row { 1024*1024, false, 1024*1024, },
-        row { 1024*1024, true,  1024*1024 + 16, },
+        row { 1024 * 1024, false, 1024 * 1024, },
+        row { 1024 * 1024, true,  1024 * 1024 + 16, },
     };
 
     row test = GENERATE(Catch::Generators::from_range(std::begin(testrows), std::end(testrows)));
 
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
-    std::size_t actual = crypto.needed(id, test.length, test.isFinalBlock);
+    std::size_t actual = algorithm.EncryptedSize(test.length, test.isFinalBlock);
 
     CAPTURE(test.length);
     CAPTURE(test.isFinalBlock);
@@ -123,30 +123,17 @@ TEST_CASE("CCrypto::needed")
     CHECK(actual == test.expectedSize);
 }
 
-TEST_CASE("CCrypto::needed - size error")
+TEST_CASE("AdvapiCryptographyProvider::EncryptedSize - size error")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     // finalBlock == false requires a full block.
-    std::size_t actual = crypto.needed(id, 4, false);
-
-    CHECK(actual == ~0u);
-    CHECK(dlgProvider.showMessageBoxCalls.size() == 1);
-
-    auto callInfo = dlgProvider.showMessageBoxCalls[0];
-    CAPTURE(callInfo.message, callInfo.buttons, callInfo.icon);
-
-    const CString expectedMessage = CString{ "Could not get encryption length needed using\n" } + TestAlgorithmName;
-    CHECK(callInfo.message == expectedMessage);
-    CHECK(callInfo.buttons == hex::MessageBoxButtons::Ok);
-    CHECK(callInfo.icon == hex::MessageBoxIcon::None);
+    CHECK_THROWS_AS(algorithm.EncryptedSize(4, false), hex::cryptography_error);
 }
 
-TEST_CASE("CCrypto::encrypt")
+TEST_CASE("AdvapiCryptographyProvider::Encrypt")
 {
     struct row
     {
@@ -183,18 +170,16 @@ TEST_CASE("CCrypto::encrypt")
 
     row test = GENERATE(Catch::Generators::from_range(std::begin(testrows), std::end(testrows)));
 
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     std::vector<std::uint8_t> buffer;
-
     buffer.resize(1024);
+
     std::copy(test.data.cbegin(), test.data.cend(), buffer.begin());
 
-    std::size_t actualLen = crypto.encrypt(
-        id,
+    std::size_t actualLen = algorithm.Encrypt(
         (BYTE*)buffer.data(),
         test.data.size(),
         buffer.size(),
@@ -215,44 +200,35 @@ TEST_CASE("CCrypto::encrypt")
     CHECK(equal);
 }
 
-TEST_CASE("CCrypto::encrypt - size error")
+TEST_CASE("AdvapiCryptographyProvider::Encrypt - size error")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     std::vector<std::uint8_t> buffer;
     buffer.resize(15);
 
-    std::size_t actualLen = crypto.encrypt(
-        id,
+    CHECK_THROWS_AS(algorithm.Encrypt(
         (BYTE*)buffer.data(),
         15,
         15,
         false
-    );
-
-    // non-final block must be a full block.
-    CHECK(actualLen == ~0u);
-
-    // no messages shown to verify.
+    ), hex::cryptography_error);
 }
 
-TEST_CASE("CCrypto::encrypt - setting password twice does not effect output")
+TEST_CASE("AdvapiCryptographyProvider::Encrypt - setting password twice does not effect output")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
 
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, "not the test password");
-    crypto.SetPassword(id, TestPassword);
+    algorithm.SetPassword("not the test password");
+    algorithm.SetPassword(TestPassword);
 
     // same block as one row in the CCrypto::encrypt case
     std::array<std::uint8_t, 16> buffer = { 0x00 };
 
-    std::size_t actualLen = crypto.encrypt(
-        id,
+    std::size_t actualLen = algorithm.Encrypt(
         (BYTE*)buffer.data(),
         1,
         buffer.size(),
@@ -271,13 +247,11 @@ TEST_CASE("CCrypto::encrypt - setting password twice does not effect output")
     CHECK(equal);
 }
 
-TEST_CASE("CCrypto::encrypt - matches Crypto++ results")
+TEST_CASE("AdvapiCryptographyProvider::Encrypt - matches Crypto++ results")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     std::vector<std::uint8_t> data;
     data.resize(1024 * 1024);
@@ -293,8 +267,7 @@ TEST_CASE("CCrypto::encrypt - matches Crypto++ results")
     std::vector<std::uint8_t> hexOutput = data;
     hexOutput.resize(hexOutput.size() + 16);
 
-    std::size_t actualLen = crypto.encrypt(
-        id,
+    std::size_t actualLen = algorithm.Encrypt(
         (BYTE*)hexOutput.data(),
         dataLen,
         hexOutput.size(),
@@ -327,7 +300,7 @@ TEST_CASE("CCrypto::encrypt - matches Crypto++ results")
     };
 
     CHECK(actualLen == cryptoppOutput.size());
-    
+
     for (size_t i = 0; i < actualLen; i++)
     {
         if (hexOutput[i] != cryptoppOutput[i])
@@ -339,7 +312,7 @@ TEST_CASE("CCrypto::encrypt - matches Crypto++ results")
 }
 
 
-TEST_CASE("CCrypto::decrypt")
+TEST_CASE("AdvapiCryptographyProvider::Decrypt")
 {
     struct row
     {
@@ -376,19 +349,16 @@ TEST_CASE("CCrypto::decrypt")
 
     row test = GENERATE(Catch::Generators::from_range(std::begin(testrows), std::end(testrows)));
 
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     std::vector<std::uint8_t> buffer;
 
     buffer.resize(1024);
     std::copy(test.encryptedData.cbegin(), test.encryptedData.cend(), buffer.begin());
 
-    std::size_t actualLen = crypto.decrypt(
-        id,
+    std::size_t actualLen = algorithm.Decrypt(
         (BYTE*)buffer.data(),
         test.encryptedData.size(),
         test.isFinalBlock
@@ -407,37 +377,27 @@ TEST_CASE("CCrypto::decrypt")
     CHECK(equal);
 }
 
-TEST_CASE("CCrypto::decrypt - size error")
+TEST_CASE("AdvapiCryptographyProvider::Decrypt - size error")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     std::vector<std::uint8_t> buffer;
     buffer.resize(15);
 
-    std::size_t actualLen = crypto.decrypt(
-        id,
+    CHECK_THROWS_AS(algorithm.Decrypt(
         (BYTE*)buffer.data(),
         15,
         false
-    );
-
-    // non-final block must be a full block.
-    CHECK(actualLen == ~0u);
-
-    // no messages shown to verify.
+    ), hex::cryptography_error);
 }
 
-TEST_CASE("CCrypto::decrypt - matches Crypto++ results")
+TEST_CASE("AdvapiCryptographyProvider::Decrypt - matches Crypto++ results")
 {
-    TestDialogProvider dlgProvider;
-    CCrypto crypto{ dlgProvider };
-
-    std::size_t id = findTestAlgorithm(crypto);
-    crypto.SetPassword(id, TestPassword);
+    hex::AdvapiCryptographyProvider provider;
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+    algorithm.SetPassword(TestPassword);
 
     std::vector<std::uint8_t> data{
         0x13, 0x1F, 0xCF, 0x92, 0x56, 0x9A, 0xD8, 0x22, 0x2A, 0x6E, 0x06, 0xDD, 0x5A, 0xAE, 0x9C, 0x11,
@@ -446,8 +406,7 @@ TEST_CASE("CCrypto::decrypt - matches Crypto++ results")
 
     std::vector<std::uint8_t> hexOutput = data;
 
-    std::size_t actualLen = crypto.decrypt(
-        id,
+    std::size_t actualLen = algorithm.Decrypt(
         (BYTE*)hexOutput.data(),
         hexOutput.size(),
         true

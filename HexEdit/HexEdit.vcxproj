@@ -403,6 +403,7 @@
     <ClInclude Include="CoordAp.h" />
     <ClInclude Include="CopyCSrc.h" />
     <ClInclude Include="crypto.h" />
+    <ClInclude Include="Cryptography\cryptography_error.h" />
     <ClInclude Include="Cryptography\ICryptographyAlgorithm.h" />
     <ClInclude Include="Cryptography\ICryptographyProvider.h" />
     <ClInclude Include="Cryptography\Stdafx.h" />

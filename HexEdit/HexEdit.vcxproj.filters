@@ -1026,6 +1026,9 @@
     <ClInclude Include="Cryptography\Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Cryptography\cryptography_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\hexedit2.ico">

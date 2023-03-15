@@ -33,6 +33,8 @@ namespace hex
         ///
         /// \param  length      The length of the data to be encrypted.
         /// \param  finalBlock  True if this is the last block to be encrypted, or false if not.
+        /// 
+        /// \exception  cryptography_error  An error occurred computing the encrypted size.
         virtual std::size_t EncryptedSize(
             std::size_t length,
             bool finalBlock = true) = 0;
@@ -45,6 +47,8 @@ namespace hex
         /// \param  finalBlock  True if this is the last block to be encrypted, or false if not.
         /// 
         /// \returns  The size in bytes of the encrypted data.
+        /// 
+        /// \exception  cryptography_error  An error occurred encrypting the memory.
         virtual std::size_t Encrypt(
             std::uint8_t* buffer,
             std::size_t dataLen,
@@ -58,6 +62,8 @@ namespace hex
         /// \param  finalBlock  True if this is the last block to be encrypted, or false if not.
         /// 
         /// \returns  The size in bytes of the decrypted data.
+        /// 
+        /// \exception  cryptography_error  An error occurred decrypting the memory.
         virtual std::size_t Decrypt(
             std::uint8_t* buffer,
             std::size_t dataLen,

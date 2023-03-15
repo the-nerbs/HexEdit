@@ -98,6 +98,7 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
+    <ClCompile Include="Cryptography\windows\AdvapiCryptographyProviderTests.cpp" />
     <ClCompile Include="CryptoTests.cpp" />
     <ClCompile Include="ExprEvalTests.cpp" />
     <ClCompile Include="Serialization\IntelHexExporterTests.cpp" />

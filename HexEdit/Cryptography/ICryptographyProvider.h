@@ -27,6 +27,8 @@ namespace hex
         virtual std::size_t AlgorithmCount() const = 0;
 
         /// \brief  Gets an algorithm.
+        ///
+        /// \exception  std::range_error  \p index is out of range.
         virtual ICryptographyAlgorithm& GetAlgorithm(std::size_t index) const = 0;
     };
 }
