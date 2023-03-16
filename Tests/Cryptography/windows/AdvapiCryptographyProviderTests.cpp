@@ -64,12 +64,24 @@ TEST_CASE("AdvapiCryptographyProvider - test algorithm parameters")
 
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
 
-    CHECK(algorithm.NeedsPassword());
     CHECK(algorithm.BlockLength() == 128 /* bits */);
     CHECK(algorithm.KeyLength() == 128 /* bits */);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::EncryptedSize")
+TEST_CASE("AdvapiAlgorithm::NeedsPassword")
+{
+    hex::AdvapiCryptographyProvider provider;
+
+    hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
+
+    algorithm.SetPassword(nullptr);
+    CHECK(algorithm.NeedsPassword());
+
+    algorithm.SetPassword(TestPassword);
+    CHECK(!algorithm.NeedsPassword());
+}
+
+TEST_CASE("AdvapiAlgorithm::EncryptedSize")
 {
     struct row
     {
@@ -123,7 +135,7 @@ TEST_CASE("AdvapiCryptographyProvider::EncryptedSize")
     CHECK(actual == test.expectedSize);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::EncryptedSize - size error")
+TEST_CASE("AdvapiAlgorithm::EncryptedSize - size error")
 {
     hex::AdvapiCryptographyProvider provider;
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
@@ -133,7 +145,7 @@ TEST_CASE("AdvapiCryptographyProvider::EncryptedSize - size error")
     CHECK_THROWS_AS(algorithm.EncryptedSize(4, false), hex::cryptography_error);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::Encrypt")
+TEST_CASE("AdvapiAlgorithm::Encrypt")
 {
     struct row
     {
@@ -200,7 +212,7 @@ TEST_CASE("AdvapiCryptographyProvider::Encrypt")
     CHECK(equal);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::Encrypt - size error")
+TEST_CASE("AdvapiAlgorithm::Encrypt - size error")
 {
     hex::AdvapiCryptographyProvider provider;
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
@@ -217,7 +229,7 @@ TEST_CASE("AdvapiCryptographyProvider::Encrypt - size error")
     ), hex::cryptography_error);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::Encrypt - setting password twice does not effect output")
+TEST_CASE("AdvapiAlgorithm::Encrypt - setting password twice does not effect output")
 {
     hex::AdvapiCryptographyProvider provider;
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
@@ -247,7 +259,7 @@ TEST_CASE("AdvapiCryptographyProvider::Encrypt - setting password twice does not
     CHECK(equal);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::Encrypt - matches Crypto++ results")
+TEST_CASE("AdvapiAlgorithm::Encrypt - matches Crypto++ results")
 {
     hex::AdvapiCryptographyProvider provider;
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
@@ -312,7 +324,7 @@ TEST_CASE("AdvapiCryptographyProvider::Encrypt - matches Crypto++ results")
 }
 
 
-TEST_CASE("AdvapiCryptographyProvider::Decrypt")
+TEST_CASE("AdvapiAlgorithm::Decrypt")
 {
     struct row
     {
@@ -377,7 +389,7 @@ TEST_CASE("AdvapiCryptographyProvider::Decrypt")
     CHECK(equal);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::Decrypt - size error")
+TEST_CASE("AdvapiAlgorithm::Decrypt - size error")
 {
     hex::AdvapiCryptographyProvider provider;
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);
@@ -393,7 +405,7 @@ TEST_CASE("AdvapiCryptographyProvider::Decrypt - size error")
     ), hex::cryptography_error);
 }
 
-TEST_CASE("AdvapiCryptographyProvider::Decrypt - matches Crypto++ results")
+TEST_CASE("AdvapiAlgorithm::Decrypt - matches Crypto++ results")
 {
     hex::AdvapiCryptographyProvider provider;
     hex::ICryptographyAlgorithm& algorithm = findTestAlgorithm(provider);

@@ -3,7 +3,8 @@
 
 namespace hex
 {
-    class AdvapiCryptographyProvider : ICryptographyProvider
+    /// \brief  Cryptography algorithm provider for the Windows Crypt* APIs
+    class AdvapiCryptographyProvider : public ICryptographyProvider
     {
         static const CString ProviderName;
 

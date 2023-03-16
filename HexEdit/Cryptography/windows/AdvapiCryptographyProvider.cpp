@@ -65,7 +65,7 @@ namespace hex
 
         void SetPassword(const char* password) override
         {
-            if (_key == NullCryptKey)
+            if (_key != NullCryptKey)
             {
                 CryptDestroyKey(_key);
                 _key = NullCryptKey;

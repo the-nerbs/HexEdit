@@ -63,9 +63,22 @@ TEST_CASE("CCrypto - test algorithm parameters")
 
     std::size_t id = findTestAlgorithm(crypto);
 
-    CHECK(crypto.NeedsPassword(id));
     CHECK(crypto.GetBlockLength(id) == 128 /* bits */);
     CHECK(crypto.GetKeyLength(id) == 128 /* bits */);
+}
+
+TEST_CASE("CCrypto::NeedsPassword")
+{
+    TestDialogProvider dlgProvider;
+    CCrypto crypto{ dlgProvider };
+
+    std::size_t id = findTestAlgorithm(crypto);
+
+    crypto.SetPassword(id, nullptr);
+    CHECK(crypto.NeedsPassword(id));
+
+    crypto.SetPassword(id, TestPassword);
+    CHECK(!crypto.NeedsPassword(id));
 }
 
 TEST_CASE("CCrypto::needed")
