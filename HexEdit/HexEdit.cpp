@@ -2082,6 +2082,39 @@ void CHexEditApp::set_password(const char *pp)
 	}
 }
 
+bool CHexEditApp::ensure_current_alg_password()
+{
+	if (password_.IsEmpty())
+	{
+		// No password yet, so prompt for one
+		CPassword dlg;
+		dlg.m_password = password_;
+
+		if (dlg.DoModal() != IDOK)
+		{
+			// user canceled out
+			return false;
+		}
+
+		password_ = dlg.m_password;
+
+		// Create encryption key with new password
+		if (algorithm_ > 0)
+		{
+			ASSERT(algorithm_ - 1 < (int)crypto_.GetNum());
+			crypto_.SetPassword(algorithm_ - 1, password_);
+		}
+	}
+	else if (algorithm_ > 0 && crypto_.NeedsPassword(algorithm_ - 1))
+	{
+		// We have a password but somehow it has not been set for this alg
+		ASSERT(algorithm_ - 1 < (int)crypto_.GetNum());
+		crypto_.SetPassword(algorithm_ - 1, password_);
+	}
+
+	return true;
+}
+
 void CHexEditApp::OnUpdateEncryptClear(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetCheck(password_.IsEmpty());   // Set check if password is clear
