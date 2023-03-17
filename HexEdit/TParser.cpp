@@ -327,7 +327,8 @@ bool TParser::SaveValuesFile(LPCTSTR filename, const std::map<CString, __int64> 
 #ifdef _DEBUG
 			buf[sizeof(buf)-1] = '\xCD';
 #endif
-			sprintf(buf, "%.1000s|%I64d\n", pv->first, pv->second);  // max length 1000+1+20+2 (max I64 is 20 digits) = 1023
+			// max length 1000+1+20+2 (max I64 is 20 digits) = 1023
+			sprintf(buf, "%.1000s|%I64d\n", static_cast<const char*>(pv->first), pv->second);
 			ASSERT(buf[sizeof(buf)-1] == '\xCD');
 			fout.WriteString(buf);
 		}

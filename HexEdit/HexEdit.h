@@ -478,6 +478,7 @@ public:
 	// Encryption
 	void set_alg(const char *pp);
 	void set_password(const char *pp);
+	bool ensure_current_alg_password();
 	CCrypto crypto_;            // Handles all CryptoAPI stuff
 	int algorithm_;             // Current encryption algorithm
 	CString password_;          // Current encryption password

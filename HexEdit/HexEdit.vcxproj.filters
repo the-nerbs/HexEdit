@@ -349,7 +349,10 @@
     <ClCompile Include="Serialization\IntelHexExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Expressions\DialogProvider.cpp">
+    <ClCompile Include="Services\DialogProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cryptography\windows\AdvapiCryptographyProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -999,13 +1002,31 @@
     <ClInclude Include="Serialization\Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Expressions\Stdafx.h">
+    <ClInclude Include="Services\Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Expressions\IDialogProvider.h">
+    <ClInclude Include="Services\IDialogProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Expressions\DialogProvider.h">
+    <ClInclude Include="Services\DialogProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\ICryptographyAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\ICryptographyProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\windows\AdvapiCryptographyProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\windows\Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\Stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cryptography\cryptography_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

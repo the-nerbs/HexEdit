@@ -172,6 +172,7 @@
     <ClCompile Include="Control.cpp" />
     <ClCompile Include="CopyCSrc.cpp" />
     <ClCompile Include="crypto.cpp" />
+    <ClCompile Include="Cryptography\windows\AdvapiCryptographyProvider.cpp" />
     <ClCompile Include="DataFormatView.cpp" />
     <ClCompile Include="DFFDData.cpp" />
     <ClCompile Include="DFFDEVAL.cpp" />
@@ -189,7 +190,7 @@
     <ClCompile Include="EBCDIC.cpp" />
     <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="Expr.cpp" />
-    <ClCompile Include="Expressions\DialogProvider.cpp" />
+    <ClCompile Include="Services\DialogProvider.cpp" />
     <ClCompile Include="FindDlg.cpp" />
     <ClCompile Include="GenDockablePane.cpp" />
     <ClCompile Include="GeneralCRC.cpp" />
@@ -402,6 +403,12 @@
     <ClInclude Include="CoordAp.h" />
     <ClInclude Include="CopyCSrc.h" />
     <ClInclude Include="crypto.h" />
+    <ClInclude Include="Cryptography\cryptography_error.h" />
+    <ClInclude Include="Cryptography\ICryptographyAlgorithm.h" />
+    <ClInclude Include="Cryptography\ICryptographyProvider.h" />
+    <ClInclude Include="Cryptography\Stdafx.h" />
+    <ClInclude Include="Cryptography\windows\AdvapiCryptographyProvider.h" />
+    <ClInclude Include="Cryptography\windows\Stdafx.h" />
     <ClInclude Include="DataFormatView.h" />
     <ClInclude Include="DFFDData.h" />
     <ClInclude Include="DFFDEVAL.h" />
@@ -417,9 +424,9 @@
     <ClInclude Include="DirDialog.h" />
     <ClInclude Include="Explorer.h" />
     <ClInclude Include="Expr.h" />
-    <ClInclude Include="Expressions\DialogProvider.h" />
-    <ClInclude Include="Expressions\IDialogProvider.h" />
-    <ClInclude Include="Expressions\Stdafx.h" />
+    <ClInclude Include="Services\DialogProvider.h" />
+    <ClInclude Include="Services\IDialogProvider.h" />
+    <ClInclude Include="Services\Stdafx.h" />
     <ClInclude Include="FindDlg.h" />
     <ClInclude Include="GenDockablePane.h" />
     <ClInclude Include="GeneralCRC.h" />

@@ -6,11 +6,54 @@
 
 namespace hex
 {
-    /// \brief  Interface class for types that allow prompting the user for a value.
+    enum class MessageBoxButtons
+    {
+        Ok,
+        OkCancel,
+        AbortRetryIgnore,
+        YesNoCancel,
+        YesNo,
+        RetryCancel,
+    };
+
+    enum class MessageBoxIcon
+    {
+        None,
+        Hand,
+        Question,
+        Exclamation,
+        Asterisk,
+    };
+
+    enum class MessageBoxResult
+    {
+        Ok,
+        Cancel,
+        Abort,
+        Retry,
+        Ignore,
+        Yes,
+        No,
+        Close,
+    };
+
+    /// \brief  Interface class for types that show dialogs.
     class IDialogProvider
     {
     public:
         virtual ~IDialogProvider() = default;
+
+        /// \brief  Shows a message to the user with the given set of buttons.
+        ///
+        /// \param       message  The message to show.
+        /// \param[opt]  buttons  The buttons to show. Defaults to only an OK button.
+        /// \param[opt]  icon     The icon to show. Defaults to no icon.
+        /// 
+        /// \returns  The button that was pressed or \p MessageBoxResult::Close if the dialog was closed.
+        virtual MessageBoxResult ShowMessageBox(
+            const CString& message,
+            MessageBoxButtons buttons = MessageBoxButtons::Ok,
+            MessageBoxIcon icon = MessageBoxIcon::None) = 0;
 
         /// \brief  Gets an integer from the user.
         /// 

@@ -1,7 +1,7 @@
 #ifndef EXPR_INCLUDED
 #define EXPR_INCLUDED
 
-#include "Expressions/IDialogProvider.h"
+#include "Services/IDialogProvider.h"
 
 #include <vector>
 #include <map>

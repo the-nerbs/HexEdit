@@ -1,6 +1,8 @@
 #include "Stdafx.h"
 #include "Expr.h"
 
+#include "utils/TestDialogProvider.h"
+
 #include <catch.hpp>
 
 using value_t = expr_eval::value_t;
@@ -73,80 +75,6 @@ static value_t empty_value_with_type(expr_eval::type_t type)
     return v;
 }
 
-
-struct GetIntegerCall
-{
-    CString prompt;
-    std::int64_t value;
-    std::int64_t min;
-    std::int64_t max;
-};
-
-struct GetStringCall
-{
-    CString prompt;
-    CString value;
-};
-
-struct GetBooleanCall
-{
-    CString prompt;
-    CString trueText;
-    CString falseText;
-};
-
-class TestDialogProvider : public hex::IDialogProvider
-{
-public:
-    bool cancel = false;
-    std::vector<GetIntegerCall> getIntegerCalls;
-    std::vector<GetStringCall> getStringCalls;
-    std::vector<GetBooleanCall> getBooleanCalls;
-
-    bool GetInteger(const CString& prompt, std::int64_t& result, std::int64_t min = INT64_MIN, std::int64_t max = INT64_MAX) override
-    {
-        getIntegerCalls.push_back(GetIntegerCall{
-            prompt, result, min, max
-        });
-
-        if (!cancel)
-        {
-            // just yield the given value
-            return true;
-        }
-
-        return false;
-    }
-
-    bool GetString(const CString& prompt, CString& result) override
-    {
-        getStringCalls.push_back(GetStringCall{
-            prompt, result
-        });
-
-        if (!cancel)
-        {
-            // just yield the given value
-            return true;
-        }
-
-        return false;
-    }
-
-    bool GetBoolean(const CString& prompt, const CString& trueText, const CString& falseText) override
-    {
-        getBooleanCalls.push_back(GetBooleanCall{
-            prompt, trueText, falseText
-        });
-
-        if (!cancel)
-        {
-            return true;
-        }
-
-        return false;
-    }
-};
 
 class test_expr : public expr_eval
 {

@@ -98,6 +98,8 @@
   <ItemGroup>
     <ClCompile Include="BoyerTests.cpp" />
     <ClCompile Include="CFile64Tests.cpp" />
+    <ClCompile Include="Cryptography\windows\AdvapiCryptographyProviderTests.cpp" />
+    <ClCompile Include="CryptoTests.cpp" />
     <ClCompile Include="ExprEvalTests.cpp" />
     <ClCompile Include="Serialization\IntelHexExporterTests.cpp" />
     <ClCompile Include="Serialization\SRecordExporterTests.cpp" />
@@ -109,6 +111,7 @@
     <ClCompile Include="utils\ErrorFile.cpp" />
     <ClInclude Include="utils\ErrorFile.h" />
     <ClCompile Include="utils\File.cpp" />
+    <ClCompile Include="utils\TestDialogProvider.cpp" />
     <ClCompile Include="utils\TestFiles.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +124,7 @@
     <ClInclude Include="utils\CoInitialize.h" />
     <ClInclude Include="utils\File.h" />
     <ClInclude Include="utils\Garbage.h" />
+    <ClInclude Include="utils\TestDialogProvider.h" />
     <ClInclude Include="utils\TestFiles.h" />
   </ItemGroup>
   <ItemGroup>

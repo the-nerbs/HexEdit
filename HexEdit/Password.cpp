@@ -39,7 +39,7 @@ CPassword::CPassword(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 
 	m_note = "Notes:\n"
-			 "1. Do not lose this password, as any data excrypted with it can only be\n"
+			 "1. Do not lose this password, as any data encrypted with it can only be\n"
 			 "    recovered by decrypting with the same password (and algorithm).\n"
 			 "2. Passwords are case-sensitive.\n"
 			 "3. Entering the masked password twice is used to catch typos.\n"

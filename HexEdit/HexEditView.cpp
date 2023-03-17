@@ -13509,10 +13509,12 @@ func_return:
 
 void CHexEditView::OnEncrypt()
 {
-	CHexEditApp *aa = dynamic_cast<CHexEditApp *>(AfxGetApp());
-	CMainFrame *mm = (CMainFrame *)AfxGetMainWnd();
+	CHexEditApp *app = dynamic_cast<CHexEditApp *>(AfxGetApp());
+	CMainFrame *mainWnd = (CMainFrame *)AfxGetMainWnd();
 	if (check_ro("encrypt"))
+	{
 		return;
+	}
 
 	// Get current address or selection
 	FILE_ADDRESS start_addr, end_addr;          // Start and end of selection
@@ -13522,41 +13524,23 @@ void CHexEditView::OnEncrypt()
 	if (start_addr >= end_addr)
 	{
 		// No selection, presumably in macro playback
-		ASSERT(aa->playing_);
+		ASSERT(app->playing_);
 		TaskMessageBox("No Selection", "There is nothing selected to encrypt.");
-		aa->mac_error_ = 10;
+		app->mac_error_ = 10;
 		return;
 	}
 
-	if (aa->password_.IsEmpty())
+	// make sure the selected algorithm has a password, prompting the user if not.
+	if (!app->ensure_current_alg_password())
 	{
-		CPassword dlg;
-		dlg.m_password = aa->password_;
-		if (dlg.DoModal() == IDOK)
-		{
-			aa->password_ = dlg.m_password;
-			// Create encryption key with new password
-			if (aa->algorithm_ > 0)
-			{
-				ASSERT(aa->algorithm_ - 1 < (int)aa->crypto_.GetNum());
-				aa->crypto_.SetPassword(aa->algorithm_-1, aa->password_);
-			}
-		}
-		else
-			return;
-	}
-	else if (aa->algorithm_ > 0 && aa->crypto_.NeedsPassword(aa->algorithm_-1))
-	{
-		// We have a password but somehow it has not been set for this alg
-		ASSERT(aa->algorithm_ - 1 < (int)aa->crypto_.GetNum());
-		aa->crypto_.SetPassword(aa->algorithm_-1, aa->password_);
+		return;
 	}
 
-	unsigned char *buf = NULL;
+	std::unique_ptr<unsigned char[]> buf;
 
-	if (aa->algorithm_ > 0)
+	if (app->algorithm_ > 0)
 	{
-		if (display_.overtype && aa->crypto_.needed(aa->algorithm_-1, 256) != 256)
+		if (display_.overtype && app->crypto_.needed(app->algorithm_-1, 256) != 256)
 		{
 			if (AvoidableTaskDialog(IDS_OVERTYPE,
 				"Encrypting with this algorithm will increase the length "
@@ -13565,11 +13549,13 @@ void CHexEditView::OnEncrypt()
 				"Do you want to turn off overtype mode?",
 				NULL, NULL, TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON) != IDOK)
 			{
-				aa->mac_error_ = 10;
+				app->mac_error_ = 10;
 				return;
 			}
 			else if (!do_insert())
+			{
 				return;
+			}
 		}
 
 		// Test if selection is too big to do in memory
@@ -13579,12 +13565,12 @@ void CHexEditView::OnEncrypt()
 
 			// Get input and output buffers
 			size_t inbuflen = 32768;
-			size_t outbuflen = aa->crypto_.needed(aa->algorithm_-1, inbuflen);
+			size_t outbuflen = app->crypto_.needed(app->algorithm_-1, inbuflen);
 
 			FILE_ADDRESS total_out = 0;
 			try
 			{
-				buf = new unsigned char[outbuflen];
+				buf = std::make_unique<unsigned char[]>(outbuflen);
 			}
 			catch (std::bad_alloc)
 			{
@@ -13609,11 +13595,11 @@ void CHexEditView::OnEncrypt()
 				{
 					// Get the next buffer full from the document
 					len = size_t(std::min<FILE_ADDRESS>(inbuflen, end_addr - curr));
-					VERIFY(GetDocument()->GetData(buf, len, curr) == len);
+					VERIFY(GetDocument()->GetData(buf.get(), len, curr) == len);
 
 					// Encrypt and write it
-					size_t outlen = aa->crypto_.encrypt(aa->algorithm_-1, buf, len, outbuflen, curr + len == end_addr);
-					ff.Write(buf, outlen);
+					size_t outlen = app->crypto_.encrypt(app->algorithm_-1, buf.get(), len, outbuflen, curr + len == end_addr);
+					ff.Write(buf.get(), outlen);
 					total_out += outlen;
 
 					if (AbortKeyPress() &&
@@ -13627,7 +13613,7 @@ void CHexEditView::OnEncrypt()
 						goto func_return;
 					}
 
-				mm->Progress(int(((curr - start_addr)*100)/(end_addr - start_addr)));
+					mainWnd->Progress(int(((curr - start_addr)*100)/(end_addr - start_addr)));
 				}
 			}
 			catch (CFileException *pfe)
@@ -13649,7 +13635,7 @@ void CHexEditView::OnEncrypt()
 			ASSERT(idx != -1);
 			GetDocument()->Change(mod_insert_file, start_addr, total_out, NULL, idx, this, TRUE);
 
-			// If length changed update the selection and makde sure it is undoable
+			// If length changed, update the selection and make sure it can be undone
 			if (total_out != end_addr - start_addr)
 			{
 				// Select encrypted data
@@ -13695,27 +13681,26 @@ void CHexEditView::OnEncrypt()
 			CWaitCursor wait;                           // Turn on wait cursor (hourglass)
 
 			size_t len = size_t(end_addr - start_addr); // Length of selection
-			size_t outlen = aa->crypto_.needed(aa->algorithm_-1, len);
+			size_t outlen = app->crypto_.needed(app->algorithm_-1, len);
 
 			// Get memory for selection and read it from the document
 			try
 			{
-				buf = new unsigned char[outlen];
+				buf = std::make_unique<unsigned char[]>(outlen);
 			}
 			catch (std::bad_alloc)
 			{
 				AfxMessageBox("Insufficient memory");
-				aa->mac_error_ = 10;
+				app->mac_error_ = 10;
 				return;
 			}
 
-			VERIFY(GetDocument()->GetData(buf, len, start_addr) == len);
+			VERIFY(GetDocument()->GetData(buf.get(), len, start_addr) == len);
 
-			if (aa->crypto_.encrypt(aa->algorithm_-1, buf, len, outlen) != outlen)
+			if (app->crypto_.encrypt(app->algorithm_-1, buf.get(), len, outlen) != outlen)
 			{
-				ASSERT(0);
-				AfxMessageBox("Encryption error");
-				aa->mac_error_ = 10;
+				AfxMessageBox(CString("Could not encrypt using:\n") + app->crypto_.GetName(app->algorithm_ - 1));
+				app->mac_error_ = 10;
 				goto func_return;
 			}
 
@@ -13725,7 +13710,7 @@ void CHexEditView::OnEncrypt()
 
 				// Since the encrypted text is bigger we must delete then insert
 				GetDocument()->Change(mod_delforw, start_addr, len, NULL, 0, this);
-				GetDocument()->Change(mod_insert, start_addr, outlen, buf, 0, this, TRUE);
+				GetDocument()->Change(mod_insert, start_addr, outlen, buf.get(), 0, this, TRUE);
 				ASSERT(undo_.back().utype == undo_change);
 				undo_.back().previous_too = true;    // Merge changes (at least in this view)
 
@@ -13738,27 +13723,31 @@ void CHexEditView::OnEncrypt()
 				((CMainFrame *)AfxGetMainWnd())->StatusBarText(mess);
 			}
 			else
-				GetDocument()->Change(mod_replace, start_addr, len, buf, 0, this);
+			{
+				GetDocument()->Change(mod_replace, start_addr, len, buf.get(), 0, this);
+			}
 		}
 	}
 	else
 	{
 		// Note that CryptoAPI algs (above) the key is set when password
 		// or alg is changed (more efficient) but for internal we set it here too.
-		::set_key(aa->password_, aa->password_.GetLength());
+		::set_key(app->password_, app->password_.GetLength());
 
 		// Make sure selection is right size
 		if ((end_addr-start_addr)%8 != 0)
 		{
 			// Presumably in macro playback
-			ASSERT(aa->playing_);
+			ASSERT(app->playing_);
 			AvoidableTaskDialog(IDS_SEL_LEN,
 				"The selection length is not a multiple of 8.  "
 				"For this encryption algorithm the length of the "
 				"selection must be a multiple of the encryption block length.");
-			aa->mac_error_ = 10;
+			app->mac_error_ = 10;
 			return;
 		}
+
+		CWaitCursor wait;                       // Turn on wait cursor (hourglass)
 
 		size_t len; // Length of selection
 
@@ -13771,37 +13760,36 @@ void CHexEditView::OnEncrypt()
 			if (end_addr - start_addr > UINT_MAX)
 				throw std::bad_alloc();
 			len = size_t(end_addr - start_addr);
-			buf = new unsigned char[len];
+			buf = std::make_unique<unsigned char[]>(len);
 		}
 		catch (std::bad_alloc)
 		{
 			AfxMessageBox("Insufficient memory - selection too large");
-			aa->mac_error_ = 10;
+			app->mac_error_ = 10;
 			return;
 		}
 
-		VERIFY(GetDocument()->GetData(buf, len, start_addr) == len);
+		VERIFY(GetDocument()->GetData(buf.get(), len, start_addr) == len);
 
-		::encrypt(buf, len);  // built-in (Blowfish) encryption
+		::encrypt(buf.get(), len);  // built-in (Blowfish) encryption
 
-		GetDocument()->Change(mod_replace, start_addr, len, buf, 0, this);
+		GetDocument()->Change(mod_replace, start_addr, len, buf.get(), 0, this);
 	}
 	DisplayCaret();
-	aa->SaveToMacro(km_encrypt, 1);  // 1 == encrypt (2 == decrypt)
+	app->SaveToMacro(km_encrypt, 1);  // 1 == encrypt (2 == decrypt)
 
 func_return:
-	mm->Progress(-1);  // disable progress bar
-
-	if (buf != NULL)
-		delete[] buf;
+	mainWnd->Progress(-1);  // disable progress bar
 }
 
 void CHexEditView::OnDecrypt()
 {
-	CHexEditApp *aa = dynamic_cast<CHexEditApp *>(AfxGetApp());
-	CMainFrame *mm = (CMainFrame *)AfxGetMainWnd();
-	if (aa->algorithm_ < 0 || check_ro("decrypt"))
+	CHexEditApp *app = dynamic_cast<CHexEditApp *>(AfxGetApp());
+	CMainFrame *mainWnd = (CMainFrame *)AfxGetMainWnd();
+	if (app->algorithm_ < 0 || check_ro("decrypt"))
+	{
 		return;
+	}
 
 	// Get current address or selection
 	FILE_ADDRESS start_addr, end_addr;          // Start and end of selection
@@ -13811,82 +13799,70 @@ void CHexEditView::OnDecrypt()
 	if (start_addr >= end_addr)
 	{
 		// No selection, presumably in macro playback
-		ASSERT(aa->playing_);
-		TaskMessageBox("No Selection", "There is no selection to decrypt.");
-		aa->mac_error_ = 10;
+		ASSERT(app->playing_);
+		TaskMessageBox("No Selection", "There is nothing selected to decrypt.");
+		app->mac_error_ = 10;
 		return;
 	}
 
-	if (aa->password_.IsEmpty())
+	// make sure the selected algorithm has a password, prompting the user if not.
+	if (!app->ensure_current_alg_password())
 	{
-		CPassword dlg;
-		dlg.m_password = aa->password_;
-		if (dlg.DoModal() == IDOK)
-		{
-			aa->password_ = dlg.m_password;
-			// Create encryption key with new password
-			if (aa->algorithm_ > 0)
-			{
-				ASSERT(aa->algorithm_ - 1 < (int)aa->crypto_.GetNum());
-				aa->crypto_.SetPassword(aa->algorithm_-1, aa->password_);
-			}
-		}
-		else
-			return;
-	}
-	else if (aa->algorithm_ > 0 && aa->crypto_.NeedsPassword(aa->algorithm_-1))
-	{
-		// We have a password but somehow it has not been set for this alg
-		ASSERT(aa->algorithm_ - 1 < (int)aa->crypto_.GetNum());
-		aa->crypto_.SetPassword(aa->algorithm_-1, aa->password_);
+		return;
 	}
 
-	unsigned char *buf = NULL;
+	std::unique_ptr<unsigned char[]> buf;
 
-	if (aa->algorithm_ > 0)
+	if (app->algorithm_ > 0)
 	{
-		int blen = aa->crypto_.GetBlockLength(aa->algorithm_-1);
+		int blen = app->crypto_.GetBlockLength(app->algorithm_-1);
 		if (blen == -1)
 		{
 			AfxMessageBox("Encryption block length error");
-			aa->mac_error_ = 10;
+			app->mac_error_ = 10;
 			return;
 		}
 
 		if (blen != 0 && display_.overtype)
 		{
 			if (AvoidableTaskDialog(IDS_OVERTYPE,
-				"Decrypting with this algorithm may reduce increase the length "
+				"Decrypting with this algorithm may reduce the length "
 				"of the current (encrypted) selection and hence decrease the "
 				"length of the file.  This is not permitted in OVR mode.\n\n."
 				"Do you want to turn off overtype mode?",
 				NULL, NULL, TDCBF_OK_BUTTON | TDCBF_CANCEL_BUTTON) != IDOK)
 			{
-				aa->mac_error_ = 10;
+				app->mac_error_ = 10;
 				return;
 			}
 			else if (!do_insert())
+			{
 				return;
+			}
 		}
 
-		ASSERT(blen%8 == 0); // Should be multiple of number of bits/byte
+		ASSERT(blen % 8 == 0); // Should be multiple of number of bits/byte
 		if (blen == 0)
+		{
 			blen = 1;       // Stream cipher - don't restrict selection length
+		}
 		else
-			blen = blen/8;  // Convert bits to bytes
+		{
+			blen = blen / 8;  // Convert bits to bytes
+		}
 
 		// Make sure selection is right size
-		if ((end_addr-start_addr)%blen != 0)
+		if ((end_addr - start_addr) % blen != 0)
 		{
 			// Presumably in macro playback
-			ASSERT(aa->playing_);
+			ASSERT(app->playing_);
 			CString ss;
 			ss.Format("%d", blen);
 			AvoidableTaskDialog(IDS_SEL_LEN,
 				"The selection length is not a multiple of " + ss + ".  "
 				"For this encryption algorithm the length of the "
 				"selection must be a multiple of the encryption block length.");
-			aa->mac_error_ = 10;
+			app->mac_error_ = 10;
 			return;
 		}
 
@@ -13901,7 +13877,7 @@ void CHexEditView::OnDecrypt()
 			FILE_ADDRESS total_out = 0;
 			try
 			{
-				buf = new unsigned char[buflen];
+				buf = std::make_unique<unsigned char[]>(buflen);
 			}
 			catch (std::bad_alloc)
 			{
@@ -13925,20 +13901,20 @@ void CHexEditView::OnDecrypt()
 				{
 					// Get the next buffer full from the document
 					len = size_t(std::min<FILE_ADDRESS>(buflen, end_addr - curr));
-					VERIFY(GetDocument()->GetData(buf, len, curr) == len);
+					VERIFY(GetDocument()->GetData(buf.get(), len, curr) == len);
 
-					size_t outlen = aa->crypto_.decrypt(aa->algorithm_-1, buf, len, curr + len == end_addr);
+					size_t outlen = app->crypto_.decrypt(app->algorithm_-1, buf.get(), len, curr + len == end_addr);
 
 					if (outlen == size_t(-1))
 					{
-						AfxMessageBox(CString("Could not decrypt using:\n") + aa->crypto_.GetName(aa->algorithm_-1));
+						AfxMessageBox(CString("Could not decrypt using:\n") + app->crypto_.GetName(app->algorithm_-1));
 						ff.Close();
 						remove(temp_file);
 						theApp.mac_error_ = 10;
 						goto func_return;
 					}
 
-					ff.Write(buf, outlen);
+					ff.Write(buf.get(), outlen);
 					total_out += outlen;
 
 					if (AbortKeyPress() &&
@@ -13952,7 +13928,7 @@ void CHexEditView::OnDecrypt()
 						goto func_return;
 					}
 
-				mm->Progress(int(((curr - start_addr)*100)/(end_addr - start_addr)));
+				mainWnd->Progress(int(((curr - start_addr)*100)/(end_addr - start_addr)));
 				}
 			}
 			catch (CFileException *pfe)
@@ -14016,27 +13992,29 @@ void CHexEditView::OnDecrypt()
 				}
 			}
 
+			CWaitCursor wait;                           // Turn on wait cursor (hourglass)
+
 			size_t len = size_t(end_addr - start_addr); // Length of selection
 			size_t outlen;          // Size of decrypted text (may be less than encrypted)
 
 			// Get memory for selection and read it from the document
 			try
 			{
-				buf = new unsigned char[len];
+				buf = std::make_unique<unsigned char[]>(len);
 			}
 			catch (std::bad_alloc)
 			{
 				AfxMessageBox("Insufficient memory");
-				aa->mac_error_ = 10;
+				app->mac_error_ = 10;
 				return;
 			}
-			VERIFY(GetDocument()->GetData(buf, len, start_addr) == len);
+			VERIFY(GetDocument()->GetData(buf.get(), len, start_addr) == len);
 
-			outlen = aa->crypto_.decrypt(aa->algorithm_-1, buf, len);
+			outlen = app->crypto_.decrypt(app->algorithm_-1, buf.get(), len);
 			if (outlen == size_t(-1))
 			{
-				AfxMessageBox(CString("Could not decrypt using:\n") + aa->crypto_.GetName(aa->algorithm_-1));
-				aa->mac_error_ = 10;
+				AfxMessageBox(CString("Could not decrypt using:\n") + app->crypto_.GetName(app->algorithm_-1));
+				app->mac_error_ = 10;
 				goto func_return;
 			}
 
@@ -14046,7 +14024,7 @@ void CHexEditView::OnDecrypt()
 
 				// Since the decrypted text is smaller we must delete then insert
 				GetDocument()->Change(mod_delforw, start_addr, len, NULL, 0, this);
-				GetDocument()->Change(mod_insert, start_addr, outlen, buf, 0, this, TRUE);
+				GetDocument()->Change(mod_insert, start_addr, outlen, buf.get(), 0, this, TRUE);
 				ASSERT(undo_.back().utype == undo_change);
 				undo_.back().previous_too = true;    // Merge changes (at least in this view)
 
@@ -14059,25 +14037,27 @@ void CHexEditView::OnDecrypt()
 				((CMainFrame *)AfxGetMainWnd())->StatusBarText(mess);
 			}
 			else
-				GetDocument()->Change(mod_replace, start_addr, len, buf, 0, this);
+			{
+				GetDocument()->Change(mod_replace, start_addr, len, buf.get(), 0, this);
+			}
 		}
 	}
 	else
 	{
 		// Note that CryptoAPI algs (above) the key is set when password
 		// or alg is changed (more efficient) but for internal we set it here too
-		::set_key(aa->password_, aa->password_.GetLength());
+		::set_key(app->password_, app->password_.GetLength());
 
 		// Make sure selection is right size
 		if ((end_addr-start_addr)%8 != 0)
 		{
 			// Presumably in macro playback
-			ASSERT(aa->playing_);
+			ASSERT(app->playing_);
 			AvoidableTaskDialog(IDS_SEL_LEN,
 				"The selection length is not a multiple of 8.  "
 				"For this encryption algorithm the length of the "
 				"selection must be a multiple of the encryption block length.");
-			aa->mac_error_ = 10;
+			app->mac_error_ = 10;
 			return;
 		}
 
@@ -14094,29 +14074,26 @@ void CHexEditView::OnDecrypt()
 			if (end_addr - start_addr > UINT_MAX)
 				throw std::bad_alloc();
 			len = size_t(end_addr - start_addr);
-			buf = new unsigned char[len];
+			buf = std::make_unique<unsigned char[]>(len);
 		}
 		catch (std::bad_alloc)
 		{
 			AfxMessageBox("Insufficient memory");
-			aa->mac_error_ = 10;
+			app->mac_error_ = 10;
 			return;
 		}
 
-		VERIFY(GetDocument()->GetData(buf, len, start_addr) == len);
+		VERIFY(GetDocument()->GetData(buf.get(), len, start_addr) == len);
 
-		::decrypt(buf, len);
+		::decrypt(buf.get(), len);
 
-		GetDocument()->Change(mod_replace, start_addr, len, buf, 0, this);
+		GetDocument()->Change(mod_replace, start_addr, len, buf.get(), 0, this);
 	}
 	DisplayCaret();
-	aa->SaveToMacro(km_encrypt, 2);  // 2 == decrypt (1 == encrypt)
+	app->SaveToMacro(km_encrypt, 2);  // 2 == decrypt (1 == encrypt)
 
 func_return:
-	mm->Progress(-1);  // disable progress bar
-
-	if (buf != NULL)
-		delete[] buf;
+	mainWnd->Progress(-1);  // disable progress bar
 }
 
 void CHexEditView::OnUpdateEncrypt(CCmdUI* pCmdUI)

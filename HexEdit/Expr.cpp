@@ -49,7 +49,7 @@
 #include "dialog.h"
 #include "misc.h"
 
-#include "Expressions/DialogProvider.h"
+#include "Services/DialogProvider.h"
 
 template <class T>
 static constexpr int sign(T x)
