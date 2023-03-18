@@ -1,0 +1,506 @@
+#include "Stdafx.h"
+#include "Misc.h"
+
+#include <catch.hpp>
+
+#include <algorithm>
+
+
+struct color_row
+{
+    COLORREF bgr;
+    int hue;
+    int lightness;
+    int saturation;
+    const char* name;   // for diagnostics
+};
+
+// note: Hue is a percentage here, not the typical degrees!
+// This table was generated from this C# snippet:
+//  foreach (var prop in typeof(Color).GetProperties(BindingFlags.Public | BindingFlags.Static)) {
+//      var c = (Color)prop.GetValue(null);
+//  
+//      if (c.A == 255)
+//      {
+//          int bgr = (c.B << 16) | (c.G << 8) | (c.R << 0);
+//          int hue = c.R == c.G && c.G == c.B ? -1 : (int)(100 * c.GetHue() / 360.0);
+//          int lum = (int)Math.Round(c.GetBrightness() * 100);
+//          int sat = (int)Math.Round(c.GetSaturation() * 100);
+//  
+//          WriteLine($"{{ 0x{bgr:X8}, {hue,3}, {lum,3}, {sat,3}, \"{c.Name}\" }},");
+//      }
+//  }
+static constexpr color_row color_testrows[] = {
+    //    BBGGRR   H%   L%   S%
+    { 0x00FFF8F0,  57,  97, 100, "AliceBlue" },
+    { 0x00D7EBFA,   9,  91,  78, "AntiqueWhite" },
+    { 0x00FFFF00,  50,  50, 100, "Aqua" },
+    { 0x00D4FF7F,  44,  75, 100, "Aquamarine" },
+    { 0x00FFFFF0,  50,  97, 100, "Azure" },
+    { 0x00DCF5F5,  16,  91,  56, "Beige" },
+    { 0x00C4E4FF,   9,  88, 100, "Bisque" },
+    { 0x00000000,  -1,   0,   0, "Black" },
+    { 0x00CDEBFF,  10,  90, 100, "BlanchedAlmond" },
+    { 0x00FF0000,  66,  50, 100, "Blue" },
+    { 0x00E22B8A,  75,  53,  76, "BlueViolet" },
+    { 0x002A2AA5,   0,  41,  59, "Brown" },
+    { 0x0087B8DE,   9,  70,  57, "BurlyWood" },
+    { 0x00A09E5F,  50,  50,  25, "CadetBlue" },
+    { 0x0000FF7F,  25,  50, 100, "Chartreuse" },
+    { 0x001E69D2,   6,  47,  75, "Chocolate" },
+    { 0x00507FFF,   4,  66, 100, "Coral" },
+    { 0x00ED9564,  60,  66,  79, "CornflowerBlue" },
+    { 0x00DCF8FF,  13,  93, 100, "Cornsilk" },
+    { 0x003C14DC,  96,  47,  83, "Crimson" },
+    { 0x00FFFF00,  50,  50, 100, "Cyan" },
+    { 0x008B0000,  66,  27, 100, "DarkBlue" },
+    { 0x008B8B00,  50,  27, 100, "DarkCyan" },
+    { 0x000B86B8,  11,  38,  89, "DarkGoldenrod" },
+    { 0x00A9A9A9,  -1,  66,   0, "DarkGray" },
+    { 0x00006400,  33,  20, 100, "DarkGreen" },
+    { 0x006BB7BD,  15,  58,  38, "DarkKhaki" },
+    { 0x008B008B,  83,  27, 100, "DarkMagenta" },
+    { 0x002F6B55,  22,  30,  39, "DarkOliveGreen" },
+    { 0x00008CFF,   9,  50, 100, "DarkOrange" },
+    { 0x00CC3299,  77,  50,  61, "DarkOrchid" },
+    { 0x0000008B,   0,  27, 100, "DarkRed" },
+    { 0x007A96E9,   4,  70,  72, "DarkSalmon" },
+    { 0x008BBC8F,  31,  64,  27, "DarkSeaGreen" },
+    { 0x008B3D48,  69,  39,  39, "DarkSlateBlue" },
+    { 0x004F4F2F,  50,  25,  25, "DarkSlateGray" },
+    { 0x00D1CE00,  50,  41, 100, "DarkTurquoise" },
+    { 0x00D30094,  78,  41, 100, "DarkViolet" },
+    { 0x009314FF,  90,  54, 100, "DeepPink" },
+    { 0x00FFBF00,  54,  50, 100, "DeepSkyBlue" },
+    { 0x00696969,  -1,  41,   0, "DimGray" },
+    { 0x00FF901E,  58,  56, 100, "DodgerBlue" },
+    { 0x002222B2,   0,  42,  68, "Firebrick" },
+    { 0x00F0FAFF,  11,  97, 100, "FloralWhite" },
+    { 0x00228B22,  33,  34,  61, "ForestGreen" },
+    { 0x00FF00FF,  83,  50, 100, "Fuchsia" },
+    { 0x00DCDCDC,  -1,  86,   0, "Gainsboro" },
+    { 0x00FFF8F8,  66,  99, 100, "GhostWhite" },
+    { 0x0000D7FF,  14,  50, 100, "Gold" },
+    { 0x0020A5DA,  11,  49,  74, "Goldenrod" },
+    { 0x00808080,  -1,  50,   0, "Gray" },
+    { 0x00008000,  33,  25, 100, "Green" },
+    { 0x002FFFAD,  23,  59, 100, "GreenYellow" },
+    { 0x00F0FFF0,  33,  97, 100, "Honeydew" },
+    { 0x00B469FF,  91,  71, 100, "HotPink" },
+    { 0x005C5CCD,   0,  58,  53, "IndianRed" },
+    { 0x0082004B,  76,  25, 100, "Indigo" },
+    { 0x00F0FFFF,  16,  97, 100, "Ivory" },
+    { 0x008CE6F0,  15,  75,  77, "Khaki" },
+    { 0x00FAE6E6,  66,  94,  67, "Lavender" },
+    { 0x00F5F0FF,  94,  97, 100, "LavenderBlush" },
+    { 0x0000FC7C,  25,  49, 100, "LawnGreen" },
+    { 0x00CDFAFF,  15,  90, 100, "LemonChiffon" },
+    { 0x00E6D8AD,  54,  79,  53, "LightBlue" },
+    { 0x008080F0,   0,  72,  79, "LightCoral" },
+    { 0x00FFFFE0,  50,  94, 100, "LightCyan" },
+    { 0x00D2FAFA,  16,  90,  80, "LightGoldenrodYellow" },
+    { 0x0090EE90,  33,  75,  73, "LightGreen" },
+    { 0x00D3D3D3,  -1,  83,   0, "LightGray" },
+    { 0x00C1B6FF,  97,  86, 100, "LightPink" },
+    { 0x007AA0FF,   4,  74, 100, "LightSalmon" },
+    { 0x00AAB220,  49,  41,  70, "LightSeaGreen" },
+    { 0x00FACE87,  56,  75,  92, "LightSkyBlue" },
+    { 0x00998877,  58,  53,  14, "LightSlateGray" },
+    { 0x00DEC4B0,  59,  78,  41, "LightSteelBlue" },
+    { 0x00E0FFFF,  16,  94, 100, "LightYellow" },
+    { 0x0000FF00,  33,  50, 100, "Lime" },
+    { 0x0032CD32,  33,  50,  61, "LimeGreen" },
+    { 0x00E6F0FA,   8,  94,  67, "Linen" },
+    { 0x00FF00FF,  83,  50, 100, "Magenta" },
+    { 0x00000080,   0,  25, 100, "Maroon" },
+    { 0x00AACD66,  44,  60,  51, "MediumAquamarine" },
+    { 0x00CD0000,  66,  40, 100, "MediumBlue" },
+    { 0x00D355BA,  80,  58,  59, "MediumOrchid" },
+    { 0x00DB7093,  72,  65,  60, "MediumPurple" },
+    { 0x0071B33C,  40,  47,  50, "MediumSeaGreen" },
+    { 0x00EE687B,  69,  67,  80, "MediumSlateBlue" },
+    { 0x009AFA00,  43,  49, 100, "MediumSpringGreen" },
+    { 0x00CCD148,  49,  55,  60, "MediumTurquoise" },
+    { 0x008515C7,  89,  43,  81, "MediumVioletRed" },
+    { 0x00701919,  66,  27,  64, "MidnightBlue" },
+    { 0x00FAFFF5,  41,  98, 100, "MintCream" },
+    { 0x00E1E4FF,   1,  94, 100, "MistyRose" },
+    { 0x00B5E4FF,  10,  85, 100, "Moccasin" },
+    { 0x00ADDEFF,   9,  84, 100, "NavajoWhite" },
+    { 0x00800000,  66,  25, 100, "Navy" },
+    { 0x00E6F5FD,  10,  95,  85, "OldLace" },
+    { 0x00008080,  16,  25, 100, "Olive" },
+    { 0x00238E6B,  22,  35,  60, "OliveDrab" },
+    { 0x0000A5FF,  10,  50, 100, "Orange" },
+    { 0x000045FF,   4,  50, 100, "OrangeRed" },
+    { 0x00D670DA,  83,  65,  59, "Orchid" },
+    { 0x00AAE8EE,  15,  80,  67, "PaleGoldenrod" },
+    { 0x0098FB98,  33,  79,  93, "PaleGreen" },
+    { 0x00EEEEAF,  50,  81,  65, "PaleTurquoise" },
+    { 0x009370DB,  94,  65,  60, "PaleVioletRed" },
+    { 0x00D5EFFF,  10,  92, 100, "PapayaWhip" },
+    { 0x00B9DAFF,   7,  86, 100, "PeachPuff" },
+    { 0x003F85CD,   8,  53,  59, "Peru" },
+    { 0x00CBC0FF,  97,  88, 100, "Pink" },
+    { 0x00DDA0DD,  83,  75,  47, "Plum" },
+    { 0x00E6E0B0,  51,  80,  52, "PowderBlue" },
+    { 0x00800080,  83,  25, 100, "Purple" },
+    { 0x000000FF,   0,  50, 100, "Red" },
+    { 0x008F8FBC,   0,  65,  25, "RosyBrown" },
+    { 0x00E16941,  62,  57,  73, "RoyalBlue" },
+    { 0x0013458B,   6,  31,  76, "SaddleBrown" },
+    { 0x007280FA,   1,  71,  93, "Salmon" },
+    { 0x0060A4F4,   7,  67,  87, "SandyBrown" },
+    { 0x00578B2E,  40,  36,  50, "SeaGreen" },
+    { 0x00EEF5FF,   6,  97, 100, "SeaShell" },
+    { 0x002D52A0,   5,  40,  56, "Sienna" },
+    { 0x00C0C0C0,  -1,  75,   0, "Silver" },
+    { 0x00EBCE87,  54,  73,  71, "SkyBlue" },
+    { 0x00CD5A6A,  68,  58,  53, "SlateBlue" },
+    { 0x00908070,  58,  50,  13, "SlateGray" },
+    { 0x00FAFAFF,   0,  99, 100, "Snow" },
+    { 0x007FFF00,  41,  50, 100, "SpringGreen" },
+    { 0x00B48246,  57,  49,  44, "SteelBlue" },
+    { 0x008CB4D2,   9,  69,  44, "Tan" },
+    { 0x00808000,  50,  25, 100, "Teal" },
+    { 0x00D8BFD8,  83,  80,  24, "Thistle" },
+    { 0x004763FF,   2,  64, 100, "Tomato" },
+    { 0x00D0E040,  48,  56,  72, "Turquoise" },
+    { 0x00EE82EE,  83,  72,  76, "Violet" },
+    { 0x00B3DEF5,  10,  83,  77, "Wheat" },
+    { 0x00FFFFFF,  -1, 100,   0, "White" },
+    { 0x00F5F5F5,  -1,  96,   0, "WhiteSmoke" },
+    { 0x0000FFFF,  16,  50, 100, "Yellow" },
+    { 0x0032CD9A,  22,  50,  61, "YellowGreen" },
+};
+
+TEST_CASE("get_hls")
+{
+    const color_row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(color_testrows),
+            std::end(color_testrows)
+        )
+    );
+    CAPTURE(test.name);
+
+    int h = 0;
+    int l = 0;
+    int s = 0;
+    get_hls(test.bgr, h, l, s);
+
+    CAPTURE(h, test.hue);
+    CAPTURE(l, test.lightness);
+    CAPTURE(s, test.saturation);
+
+    // Note: the existing RGB -> HSL conversion has some slop, so we don't 
+    // get exactly the same hue values that .NET's System.Drawing.Color gave
+    // for the test table above. The most-off is Orchid at ~2% (~7.2 deg),
+    // but everything else is within 1% (3.6 degs).
+    //
+    // Ultimately, this slop doesn't matter since 1) even the best of human
+    // eyes are bad at detecting exact colors, and 2) monitors all show colors
+    // different anyway.
+    constexpr int tolerance = 2;
+
+    CHECK(std::abs(h - test.hue) <= tolerance);
+
+    CHECK(l == test.lightness);
+    CHECK(s == test.saturation);
+}
+
+TEST_CASE("get_rgb")
+{
+    const color_row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(color_testrows),
+            std::end(color_testrows)
+        )
+    );
+    CAPTURE(test.name);
+
+    COLORREF bgr = get_rgb(test.hue, test.lightness, test.saturation);
+
+    CAPTURE(bgr, test.bgr);
+
+    // Note: the existing RGB -> HSL conversion has some slop, so we don't 
+    // get exactly the same RGB values that .NET's System.Drawing.Color gave
+    // for the test table above. The most-off are Gold (green channel) and
+    // LightSeaGreen (blue channel) at 9 units off (~3.5%).
+    //
+    // Same as with the hls slop - this is too small a change to be noticed.
+    constexpr int tolerance = 9;
+
+    int expectedR = test.bgr & 0xFF;
+    int expectedG = (test.bgr >> 8) & 0xFF;
+    int expectedB = (test.bgr >> 16) & 0xFF;
+
+    int actualR = bgr & 0xFF;
+    int actualG = (bgr >> 8) & 0xFF;
+    int actualB = (bgr >> 16) & 0xFF;
+
+    CHECK(std::abs(expectedR - actualR) <= tolerance);
+    CHECK(std::abs(expectedG - actualG) <= tolerance);
+    CHECK(std::abs(expectedB - actualB) <= tolerance);
+}
+
+TEST_CASE("tone_down")
+{
+    struct row
+    {
+        COLORREF baseColor;
+        COLORREF targetColor;
+        double t;
+        COLORREF expected;
+    };
+
+    static const row testrows[] = {
+        //      base      target      t    expected
+        //    BBGGRR      BBGGRR             BBGGRR
+        { 0x00000000, 0x00000000,  0.00, 0x00000000 },  // no-op cases
+        { 0x00000000, 0x00000000,  1.00, 0x00000000 },
+        { 0x00FFFFFF, 0x00FFFFFF,  0.00, 0x00FFFFFF },
+        { 0x00FFFFFF, 0x00FFFFFF,  1.00, 0x00FFFFFF },
+
+        { 0x007f7f7f, 0x00000000,  1.00, 0x00000000 },  // --------------------
+        { 0x007f7f7f, 0x00000000,  0.75, 0x001F1F1F },
+        { 0x007f7f7f, 0x00000000,  0.50, 0x003F3F3F },
+        { 0x007f7f7f, 0x00000000,  0.25, 0x005F5F5F },  
+        { 0x007f7f7f, 0x00000000,  0.00, 0x007F7F7F },  // ^^^ tone down ^^^
+        { 0x007f7f7f, 0x00000000, -0.00, 0x007F7F7F },  // vvv  tone up  vvv
+        { 0x007f7f7f, 0x00000000, -0.25, 0x009F9F9F },
+        { 0x007f7f7f, 0x00000000, -0.50, 0x00BFBFBF },
+        { 0x007f7f7f, 0x00000000, -0.75, 0x00DFDFDF },
+        { 0x007f7f7f, 0x00000000, -1.00, 0x00FFFFFF },  //  -------------------
+
+        { 0x00000000, 0x00FFFFFF,  0.00, 0x00000000 },  // tone up (target bright)
+        { 0x00000000, 0x00FFFFFF,  0.25, 0x003f3f3f },
+        { 0x00000000, 0x00FFFFFF,  0.50, 0x007F7F7F },
+        { 0x00000000, 0x00FFFFFF,  0.75, 0x00BFBFBF },
+        { 0x00000000, 0x00FFFFFF,  1.00, 0x00FFFFFF },
+
+        { 0x000000FF, 0x00C0C0C0,  0.75, 0x005c5cff },  // hues are preserved
+        { 0x0000FF00, 0x00C0C0C0,  0.75, 0x005cff5c },
+        { 0x00FF0000, 0x00C0C0C0,  0.75, 0x00ff5c5c },
+
+        { 0x007f7f7f, 0x00000000,  1.50, 0x00000000 },  // results are clamped
+        { 0x007f7f7f, 0x00000000, -1.50, 0x00FFFFFF },
+
+        { 0x00BFBFBF, 0x00BFBFBF, -1.00, 0x00BCBCBC },  // tone up will change the color a bit,
+        { 0x003F3F3F, 0x003F3F3F, -1.00, 0x00424242 },  // even if base and target match
+    };
+
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.baseColor, test.targetColor, test.t, test.expected);
+
+
+    COLORREF actual = tone_down(test.baseColor, test.targetColor, test.t);
+    CAPTURE(actual);
+
+    // note: the HSL/RGB conversions have some slop,
+    // so only compare to within a tolerance.
+    constexpr int tolerance = 2;
+
+    int expectedR = test.expected & 0xFF;
+    int expectedG = (test.expected >> 8) & 0xFF;
+    int expectedB = (test.expected >> 16) & 0xFF;
+
+    int actualR = actual & 0xFF;
+    int actualG = (actual >> 8) & 0xFF;
+    int actualB = (actual >> 16) & 0xFF;
+
+    CHECK(std::abs(expectedR - actualR) <= tolerance);
+    CHECK(std::abs(expectedG - actualG) <= tolerance);
+    CHECK(std::abs(expectedB - actualB) <= tolerance);
+}
+
+TEST_CASE("add_contrast")
+{
+    struct row
+    {
+        COLORREF baseColor;
+        COLORREF backgroundColor;
+        COLORREF expected;
+    };
+
+    static const row testrows[] = {
+        //    BBGGRR      BBGGRR      BBGGRR
+        { 0x00000000, 0x00000000, 0x003f3f3f },
+        { 0x003f3f3f, 0x00000000, 0x003f3f3f }, // enough contrast already
+        { 0x00000000, 0x003f3f3f, 0x00808080 }, // enough contract, but wrong direction
+
+        { 0x00ffffff, 0x00ffffff, 0x00bfbfbf },
+        { 0x00bfbfbf, 0x00000000, 0x00bfbfbf }, // enough contrast already
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.baseColor, test.backgroundColor, test.expected);
+
+
+    COLORREF actual = add_contrast(test.baseColor, test.backgroundColor);
+    CAPTURE(actual);
+
+    // note: the HSL/RGB conversions have some slop,
+    // so only compare to within a tolerance.
+    constexpr int tolerance = 2;
+
+    int expectedR = test.expected & 0xFF;
+    int expectedG = (test.expected >> 8) & 0xFF;
+    int expectedB = (test.expected >> 16) & 0xFF;
+
+    int actualR = actual & 0xFF;
+    int actualG = (actual >> 8) & 0xFF;
+    int actualB = (actual >> 16) & 0xFF;
+
+    CHECK(std::abs(expectedR - actualR) <= tolerance);
+    CHECK(std::abs(expectedG - actualG) <= tolerance);
+    CHECK(std::abs(expectedB - actualB) <= tolerance);
+}
+
+TEST_CASE("same_hue")
+{
+    struct row
+    {
+        COLORREF baseColor;
+        int saturation;
+        int luminance;
+        COLORREF expected;
+    };
+
+    static const row testrows[] = {
+        //    BBGGRR   S%   L%      BBGGRR
+        { 0x00000000,   0,   0, 0x00000000 },
+        { 0x00000000,   0, 100, 0x00ffffff },
+        { 0x00ffffff,   0,   0, 0x00000000 },
+        { 0x00ffffff,   0, 100, 0x00ffffff },
+
+        // reds
+        { 0x000000ff,   0,   0, 0x00000000 },
+        { 0x000000ff,  25,  50, 0x0060609f },
+        { 0x000000ff,  50,  50, 0x004040bf },
+        { 0x000000ff,  75,  50, 0x002020df },
+        { 0x000000ff, 100,  50, 0x000000ff },
+
+        { 0x000000ff,   0,   0, 0x00000000 },
+        { 0x000000ff, 100,  25, 0x00000080 },
+      //{ 0x000000ff, 100,  50, 0x000000ff }, // dups another row
+        { 0x000000ff, 100,  75, 0x008080ff },
+        { 0x000000ff, 100, 100, 0x00ffffff },
+
+        // greens
+        { 0x0000ff00,   0,   0, 0x00000000 },
+        { 0x0000ff00,  25,  50, 0x00609f60 },
+        { 0x0000ff00,  50,  50, 0x0040bf40 },
+        { 0x0000ff00,  75,  50, 0x0020df20 },
+        { 0x0000ff00, 100,  50, 0x0000ff00 },
+
+        { 0x0000ff00,   0,   0, 0x00000000 },
+        { 0x0000ff00, 100,  25, 0x00008000 },
+      //{ 0x0000ff00, 100,  50, 0x0000ff00 }, // dups another row
+        { 0x0000ff00, 100,  75, 0x0080ff80 },
+        { 0x0000ff00, 100, 100, 0x00ffffff },
+
+        // blues
+        { 0x00ff0000,   0,   0, 0x00000000 },
+        { 0x00ff0000,  25,  50, 0x009f6060 },
+        { 0x00ff0000,  50,  50, 0x00bf4040 },
+        { 0x00ff0000,  75,  50, 0x00df2020 },
+        { 0x00ff0000, 100,  50, 0x00ff0000 },
+
+        { 0x00ff0000,   0,   0, 0x00000000 },
+        { 0x00ff0000, 100,  25, 0x00800000 },
+      //{ 0x00ff0000, 100,  50, 0x00ff0000 }, // dups another row
+        { 0x00ff0000, 100,  75, 0x00ff8080 },
+        { 0x00ff0000, 100, 100, 0x00ffffff },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.baseColor, test.saturation, test.luminance, test.expected);
+
+
+    COLORREF actual = same_hue(test.baseColor, test.saturation, test.luminance);
+    CAPTURE(actual);
+
+    // note: the HSL/RGB conversions have some slop,
+    // so only compare to within a tolerance.
+    constexpr int tolerance = 2;
+
+    int expectedR = test.expected & 0xFF;
+    int expectedG = (test.expected >> 8) & 0xFF;
+    int expectedB = (test.expected >> 16) & 0xFF;
+
+    int actualR = actual & 0xFF;
+    int actualG = (actual >> 8) & 0xFF;
+    int actualB = (actual >> 16) & 0xFF;
+
+    CHECK(std::abs(expectedR - actualR) <= tolerance);
+    CHECK(std::abs(expectedG - actualG) <= tolerance);
+    CHECK(std::abs(expectedB - actualB) <= tolerance);
+}
+
+TEST_CASE("opp_hue")
+{
+    struct row
+    {
+        COLORREF baseColor;
+        COLORREF expected;
+    };
+
+    static const row testrows[] = {
+        //      base    expected
+        //    BBGGRR      BBGGRR
+        { 0x00000000, 0x00000000 },
+        { 0x003f3f3f, 0x003f3f3f },
+        { 0x00808080, 0x00808080 },
+        { 0x00bfbfbf, 0x00bfbfbf },
+        { 0x00ffffff, 0x00ffffff },
+
+        { 0x000000ff, 0x00ffff00 },
+        { 0x0000ff00, 0x00ff00ff },
+        { 0x00ff0000, 0x0000ffff },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.baseColor, test.expected);
+
+
+    COLORREF actual = opp_hue(test.baseColor);
+    CAPTURE(actual);
+
+    // note: the HSL/RGB conversions have some slop,
+    // so only compare to within a tolerance.
+    constexpr int tolerance = 2;
+
+    int expectedR = test.expected & 0xFF;
+    int expectedG = (test.expected >> 8) & 0xFF;
+    int expectedB = (test.expected >> 16) & 0xFF;
+
+    int actualR = actual & 0xFF;
+    int actualG = (actual >> 8) & 0xFF;
+    int actualB = (actual >> 16) & 0xFF;
+
+    CHECK(std::abs(expectedR - actualR) <= tolerance);
+    CHECK(std::abs(expectedG - actualG) <= tolerance);
+    CHECK(std::abs(expectedB - actualB) <= tolerance);
+}

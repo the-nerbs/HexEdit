@@ -101,6 +101,7 @@
     <ClCompile Include="Cryptography\windows\AdvapiCryptographyProviderTests.cpp" />
     <ClCompile Include="CryptoTests.cpp" />
     <ClCompile Include="ExprEvalTests.cpp" />
+    <ClCompile Include="MiscTests.cpp" />
     <ClCompile Include="Serialization\IntelHexExporterTests.cpp" />
     <ClCompile Include="Serialization\SRecordExporterTests.cpp" />
     <ClCompile Include="Serialization\IntelHexImporterTests.cpp" />

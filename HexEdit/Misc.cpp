@@ -329,10 +329,10 @@ static int rgbmax = 255;
 
 void get_hls(COLORREF rgb, int &hue, int &luminance, int &saturation)
 {
-
 	int red = GetRValue(rgb);
 	int green = GetGValue(rgb);
 	int blue = GetBValue(rgb);
+
 	int cmax = std::max(red, std::max(green, blue));
 	int cmin = std::min(red, std::min(green, blue));
 
@@ -341,25 +341,37 @@ void get_hls(COLORREF rgb, int &hue, int &luminance, int &saturation)
 
 	if (cmax == cmin)
 	{
+		// no hue, just greyscale
 		hue = -1;
 		saturation = 0;
 	}
 	else
 	{
+		int cdiff = cmax - cmin;
+
 		// Work out saturation
-		if (luminance <= hlsmax/2)
-			saturation = ((cmax-cmin)*hlsmax + (cmax+cmin)/2) / (cmax+cmin);
+		if (luminance <= hlsmax / 2)
+		{
+			saturation = (cdiff * hlsmax + (cmax + cmin) / 2) / (cmax + cmin);
+		}
 		else
-			saturation = ((cmax-cmin)*hlsmax + (2*rgbmax-cmax-cmin)/2)/(2*rgbmax-cmax-cmin);
+		{
+			saturation = (cdiff * hlsmax + (2 * rgbmax - cmax - cmin) / 2) / (2 * rgbmax - cmax - cmin);
+		}
 
 		// Work out hue
-		int Rdelta = ((cmax-red  )*(hlsmax/6) + (cmax-cmin)/2) / (cmax-cmin);
-		int Gdelta = ((cmax-green)*(hlsmax/6) + (cmax-cmin)/2) / (cmax-cmin);
-		int Bdelta = ((cmax-blue )*(hlsmax/6) + (cmax-cmin)/2) / (cmax-cmin);
+		int Rdelta = ((cmax - red) * (hlsmax / 6) + cdiff / 2) / cdiff;
+		int Gdelta = ((cmax - green) * (hlsmax / 6) + cdiff / 2) / cdiff;
+		int Bdelta = ((cmax - blue) * (hlsmax / 6) + cdiff / 2) / cdiff;
+
 		if (red == cmax)
+		{
 			hue = Bdelta - Gdelta;
+		}
 		else if (green == cmax)
-			hue = (hlsmax/3) + Rdelta - Bdelta;
+		{
+			hue = (hlsmax / 3) + Rdelta - Bdelta;
+		}
 		else
 		{
 			ASSERT(blue == cmax);
@@ -367,9 +379,13 @@ void get_hls(COLORREF rgb, int &hue, int &luminance, int &saturation)
 		}
 
 		if (hue < 0)
+		{
 			hue += hlsmax;
-		if (hue > hlsmax)
+		}
+		else if (hue > hlsmax)
+		{
 			hue -= hlsmax;
+		}
 	}
 }
 
@@ -377,18 +393,28 @@ static int hue2rgb(int n1, int n2, int hue)
 {
 	// Keep hue within range
 	if (hue < 0)
+	{
 		hue += hlsmax;
+	}
 	else if (hue > hlsmax)
+	{
 		hue -= hlsmax;
+	}
 
-	if (hue < hlsmax/6)
-		return n1 + ((n2-n1)*hue + hlsmax/12)/(hlsmax/6);
-	else if (hue < hlsmax/2)
+	if (hue < hlsmax / 6)
+	{
+		return n1 + ((n2 - n1) * hue + hlsmax / 12) / (hlsmax / 6);
+	}
+	else if (hue < hlsmax / 2)
+	{
 		return n2;
-	else if (hue < (hlsmax*2)/3)
-		return n1 + ((n2-n1)*((hlsmax*2)/3 - hue) + hlsmax/12)/(hlsmax/6);
-	else
-		return n1;
+	}
+	else if (hue < (hlsmax * 2) / 3)
+	{
+		return n1 + ((n2 - n1) * ((hlsmax * 2) / 3 - hue) + hlsmax / 12) / (hlsmax / 6);
+	}
+
+	return n1;
 }
 
 COLORREF get_rgb(int hue,int luminance, int saturation)
@@ -398,20 +424,24 @@ COLORREF get_rgb(int hue,int luminance, int saturation)
 
 	if (hue == -1 || saturation == 0)
 	{
-		red = green = blue = (luminance*rgbmax)/hlsmax;
+		red = green = blue = (luminance *rgbmax)/hlsmax;
 	}
 	else
 	{
-		if (luminance <= hlsmax/2)
-			magic2 = (luminance*(hlsmax + saturation) + hlsmax/2)/hlsmax;
+		if (luminance <= hlsmax / 2)
+		{
+			magic2 = (luminance * (hlsmax + saturation) + hlsmax / 2) / hlsmax;
+		}
 		else
-			magic2 = luminance + saturation - (luminance*saturation + hlsmax/2)/hlsmax;
-		magic1 = 2*luminance - magic2;
+		{
+			magic2 = luminance + saturation - (luminance * saturation + hlsmax / 2) / hlsmax;
+		}
+		magic1 = 2 * luminance - magic2;
 
 		// get RGB, changing units from HLSMAX to RGBMAX
-		red =   (hue2rgb(magic1, magic2, hue + hlsmax/3)*rgbmax + hlsmax/2)/hlsmax;
-		green = (hue2rgb(magic1, magic2, hue           )*rgbmax + hlsmax/2)/hlsmax;
-		blue =  (hue2rgb(magic1, magic2, hue - hlsmax/3)*rgbmax + hlsmax/2)/hlsmax;
+		red   = (hue2rgb(magic1, magic2, hue + hlsmax / 3) * rgbmax + hlsmax / 2) / hlsmax;
+		green = (hue2rgb(magic1, magic2, hue             ) * rgbmax + hlsmax / 2) / hlsmax;
+		blue  = (hue2rgb(magic1, magic2, hue - hlsmax / 3) * rgbmax + hlsmax / 2) / hlsmax;
 	}
 
 	return RGB(red, green, blue);
@@ -437,12 +467,20 @@ COLORREF tone_down(COLORREF col, COLORREF bg_col, double amt /* = 0.75*/)
 
 	// If toning "up" make sure that there is some change in the colour
 	if (diff == 0 && amt < 0.0)
+	{
 		diff = luminance > 50 ? 1 : -1;
+	}
+
 	luminance += int(diff*amt);
+
 	if (luminance > 100)
+	{
 		luminance = 100;
+	}
 	else if (luminance < 0)
+	{
 		luminance = 0;
+	}
 
 	// Make colour the same shade as col but less "bright"
 	return get_rgb(hue, luminance, saturation);
@@ -451,9 +489,9 @@ COLORREF tone_down(COLORREF col, COLORREF bg_col, double amt /* = 0.75*/)
 // Increase contrast (tone up) if necessary.
 // If a colour (col) does not have enough contrast with a background
 // colour (bg_col) then increase the contrast.  This is similar to
-// passing a -ve value  to tone_up (above) but "tones up" conditionally.
+// passing a -ve value to tone_down (above) but "tones up" conditionally.
 // Returns col with adjusted luminance which may be exactly the
-// colour of col if therre is already enough contrast.
+// colour of col if there is already enough contrast.
 COLORREF add_contrast(COLORREF col, COLORREF bg_col)
 {
 	int hue, luminance, saturation;
@@ -488,9 +526,14 @@ COLORREF same_hue(COLORREF col, int sat, int lum /* = -1 */)
 	get_hls(col, hue, luminance, saturation);
 
 	if (lum > -1)
+	{
 		luminance = lum;
+	}
+
 	if (sat > -1)
+	{
 		saturation = sat;
+	}
 
 	return get_rgb(hue, luminance, saturation);
 }
