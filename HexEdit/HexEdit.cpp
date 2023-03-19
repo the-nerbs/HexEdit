@@ -773,6 +773,8 @@ void CHexEditApp::InitVersionInfo()
 		dec_point_ = *plconv->decimal_point;
 
 	// Work out if we appear to be in US for spelling changes
+	//TODO: the string compare here seems like it'd be fragile - is there a more reliable way?
+	//  Probably not from pure C or C++ library calls, so probably need to query from the platform.
 	is_us_ = _strnicmp("English_United States", ::setlocale(LC_COLLATE, NULL), 20) == 0;
 }
 

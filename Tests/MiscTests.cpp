@@ -1,9 +1,12 @@
 #include "Stdafx.h"
 #include "Misc.h"
 
+#include <gsl/util>
+
 #include <catch.hpp>
 
 #include <algorithm>
+#include <clocale>
 
 
 struct color_row
@@ -503,4 +506,201 @@ TEST_CASE("opp_hue")
     CHECK(std::abs(expectedR - actualR) <= tolerance);
     CHECK(std::abs(expectedG - actualG) <= tolerance);
     CHECK(std::abs(expectedB - actualB) <= tolerance);
+}
+
+
+static constexpr double one_second = 1 / (60.0 * 60.0 * 24.0);
+
+TEST_CASE("TZDiff")
+{
+    double actual = TZDiff();
+
+    // TODO(C++20): <chrono> has timezone capabilities now, and
+    // as ugly as chrono is to use, it may be less work than this.
+    std::time_t base = std::time(nullptr);
+
+    std::time_t local = std::mktime(std::localtime(&base));
+    std::time_t utc = std::mktime(std::gmtime(&base));
+
+    double computedOffsetInSeconds = std::difftime(local, utc);
+    double computedOffsetInDays = computedOffsetInSeconds / 60.0 / 60.0 / 24.0;
+
+    CHECK(std::abs(actual - computedOffsetInDays) < one_second);
+}
+
+TEST_CASE("FromTime_t")
+{
+    struct row
+    {
+        std::int64_t input;
+        COleDateTime expected;
+    };
+
+    static const row testrows[] = {
+        { 0x00000000, COleDateTime{ 1970, 1, 1, 0, 0, 0 } },
+        { 0x64161840, COleDateTime{ 2023, 3, 18, 20, 0, 0 } },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+
+    DATE actual = FromTime_t(test.input);
+
+    // undo the timezone adjustment
+    actual -= TZDiff();
+    CAPTURE(actual);
+
+    CHECK(std::abs(actual - test.expected) < one_second);
+}
+
+TEST_CASE("FromTime_t_80")
+{
+    struct row
+    {
+        long input;
+        COleDateTime expected;
+    };
+
+    static const row testrows[] = {
+        { 0x00000000, COleDateTime{ 1980, 1, 1, 0, 0, 0 } },
+        { 0x51477240, COleDateTime{ 2023, 3, 18, 20, 0, 0 } },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+
+    DATE actual = FromTime_t_80(test.input);
+
+    // undo the timezone adjustment
+    actual -= TZDiff();
+    CAPTURE(actual);
+
+    CHECK(std::abs(actual - test.expected) < one_second);
+}
+
+TEST_CASE("FromTime_t_mins")
+{
+    struct row
+    {
+        long input;
+        COleDateTime expected;
+    };
+
+    static const row testrows[] = {
+        { 0x00000000, COleDateTime{ 1970, 1, 1, 0, 0, 0 } },
+        { 0x01AB08F0, COleDateTime{ 2023, 3, 18, 20, 0, 0 } },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+
+    DATE actual = FromTime_t_mins(test.input);
+
+    // undo the timezone adjustment
+    actual -= TZDiff();
+    CAPTURE(actual);
+
+    CHECK(std::abs(actual - test.expected) < one_second);
+}
+
+TEST_CASE("FromTime_t_1899")
+{
+    struct row
+    {
+        long input;
+        COleDateTime expected;
+    };
+
+    static const row testrows[] = {
+        { 0x00000000, COleDateTime{ 1899, 12, 30, 0, 0, 0 } },
+        { 0x2baa2640, COleDateTime{ 1923, 3, 18, 20, 0, 0 } },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+
+    DATE actual = FromTime_t_1899(test.input);
+
+    // undo the timezone adjustment
+    actual -= TZDiff();
+    CAPTURE(actual);
+
+    CHECK(std::abs(actual - test.expected) < one_second);
+}
+
+TEST_CASE("FormatDate")
+{
+    struct row
+    {
+        const char* locale;
+        COleDateTime input;
+        CString expected;
+    };
+
+    // note: at least on win7, none of the locales I tested used either
+    // two-digit years or an alternative separator, despite the norms listed
+    // on wiki: https://en.wikipedia.org/w/index.php?title=Date_format_by_country&oldid=1145395238
+    //
+    // For example, per that page, the zh-HK (Hong Kong) locale should use
+    // characters for year, month, and day, but we're seeing slashes. Other
+    // locales that use a '.' also use a slash.
+    static const row testrows[] = {
+        { "en_US",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "3/18/2023" },
+        { "en_AU",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/03/2023" },
+        { "zh",          COleDateTime{ 2023, 3, 18, 0, 0, 0}, "2023/3/18" },
+        { "zh_HK",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/3/2023" },
+
+        // also check UTF8 - the app code doesn't use it now, but may in the future.
+        { "en_US.UTF-8", COleDateTime{ 2023, 3, 18, 0, 0, 0}, "3/18/2023" },
+        { "en_AU.UTF-8", COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/03/2023" },
+        { "zh.UTF-8",    COleDateTime{ 2023, 3, 18, 0, 0, 0}, "2023/3/18" },
+        { "zh_HK.UTF-8", COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/3/2023" },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+
+    const char* originalLocale = std::setlocale(LC_TIME, nullptr);
+    char localeBuf[128] = { 0 };
+    std::strncpy(localeBuf, originalLocale, sizeof(localeBuf));
+
+    std::setlocale(LC_TIME, test.locale);
+
+    auto cleanup = gsl::finally([&]() {
+        std::setlocale(LC_TIME, localeBuf);
+    });
+
+    CString actual = FormatDate(test.input);
+
+    CHECK(actual == test.expected);
 }

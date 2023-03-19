@@ -28,11 +28,10 @@ COLORREF add_contrast(COLORREF col, COLORREF bg_col);
 
 // Date/time
 double TZDiff();
-DATE FromTime_t(__int64 v);
+DATE FromTime_t(std::int64_t v);
 DATE FromTime_t_80(long v);
 DATE FromTime_t_mins(long v);
 DATE FromTime_t_1899(long v);
-bool ConvertToFileTime(time_t tt, FILETIME *ft);
 CString FormatDate(DATE dd);
 
 // System utils
@@ -44,8 +43,6 @@ CString FileErrorMessage(const CFileException *fe, UINT mode = CFile::modeRead|C
 enum wipe_t { WIPE_FAST, WIPE_GOOD, WIPE_THOROUGH, WIPE_LAST };
 BOOL WipeFile(const char * filename, wipe_t wipe_type = WIPE_GOOD);
 bool UncompressAndWriteFile(const char *filename, const unsigned char *data, size_t len);
-void SetFileCreationTime(const char *filename, time_t tt);
-void SetFileAccessTime(const char *filename, time_t tt);
 BOOL SetFileTimes(const char * filename, const FILETIME * cre, const FILETIME * acc = NULL, const FILETIME * mod = NULL);
 BOOL SetFileCompression(const char * filename, USHORT comp);
 

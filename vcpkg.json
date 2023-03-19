@@ -8,6 +8,7 @@
       "cryptopp",
       "freeimage",
       "mpir",
+      "ms-gsl",
       "zlib"
   ]
 }

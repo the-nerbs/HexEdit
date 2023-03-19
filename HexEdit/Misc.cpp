@@ -95,8 +95,6 @@ Description:    Like AddCommas() above but adds spaces to a hex number rather
 #include <ctype.h>
 #include <assert.h>
 #include <locale.h>
-#include <sys/stat.h>           // For _stat()
-#include <sys/utime.h>          // For _utime()
 
 #pragma warning(push)
 #pragma warning(disable: 4293)  // avoid bogus overflow warning
@@ -549,61 +547,54 @@ COLORREF opp_hue(COLORREF col)
 
 // -------------------------------------------------------------------------
 // Time routines
+static constexpr double minutes_per_day = 24.0 * 60.0;
+static constexpr double seconds_per_day = minutes_per_day * 60.0;
 
 double TZDiff()
 {
-	static double tz_diff = -1e30;
+	static constexpr double not_set = -1e30;
+	static constexpr std::time_t reference_point{ 1000000 };
 
-	if (tz_diff != -1e30)
-		return tz_diff;
-	time_t dummy = time_t(1000000L);
-	tz_diff = (1000000L - mktime(gmtime(&dummy)))/86400.0;
+	static double tz_diff = not_set;
+
+	if (tz_diff == not_set)
+	{
+		time_t dummy = time_t(reference_point);
+		tz_diff = (reference_point - mktime(gmtime(&dummy))) / seconds_per_day;
+	}
+
 	return tz_diff;
 }
 
-DATE FromTime_t(__int64 v)  // Normal time_t and time64_t (secs since 1/1/1970)
+// Normal time_t and time64_t (secs since 1/1/1970)
+DATE FromTime_t(std::int64_t v)
 {
-	return (365.0*70.0 + 17 + 2) + v/(24.0*60.0*60.0) + TZDiff();
+	// 17 = # leap days between 30 Dec 1899 and 30 Dec 1969
+	//  2 = # days between 30 Dec 1969 and 1 Jan 1970
+	return (365.0 * 70.0 + 17 + 2) + v / seconds_per_day + TZDiff();
 }
 
+// MSC 5.1 time_t (secs since 1/1/1980)
 DATE FromTime_t_80(long v)
 {
-	return (365.0*80.0 + 19 + 2) + v/(24.0*60.0*60.0) + TZDiff();
+	// 19 = # leap days between 30 Dec 1899 and 30 Dec 1979
+	//  2 = # days between 30 Dec 1979 and 1 Jan 1980
+	return (365.0 * 80.0 + 19 + 2) + v / seconds_per_day + TZDiff();
 }
 
+// ??? time_t (minutes since 1/1/1970)
 DATE FromTime_t_mins(long v)
 {
-	return (365.0*70.0 + 17 + 2) + v/(24.0*60.0) + TZDiff();
+	// 17 = # leap days between 30 Dec 1899 and 30 Dec 1969
+	//  2 = # days between 30 Dec 1969 and 1 Jan 1970
+	return (365.0 * 70.0 + 17 + 2) + v / minutes_per_day + TZDiff();
 }
 
+// MSC 7 time_t (secs since 31/12/1899)
+//TODO: 31 Dec or 30 Dec ??? There's no day offset, so is the UI wrong here?
 DATE FromTime_t_1899(long v)
 {
-	return v/(24.0*60.0*60.0) + TZDiff();
-}
-
-// Convert time_t to FILETIME
-bool ConvertToFileTime(time_t tt, FILETIME *ft)
-{
-	assert(ft != NULL);
-	bool retval = false;
-
-	struct tm * ptm = ::localtime(&tt);
-	if (ptm != NULL)
-	{
-		SYSTEMTIME st;
-		st.wYear   = ptm->tm_year + 1900;
-		st.wMonth  = ptm->tm_mon + 1;
-		st.wDay    = ptm->tm_mday;
-		st.wHour   = ptm->tm_hour;
-		st.wMinute = ptm->tm_min;
-		st.wSecond = ptm->tm_sec;
-		st.wMilliseconds = 500;
-
-		FILETIME ftemp;   // File time as local time
-		if (::SystemTimeToFileTime(&st, &ftemp) && ::LocalFileTimeToFileTime(&ftemp, ft))
-			retval = true;
-	}
-	return retval;
+	return v / seconds_per_day + TZDiff();
 }
 
 //// This is the ptr to (start of) time info from the thread local info structure
@@ -1638,33 +1629,6 @@ bool UncompressAndWriteFile(const char *filename, const unsigned char *data, siz
 	return true;
 }
 
-#if 0  // not used
-// Change a file's "creation" time
-void SetFileCreationTime(const char *filename, time_t tt)
-{
-	HANDLE hh = ::CreateFile(filename, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hh == INVALID_HANDLE_VALUE)
-		return;
-
-	FILETIME ft;
-	if (ConvertToFileTime(tt, &ft))
-		::SetFileTime(hh, &ft, NULL, NULL);
-	::CloseHandle(hh);
-}
-
-// Change a file's "access" time
-void SetFileAccessTime(const char *filename, time_t tt)
-{
-	HANDLE hh = ::CreateFile(filename, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hh == INVALID_HANDLE_VALUE)
-		return;
-
-	FILETIME ft;
-	if (ConvertToFileTime(tt, &ft))
-		::SetFileTime(hh, NULL, &ft, NULL);
-	::CloseHandle(hh);
-}
-#endif
 
 BOOL SetFileTimes(const char * filename, const FILETIME * cre, const FILETIME * acc, const FILETIME * mod)
 {
