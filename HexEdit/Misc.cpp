@@ -686,7 +686,9 @@ CString NumScale(double val)
 		retval.Format("%5g %c", negative ? -dd : dd, unit_str[idx]);
 	}
 	else
+	{
 		retval.Format("%#5.3g %c", negative ? -dd : dd, unit_str[idx]);
+	}
 
 	return retval;
 }
@@ -700,38 +702,66 @@ CString NumScale(double val)
 // sep_char = character to use as a separator (default is comma)
 // ucase = when radix is greater than 10 this says to use lower/upper-case letters
 // return false on error (invalid parameter or buflen is too small)
-bool int2str(char * buf, size_t buflen, unsigned __int64 val,
+bool int2str(char * buf, size_t buflen, std::uint64_t val,
 	int radix /*=10*/, int sep /*=3*/, char sep_char /*=','*/, 
 	bool ucase /*=true*/, int min_dig /*=0*/, int max_dig /*=0*/)
 {
 	static char upper[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ?";
 	static char lower[] = "0123456789abcdefghijklmnopqrstuvwxyz?";
 
-	if (radix < 2 || radix > sizeof(upper) - 1)
+	if (buflen == 0)
+	{
 		return false;
+	}
 
-	char *pp = buf, *end = buf + buflen;
+	if (radix < 2 || radix > sizeof(upper) - 1)
+	{
+		// invalid radix
+		return false;
+	}
+
+	char* pp = buf;
+	char *const end = buf + buflen;
+
 	for (int dig = 1; ; ++dig)
 	{
 		if (ucase)
-			*pp++ = upper[(unsigned)(val%radix)];
+		{
+			*pp++ = upper[(unsigned)(val % radix)];
+		}
 		else
-			*pp++ = lower[(unsigned)(val%radix)];
+		{
+			*pp++ = lower[(unsigned)(val % radix)];
+		}
+
 		if (pp >= end)
-			return false;  // buf is full
+		{
+			// buf is full
+			return false;
+		}
 
 		// Remove the digit we just did and stop when there are no more
 		if ((val /= radix) == 0 && dig >= min_dig)
+		{
 			break;
+		}
 
 		if (max_dig > 0 && dig >= max_dig)
+		{
 			break;
+		}
 
-		if (sep > 0 && dig%sep == 0)
-			*pp++ = sep_char;    // add separator
+		if (sep > 0 && dig % sep == 0)
+		{
+			// add separator
+			*pp++ = sep_char;
+		}
 
 		if (pp >= end)
-			return false;       // buf is full
+		{
+			// buf is full
+			return false;
+		}
 	}
 	*pp++ = '\0';               // terminate the string
 
@@ -741,9 +771,9 @@ bool int2str(char * buf, size_t buflen, unsigned __int64 val,
 }
 
 // Make a string of binary digits from a number (64 bit int)
-CString bin_str(__int64 val, int bits)
+CString bin_str(std::int64_t val, int bits)
 {
-	ASSERT(bits <= 64);
+	ASSERT(0 <= bits && bits <= 64);
 	char buf[100], *pp = buf;
 
 	for (int ii = 0; ii < bits; ++ii)
@@ -768,74 +798,103 @@ void AddCommas(CString &str)
 
 	// Allocate enough space (allowing for space padding)
 	//TODO(???): this math doesn't seem right to me, but I think it only *over*-allocates, so this may not be a problem?
-	char *out = new char[(str.GetLength()*(theApp.dec_group_+1))/theApp.dec_group_ + 2]; // Result created here
-	char *dd = out;                     // Ptr to current output char
+	// Result created here
+	const std::size_t buflen = (str.GetLength() * (theApp.dec_group_ + 1)) / theApp.dec_group_ + 2;
+	std::unique_ptr<char[]> outbuf = std::make_unique<char[]>(buflen);
+
+	char *dd = outbuf.get();               // Ptr to current output char
 
 	// Skip leading whitespace
-	//TODO(bug?): CString::ReleaseBuffer not called. This is *probably* harmless though.
 	pp = str.GetBuffer(0);
-	while (isspace(*pp))
+	while (std::isspace(*pp))
+	{
 		pp++;
+	}
 
 	// Keep initial sign if any
 	if (*pp == '+' || *pp == '-')
+	{
 		*dd++ = *pp++;
+	}
 
 	// Find end of number and work out how many digits it has
-	end = pp + strspn(pp, ", \t0123456789");
-	for (const char *qq = pp; qq < end; ++qq)
-		if (isdigit(*qq))
+	end = pp + std::strspn(pp, ", \t0123456789");
+	for (const char* qq = pp; qq < end; ++qq)
+	{
+		if (std::isdigit(*qq))
+		{
 			++ndigits;
+		}
+	}
 
-	for ( ; ndigits > 0; ++pp)
-		if (isdigit(*pp))
+	for (; ndigits > 0; ++pp)
+	{
+		if (std::isdigit(*pp))
 		{
 			*dd++ = *pp;
-			if (--ndigits > 0 && ndigits%theApp.dec_group_ == 0)
+			if (--ndigits > 0 && ndigits % theApp.dec_group_ == 0)
+			{
 				*dd++ = theApp.dec_sep_char_;
+			}
 		}
+	}
 	ASSERT(pp <= end);
-	strcpy(dd, pp);
+	std::strcpy(dd, pp);
+	str.ReleaseBuffer();
 
-	str = out;
-	delete[] out;
+	str = outbuf.get();
 }
 
 // Add spaces to make a string of hex digits easier to read
 void AddSpaces(CString &str)
 {
-	const char *pp, *end;               // Ptrs into orig. string
-	int ndigits = 0;                    // Number of digits in string
-	const char sep_char = ' ';  // Used to separate groups of digits
-	const int group = 4;                // How many is in a group
+	static constexpr char sep_char = ' ';   // Used to separate groups of digits
+	static constexpr int group = 4;         // How many is in a group
+
 
 	// Allocate enough space (allowing for space padding)
-	char *out = new char[(str.GetLength()*(group+1))/group + 2]; // Result created here
-	char *dd = out;                     // Ptr to current output char
+	const std::size_t buflen = (str.GetLength() * (group + 1)) / group + 2;
+	std::unique_ptr<char[]> outbuf = std::make_unique<char[]>(buflen);
+
+	char* dd = outbuf.get();            // Ptr to current output char
 
 	// Skip leading whitespace
-	pp = str.GetBuffer(0);
-	while (isspace(*pp))
+	const char* pp = str.GetBuffer(0);
+	while (std::isspace(*pp))
+	{
 		pp++;
+	}
 
 	// Find end of number and work out how many digits it has
-	end = pp + strspn(pp, " \t0123456789ABCDEFabcdef");
-	for (const char *qq = pp; qq < end; ++qq)
-		if (isxdigit(*qq))
-			++ndigits;
+	const char* end = pp + strspn(pp, " \t0123456789ABCDEFabcdef");
+	int ndigits = 0;
 
-	for ( ; ndigits > 0; ++pp)
-		if (isxdigit(*pp))
+	for (const char* qq = pp; qq < end; ++qq)
+	{
+		if (std::isxdigit(*qq))
+		{
+			++ndigits;
+		}
+	}
+
+	for (; ndigits > 0; ++pp)
+	{
+		if (std::isxdigit(*pp))
 		{
 			*dd++ = *pp;
-			if (--ndigits > 0 && ndigits%group == 0)
-				*dd++ = sep_char;
-		}
-	ASSERT(pp <= end);
-	strcpy(dd, pp);
 
-	str = out;
-	delete[] out;
+			if (--ndigits > 0 && ndigits % group == 0)
+			{
+				*dd++ = sep_char;
+			}
+		}
+	}
+	ASSERT(pp <= end);
+	std::strcpy(dd, pp);
+
+	str.ReleaseBuffer();
+
+	str = outbuf.get();
 }
 
 CStringW MakePlural(const CStringW & ss)
@@ -856,8 +915,8 @@ CStringW MakePlural(const CStringW & ss)
 	}
 
 	// We need the last 2 characters to analyse how to make the plural
-	TCHAR ult = toupper(ss[len - 1]);
-	TCHAR penult = toupper(ss[len - 2]);
+	WCHAR ult = std::toupper(ss[len - 1]);
+	WCHAR penult = std::toupper(ss[len - 2]);
 
 	// When the noun ends in SS, SH, CH or X, we add -ES
 	if (penult == 'S' && ult == 'S' ||  // eg: kiss
@@ -869,7 +928,7 @@ CStringW MakePlural(const CStringW & ss)
 	}
 
 	// When the noun ends in a VOWEL + Y, we add -S
-	if (ult == 'Y' && CStringW(L"AEIOU").Find(penult) != -1)  // eg: bay, boy, guy
+	if (ult == 'Y' && std::wcschr(L"AEIOU", penult))  // eg: bay, boy, guy
 	{
 		return ss + L"s";
 	}

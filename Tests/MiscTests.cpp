@@ -704,3 +704,368 @@ TEST_CASE("FormatDate")
 
     CHECK(actual == test.expected);
 }
+
+
+TEST_CASE("NumScale")
+{
+    struct row
+    {
+        int abbrevMode;
+        double value;
+        CString expected;
+    };
+
+    static const row testrows[] = {
+        // basic increasing magnitude scale
+        { 0,                      0.0,   "    0  " },
+        { 0,                      1.0,   "    1  " },
+        { 0,                     12.0,   "   12  " },
+        { 0,                    123.0,   "  123  " },
+        { 0,                   1234.0,   " 1.23 K" },
+        { 0,                  12345.0,   " 12.3 K" },
+        { 0,                 123456.0,   "  123 K" },
+        { 0,                1234567.0,   " 1.23 M" },
+        { 0,               12345678.0,   " 12.3 M" },
+        { 0,              123456789.0,   "  123 M" },
+        { 0,             1234567890.0,   " 1.23 G" },
+        { 0,            12345678901.0,   " 12.3 G" },
+        { 0,           123456789012.0,   "  123 G" },
+        { 0,          1234567890123.0,   " 1.23 T" },
+        { 0,         12345678901234.0,   " 12.3 T" },
+        { 0,        123456789012345.0,   "  123 T" },
+        { 0,       1234567890123456.0,   " 1.23 P" },
+        { 0,      12345678901234567.0,   " 12.3 P" },
+        { 0,     123456789012345678.0,   "  123 P" },
+        { 0,    1234567890123456789.0,   " 1.23 E" },
+        { 0,   12345678901234567890.0,   " 12.3 E" },
+        { 0,  123456789012345678901.0,   "  123 E" },
+        { 0, 1234567890123456789012.0,   " 1e+21 " },
+
+        // rounding after 3 digits
+        { 0,                   123.4,   "  123  " },
+        { 0,                   123.5,   "  124  " },    // midpoint rounds up
+        { 0,                   124.5,   "  125  " },    //   not to nearest even
+        { 0,                   124.6,   "  125  " },
+
+        // negatives
+        { 0,                      -0.0,   "    0  " },
+        { 0,                      -1.0,   "   -1  " },
+        { 0,  -123456789012345678901.0,   " -123 E" },
+        { 0, -1234567890123456789012.0,   "-1e+21 " },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.abbrevMode, test.value, test.expected);
+
+
+    int origAbbrevMode = theApp.k_abbrev_;
+    theApp.k_abbrev_ = test.abbrevMode;
+    auto cleanup = gsl::finally([=]() {
+        theApp.k_abbrev_ = origAbbrevMode;
+    });
+
+    CString actual = NumScale(test.value);
+    CAPTURE(actual);
+
+    CHECK(actual == test.expected);
+}
+
+TEST_CASE("int2str")
+{
+    struct row
+    {
+        std::int64_t value;
+        int radix;
+        int separator_digits;
+        char separator;
+        bool uppercase;
+        int minDigits;
+        int maxDigits;
+
+        bool success;
+        CString expected;
+    };
+
+    static const row testrows[] = {
+        //  value  radix    sep    upper?   digs            results
+        {       0,  10,   3, ',',  false,   0, 5,    true,               "0" },
+        {       1,  10,   3, ',',  false,   0, 5,    true,               "1" },
+        {   12345,  10,   3, ',',  false,   0, 5,    true,          "12,345" },
+        {   12345,  10,   2, '_',  false,   0, 5,    true,         "1_23_45" },
+
+        {   65535,  16,   2, '+',  false,   0, 5,    true,           "ff+ff" },
+        {   65535,  16,   2, '+',   true,   0, 5,    true,           "FF+FF" },
+
+        {    1234,  10,   0, '.',  false,   5, 5,    true,           "01234" },
+        {    1234,  10,   0, '.',  false,   1, 1,    true,               "4" },
+
+        {    0xFF,   2,   4, '.',  false,   0, 0,    true,       "1111.1111" },
+        {  0x7FFF,   2,   0, '.',  false,   0, 0,    true, "111111111111111" },
+
+        {    1367,  37,   0, '.',  false,   0, 0,    true,              "?z" },
+        {    1367,  37,   0, '.',   true,   0, 0,    true,              "?Z" },
+
+        {  0xFFFF,   2,   0, '.',  false,   0, 0,   false,                "" }, // value too long
+        {    1234,   1,   0, '.',  false,   0, 0,   false,                "" }, // radix too small
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.value, test.radix, test.expected);
+
+
+    char buffer[16]{};
+
+    bool actualSuccess = int2str(
+        buffer, sizeof(buffer),
+        test.value,
+        test.radix,
+        test.separator_digits, test.separator,
+        test.uppercase,
+        test.minDigits,
+        test.maxDigits
+    );
+    CAPTURE(buffer);
+
+    CHECK(actualSuccess == test.success);
+    if (actualSuccess)
+    {
+        CHECK(buffer == test.expected);
+    }
+}
+
+TEST_CASE("int2str - buffer len 0")
+{
+    char buffer[16]{};
+
+    bool success = int2str(
+        buffer, 0,
+        12345,
+        10,
+        0, ',',
+        true,
+        0, 100
+    );
+
+    CHECK(!success);
+}
+
+TEST_CASE("int2str - not enough space on separator")
+{
+    char buffer[16]{};
+
+    //{ 0xFFFF, 2, 0, '.', false, 0, 0, false, "" }, // value too long
+    bool success = int2str(
+        buffer, 3,
+        7,
+        2,
+        2, ',',
+        true,
+        0, 100
+    );
+
+    CHECK(!success);
+}
+
+TEST_CASE("bin_str")
+{
+    struct row
+    {
+        std::int64_t value;
+        int bits;
+        CString expected;
+    };
+
+    static const row testrows[] = {
+        {      0,  1,                 "0" },
+        {      1,  1,                 "1" },
+        { 0xAA55, 16, "10101010 01010101" },
+        {
+            0x55AA55AA55AA55AA,
+            64,
+            "01010101 10101010 01010101 10101010 01010101 10101010 01010101 10101010"
+        },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.value, test.bits, test.expected);
+
+    CString actual = bin_str(test.value, test.bits);
+    CAPTURE(actual);
+
+    CHECK(test.expected == actual);
+}
+
+TEST_CASE("AddCommas")
+{
+    struct row
+    {
+        CString input;
+        int groupSize;
+        char groupSeparator;
+
+        CString expected;
+    };
+
+    static const row testrows[] = {
+        {      "0", 3, ',',        "0" },
+        {    "123", 3, ',',      "123" },
+        { "123456", 3, ',',  "123,456" },
+        { "123456", 2, '/', "12/34/56" },
+        { "123456", 4, '+',  "12+3456" },
+
+        // leading whitespace trimmed
+        { "   123456", 3, ',',  "123,456" },
+
+        // trailing whitespace preserved
+        { "123456   ", 3, ',',  "123,456   " },
+
+        // leading signs are preserved
+        { "+123456", 3, '_',  "+123_456" },
+        { "-123456", 3, '_',  "-123_456" },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.groupSize, test.groupSeparator, test.expected);
+
+    int origGroupSize = theApp.dec_group_;
+    int origSepChar = theApp.dec_sep_char_;
+    auto cleanup = gsl::finally([=]() {
+        theApp.dec_sep_char_ = origSepChar;
+        theApp.dec_group_ = origGroupSize;
+    });
+
+    theApp.dec_group_ = test.groupSize;
+    theApp.dec_sep_char_ = test.groupSeparator;
+
+    CString actual = test.input;
+    AddCommas(actual);
+    CAPTURE(actual);
+
+    CHECK(test.expected == actual);
+}
+
+TEST_CASE("AddSpaces")
+{
+    struct row
+    {
+        CString input;
+        CString expected;
+    };
+
+    static const row testrows[] = {
+        {         "0",           "0" },
+        {         "1",           "1" },
+        {        "12",          "12" },
+        {       "123",         "123" },
+        {      "1234",        "1234" },
+        {     "12345",      "1 2345" },
+        {    "123456",     "12 3456" },
+        {   "1234567",    "123 4567" },
+        {  "12345678",   "1234 5678" },
+        { "123456789", "1 2345 6789" },
+
+        // leading whitespace trimmed
+        { "     123456789", "1 2345 6789" },
+
+        // trailing whitespace preserved
+        { "123456789     ", "1 2345 6789     " },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+    CString actual = test.input;
+    AddSpaces(actual);
+    CAPTURE(actual);
+
+    CHECK(test.expected == actual);
+}
+
+TEST_CASE("MakePlural")
+{
+    struct row
+    {
+        CStringW input;
+        CStringW expected;
+    };
+
+    static const row testrows[] = {
+        { L"X", L"Xs" },
+        { L"child", L"children" },
+        { L"digit", L"digits" },
+
+        // *ch, *sh, *ss, *x -> add 'es'
+        { L"batch", L"batches" },
+        { L"sash", L"sashes" },
+        { L"glass", L"glasses" },
+        { L"box", L"boxes" },
+
+        // *(vowel)y -> add 's'
+        { L"monday", L"mondays" },
+
+        // *(consonant)y -> remove y, add 'ies'
+        { L"memory", L"memories" },
+
+        // *f -> *ves
+        { L"half", L"halves" },
+
+        // *fe -> *ves
+        { L"knife", L"knives" },
+
+        // *is -> *es
+        { L"thesis", L"theses" },
+
+        // cases *not* handled
+        { L"children", L"childrens" },  // already plural
+
+        { L"man", L"mans" },            // explicitly not handled
+        { L"woman", L"womans" },
+        { L"foot", L"foots" },
+        { L"goose", L"gooses" },
+        { L"mouse", L"mouses" },
+
+        // some additional cases inspired from Humanizer's handling:
+        // https://github.com/Humanizr/Humanizer/blob/1bdd7a1bad03fd001d04fc0e252d279b4e785818/src/Humanizer/Inflections/Vocabularies.cs
+        { L"octopus", L"octopuss" },    // should be octopi
+        { L"datum", L"datums" },        // should be data
+        { L"salmon", L"salmons" },      // should be salmon (uncountable word)
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.expected);
+
+    CStringW actual = MakePlural(test.input);
+    CAPTURE(actual);
+
+    CHECK(test.expected == actual);
+}
