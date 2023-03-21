@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <clocale>
+#include <cmath>
 
 
 struct color_row
@@ -1068,4 +1069,108 @@ TEST_CASE("MakePlural")
     CAPTURE(actual);
 
     CHECK(test.expected == actual);
+}
+
+
+TEST_CASE("make_real48")
+{
+    struct row
+    {
+        double value;
+        bool bigEndian;
+
+        bool expectedSuccess;
+        std::array<std::uint8_t, 6> expectedBytes;
+    };
+
+    static const row testrows[] = {
+        //             value      BE?    OK?   output
+        {              0.0,     false,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {              0.0,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {             -1.0,     false,  true, { 0x81, 0x00, 0x00, 0x00, 0x00, 0x80 } },
+        {             -1.0,      true,  true, { 0x80, 0x00, 0x00, 0x00, 0x00, 0x81 } },
+        {              1.0,     false,  true, { 0x81, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {              1.0,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x81 } },
+
+        {           1e-129,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+
+        { 1099511627775.0L,     false,  true, { 0xA8, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F } },
+        { 1099511627775.0L,      true,  true, { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8 } },
+
+        { INFINITY, false, false, {} },
+        { -INFINITY, false, false, {} },
+        { NAN, false, false, {} },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.value, test.bigEndian);
+
+
+    std::uint8_t actual[6]{};
+
+    bool success = make_real48(actual, test.value, test.bigEndian);
+
+    CHECK(success == test.expectedSuccess);
+
+    for (std::size_t i = 0; i < test.expectedBytes.size(); i++)
+    {
+        // promote these to ints so they print correctly on failure
+        int actualVal = actual[i];
+        int expectedVal = test.expectedBytes[i];
+        CAPTURE(i);
+        CHECK(actualVal == expectedVal);
+    }
+}
+
+TEST_CASE("real48")
+{
+    struct row
+    {
+        std::array<std::uint8_t, 6> bytes;
+        bool bigEndian;
+
+        double expectedValue;
+        int expectedExponent;
+        long double expectedMantissa;
+    };
+
+    static const row testrows[] = {
+        //                 bytes                    BE?           value
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,                 0.0, -128,  0.0 },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },  true,                 0.0, -128,  0.0 },
+        { { 0x81, 0x00, 0x00, 0x00, 0x00, 0x80 }, false,                -1.0,    1, -1.0 },
+        { { 0x80, 0x00, 0x00, 0x00, 0x00, 0x81 },  true,                -1.0,    1, -1.0 },
+        { { 0x81, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,                 1.0,    1,  1.0 },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x81 },  true,                 1.0,    1,  1.0 },
+
+        { { 0xA8, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F }, false,    1099511627775.0L,   40,  1.999999999998L  },
+        { { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8 },  true,    1099511627775.0L,   40,  1.999999999998L  },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.expectedValue, test.bigEndian);
+
+
+    int exp{};
+    long double mantissa{};
+    double actual = real48(test.bytes.data(), &exp, &mantissa, test.bigEndian);
+
+    const double valTolerance = std::abs(std::min(test.expectedValue, actual)) * DBL_EPSILON;
+    CHECK(std::abs(test.expectedValue - actual) <= valTolerance);
+
+    CHECK(exp == test.expectedExponent);
+    
+    static constexpr double r48_epsilon = 1.0 / (1024.0 * 1024.0 * 1024.0 * 512.0);
+    const double mantTolerance = std::abs(std::max(test.expectedMantissa, mantissa)) * r48_epsilon;
+    CHECK(std::abs(test.expectedMantissa - mantissa) <= mantTolerance);
 }
