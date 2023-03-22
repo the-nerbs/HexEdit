@@ -62,7 +62,6 @@ END_MESSAGE_MAP()
 
 
 // Acknowledged software used in HexEdit and associated web addresses
-// xxx add Boost and MPIR
 static const char *ack_name[] =
 {
 	"Boost C++ template library - various",

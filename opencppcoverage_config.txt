@@ -3,7 +3,22 @@
 # If using the Visual Studio plugin, this can be set from the settings page's
 # "Miscellaneous" tab.
 
+# exclude tests
 excluded_sources=*\Tests\*
+
+# exclude third party GUI controls
+# Getting test coverage over these (where possible) is lower priority than
+# covering the app's code, so just exclude these sources for now.
+excluded_sources=*\HexEdit\GridBtnCell_src\*
+excluded_sources=*\HexEdit\GridCtrl_src\*
+excluded_sources=*\HexEdit\GridTreeBtnCell_src\*
+excluded_sources=*\HexEdit\NewCellTypes\*
+excluded_sources=*\HexEdit\TreeColumn_src\*
+excluded_sources=*\HexEdit\ResizeCtrl.*
+excluded_sources=*\HexEdit\SimpleSplitter.*
+excluded_sources=*\HexEdit\Splasher.*
+excluded_sources=*\HexEdit\TransparentStatic2.*
+
 
 # this isn't ideal, but there are *a lot* of false negatives on closing
 # curly braces after a flow control statement (break, return, throw).
