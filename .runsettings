@@ -1,0 +1,7 @@
+﻿<RunSettings>
+
+  <Catch2Adapter>
+    <FilenameFilter>.*Tests</FilenameFilter>
+  </Catch2Adapter>
+
+</RunSettings>

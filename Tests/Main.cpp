@@ -20,12 +20,24 @@ int main(int argc, char* argv[])
     using clock = std::chrono::steady_clock;
     clock::time_point start = clock::now();
 
-    int result = Catch::Session().run(argc, argv);
+    Catch::Session session{};
+    session.applyCommandLine(argc, argv);
 
-    clock::time_point end = clock::now();
-    clock::duration time = end - start;
-    auto timeMS = std::chrono::duration_cast<std::chrono::milliseconds>(time);
-    std::cout << "Tests took " << timeMS.count() << " ms\n\n";
+    int result = session.run();
+
+    const Catch::Config& config = session.config();
+
+    // if we're called for discovering tests, then print out the discovery results.
+    if (!config.listTests()
+        && !config.listTags()
+        && !config.listReporters()
+        && !config.listListeners())
+    {
+        clock::time_point end = clock::now();
+        clock::duration time = end - start;
+        auto timeMS = std::chrono::duration_cast<std::chrono::milliseconds>(time);
+        std::cout << "Tests took " << timeMS.count() << " ms\n\n";
+    }
 
     // global clean-up...
 
