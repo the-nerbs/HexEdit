@@ -1085,33 +1085,46 @@ double real48(const unsigned char *pp, int *pexp, long double *pmant, bool big_e
 }
 
 static const long double two_pow24 = 16777216.0L;
+static const long double two_pow32 = 4294967296.0;
 static const long double two_pow56 = 72057594037927936.0L;
 
 bool make_ibm_fp32(unsigned char pp[4], double val, bool little_endian /*=false*/)
 {
-	int exp;                    // Base 2 exponent of val
+	if (std::isinf(val) || std::isnan(val))
+	{
+		// no representation
+		return false;
+	}
 
-	val = frexp(val, &exp);
+	// Base 2 exponent of val
+	int exp;
+	val = std::frexp(val, &exp);
 
-	if (val == 0.0 || exp < -279)
+	if (val == 0.0 || exp < -260)
 	{
 		// Return IBM zero for zero or exponent too small
-		memset(pp, '\0', 4);
+		std::memset(pp, '\0', 4);
 		return true;
 	}
 	else if (exp > 252)
-		return false;           // Rteurn error for exponent too big
+	{
+		// Return error for exponent too big
+		return false;
+	}
 
-	// Change signed exponent into +ve biassed exponent (-256=>0, 252=>508)
+	// Change signed exponent into positive biased exponent (-256=>0, 252=>508)
 	exp += 256;
 
 	// normalize exponent to base 16 (with corresp. adjustment to mantissa)
-	while (exp < 0 || (exp&3) != 0)   // While bottom 2 bits are not zero we don't have a base 16 exponent
+	// While bottom 2 bits are not zero we don't have a base 16 exponent
+	while (exp < 0 || (exp & 3) != 0)
 	{
 		val /= 2.0;
 		++exp;
 	}
-	exp = exp>>2;               // Convert base 2 exponent to base 16
+
+	// Convert base 2 exponent to base 16
+	exp = exp >> 2;
 
 	// At this point we have a signed base 16 exponent in range 0 to 127 and
 	// a signed mantissa in the range 0.0625 (1/16) to (just less than) 1.0.
@@ -1131,45 +1144,59 @@ bool make_ibm_fp32(unsigned char pp[4], double val, bool little_endian /*=false*
 		pp[0] = exp;
 	}
 
-	long imant = long(val * two_pow24);
+	int imant = static_cast<int>(val * two_pow24);
 	assert(imant < two_pow24);
-	pp[1] = unsigned char((imant>>16) & 0xFF);
-	pp[2] = unsigned char((imant>>8) & 0xFF);
-	pp[3] = unsigned char((imant) & 0xFF);
+
+	pp[1] = static_cast<unsigned char>((imant >> 16) & 0xFF);
+	pp[2] = static_cast<unsigned char>((imant >> 8) & 0xFF);
+	pp[3] = static_cast<unsigned char>(imant & 0xFF);
 
 	if (little_endian)
 	{
 		unsigned char cc = pp[0]; pp[0] = pp[3]; pp[3] = cc;
 		cc = pp[1]; pp[1] = pp[2]; pp[2] = cc;
 	}
+
 	return true;
 }
 
 bool make_ibm_fp64(unsigned char pp[8], double val, bool little_endian /*=false*/)
 {
-	int exp;                    // Base 2 exponent of val
+	if (std::isinf(val) || std::isnan(val))
+	{
+		// no representation
+		return false;
+	}
 
-	val = frexp(val, &exp);
+	// Base 2 exponent of val
+	int exp;
+	val = std::frexp(val, &exp);
 
-	if (val == 0.0 || exp < -279)
+	if (val == 0.0 || exp < -260)
 	{
 		// Return IBM zero for zero or exponent too small
-		memset(pp, '\0', 8);
+		std::memset(pp, '\0', 8);
 		return true;
 	}
 	else if (exp > 252)
-		return false;           // Rteurn error for exponent too big
+	{
+		// Return error for exponent too big
+		return false;
+	}
 
-	// Change signed exponent into +ve biassed exponent (-256=>0, 252=>508)
+	// Change signed exponent into positive biased exponent (-256=>0, 252=>508)
 	exp += 256;
 
-	// normalize exponent to base 16 (with corresp. adjustment to mantissa)
-	while (exp < 0 || (exp&3) != 0)   // While bottom 2 bits are not zero we don't have a base 16 exponent
+	// normalize exponent to base 16 (with corresponding adjustment to mantissa)
+	// While bottom 2 bits are not zero we don't have a base 16 exponent
+	while (exp < 0 || (exp & 3) != 0)
 	{
 		val /= 2.0;
 		++exp;
 	}
-	exp = exp>>2;               // Convert base 2 exponent to base 16
+
+	// Convert base 2 exponent to base 16
+	exp = exp>>2;
 
 	// At this point we have a signed base 16 exponent in range 0 to 127 and
 	// a signed mantissa in the range 0.0625 (1/16) to (just less than) 1.0.
@@ -1189,15 +1216,16 @@ bool make_ibm_fp64(unsigned char pp[8], double val, bool little_endian /*=false*
 		pp[0] = exp;
 	}
 
-	__int64 imant = (__int64)(val * two_pow56);
+	std::int64_t imant = static_cast<std::int64_t>(val * two_pow56);
 	assert(imant < two_pow56);
-	pp[1] = unsigned char((imant>>48) & 0xFF);
-	pp[2] = unsigned char((imant>>40) & 0xFF);
-	pp[3] = unsigned char((imant>>32) & 0xFF);
-	pp[4] = unsigned char((imant>>24) & 0xFF);
-	pp[5] = unsigned char((imant>>16) & 0xFF);
-	pp[6] = unsigned char((imant>>8) & 0xFF);
-	pp[7] = unsigned char((imant) & 0xFF);
+
+	pp[1] = static_cast<unsigned char>((imant >> 48) & 0xFF);
+	pp[2] = static_cast<unsigned char>((imant >> 40) & 0xFF);
+	pp[3] = static_cast<unsigned char>((imant >> 32) & 0xFF);
+	pp[4] = static_cast<unsigned char>((imant >> 24) & 0xFF);
+	pp[5] = static_cast<unsigned char>((imant >> 16) & 0xFF);
+	pp[6] = static_cast<unsigned char>((imant >> 8) & 0xFF);
+	pp[7] = static_cast<unsigned char>(imant & 0xFF);
 
 	if (little_endian)
 	{
@@ -1206,6 +1234,7 @@ bool make_ibm_fp64(unsigned char pp[8], double val, bool little_endian /*=false*
 		cc = pp[2]; pp[2] = pp[5]; pp[5] = cc;
 		cc = pp[3]; pp[3] = pp[4]; pp[4] = cc;
 	}
+
 	return true;
 }
 
@@ -1230,32 +1259,46 @@ long double ibm_fp32(const unsigned char *pp, int *pexp /*=NULL*/,
 	// - subtract the bias of 64
 	// - convert hex exponent to binary [note 16^X == 2^(4*X)]
 	exponent = ((int)(pp[0] & 0x7F) - 64);
-	if (pexp != NULL) *pexp = exponent;
+
+	if (pexp)
+	{
+		*pexp = exponent;
+	}
+
 	// - convert hex exponent to binary
 	//   note that we multiply the exponent by 4 since 16^X == 2^(4*X)
 	exponent *= 4;
 
 	// Get the mantissa and return zero if there are no bits on
-	mantissa = ((long)pp[1]<<16) + ((long)pp[2]<<8) + pp[3];
+	mantissa = ((long)pp[1] << 16) + ((long)pp[2] << 8) + pp[3];
 	if (mantissa == 0)
 	{
-		if (pmant != NULL) *pmant = 0.0;
+		if (pmant)
+		{
+			*pmant = 0.0;
+		}
 		return 0.0;
 	}
 
-	if (pmant != NULL)
+	if (pmant)
 	{
 		if ((pp[0] & 0x80) == 0)
+		{
 			*pmant = mantissa / two_pow24;
+		}
 		else
+		{
 			*pmant = -(mantissa / two_pow24);
+		}
 	}
 
 	// Check sign bit and return appropriate result
 	if ((pp[0] & 0x80) == 0)
+	{
 		return (mantissa / two_pow24) * powl(2, exponent);
-	else
-		return -(mantissa / two_pow24) * powl(2, exponent);
+	}
+	
+	return -(mantissa / two_pow24) * powl(2, exponent);
 }
 
 long double ibm_fp64(const unsigned char *pp, int *pexp /*=NULL*/,
@@ -1263,7 +1306,7 @@ long double ibm_fp64(const unsigned char *pp, int *pexp /*=NULL*/,
 {
 	unsigned char tt[8];                // Used to store bytes in little-endian order
 	int exponent;                       // Base 16 exponent of IBM FP value
-	__int64 mantissa;                   // Unsigned integral mantissa
+	std::int64_t mantissa;              // Unsigned integral mantissa
 
 	if (little_endian)
 	{
@@ -1282,33 +1325,52 @@ long double ibm_fp64(const unsigned char *pp, int *pexp /*=NULL*/,
 	// - remove the high (sign) bit from the first byte
 	// - subtract the bias of 64
 	exponent = ((int)(pp[0] & 0x7F) - 64);
-	if (pexp != NULL) *pexp = exponent;
+	if (pexp)
+	{
+		*pexp = exponent;
+	}
+
 	// - convert hex exponent to binary
 	//   note that we multiply the exponent by 4 since 16^X == 2^(4*X)
 	exponent *= 4;
 
 	// Get the mantissa and return zero if there are no bits on
-	mantissa =  ((__int64)pp[1]<<48) + ((__int64)pp[2]<<40) + ((__int64)pp[3]<<32) +
-				((__int64)pp[4]<<24) + ((__int64)pp[5]<<16) + ((__int64)pp[6]<<8) + pp[7];
+	mantissa = ((std::int64_t)pp[1] << 48)
+		+ ((std::int64_t)pp[2] << 40)
+		+ ((std::int64_t)pp[3] << 32)
+		+ ((std::int64_t)pp[4] << 24)
+		+ ((std::int64_t)pp[5] << 16)
+		+ ((std::int64_t)pp[6] << 8)
+		+ pp[7];
+
 	if (mantissa == 0)
 	{
-		if (pmant != NULL) *pmant = 0.0;
+		if (pmant)
+		{
+			*pmant = 0.0;
+		}
 		return 0.0;
 	}
 
-	if (pmant != NULL)
+	if (pmant)
 	{
 		if ((pp[0] & 0x80) == 0)
+		{
 			*pmant = mantissa / two_pow56;
+		}
 		else
+		{
 			*pmant = -(mantissa / two_pow56);
+		}
 	}
 
 	// Check sign bit and return appropriate result
 	if ((pp[0] & 0x80) == 0)
+	{
 		return (mantissa / two_pow56) * powl(2, exponent);
-	else
-		return -(mantissa / two_pow56) * powl(2, exponent);
+	}
+
+	return -(mantissa / two_pow56) * powl(2, exponent);
 }
 
 // The compiler does not provide a function for reading a 64 bit int from a string?!!

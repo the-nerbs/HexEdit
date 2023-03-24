@@ -1084,18 +1084,18 @@ TEST_CASE("make_real48")
     };
 
     static const row testrows[] = {
-        //             value      BE?    OK?   output
-        {              0.0,     false,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
-        {              0.0,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
-        {             -1.0,     false,  true, { 0x81, 0x00, 0x00, 0x00, 0x00, 0x80 } },
-        {             -1.0,      true,  true, { 0x80, 0x00, 0x00, 0x00, 0x00, 0x81 } },
-        {              1.0,     false,  true, { 0x81, 0x00, 0x00, 0x00, 0x00, 0x00 } },
-        {              1.0,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x81 } },
+        //            value      BE?    OK?   output
+        {             0.0,     false,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {             0.0,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {            -1.0,     false,  true, { 0x81, 0x00, 0x00, 0x00, 0x00, 0x80 } },
+        {            -1.0,      true,  true, { 0x80, 0x00, 0x00, 0x00, 0x00, 0x81 } },
+        {             1.0,     false,  true, { 0x81, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {             1.0,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x81 } },
 
-        {           1e-129,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {          1e-129,      true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
 
-        { 1099511627775.0L,     false,  true, { 0xA8, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F } },
-        { 1099511627775.0L,      true,  true, { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8 } },
+        { 1099511627775.0,     false,  true, { 0xA8, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F } },
+        { 1099511627775.0,      true,  true, { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8 } },
 
         { INFINITY, false, false, {} },
         { -INFINITY, false, false, {} },
@@ -1140,16 +1140,16 @@ TEST_CASE("real48")
     };
 
     static const row testrows[] = {
-        //                 bytes                    BE?           value
-        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,                 0.0, -128,  0.0 },
-        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },  true,                 0.0, -128,  0.0 },
-        { { 0x81, 0x00, 0x00, 0x00, 0x00, 0x80 }, false,                -1.0,    1, -1.0 },
-        { { 0x80, 0x00, 0x00, 0x00, 0x00, 0x81 },  true,                -1.0,    1, -1.0 },
-        { { 0x81, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,                 1.0,    1,  1.0 },
-        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x81 },  true,                 1.0,    1,  1.0 },
+        //                 bytes                    BE?          value
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,                0.0, -128,  0.0 },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },  true,                0.0, -128,  0.0 },
+        { { 0x81, 0x00, 0x00, 0x00, 0x00, 0x80 }, false,               -1.0,    1, -1.0 },
+        { { 0x80, 0x00, 0x00, 0x00, 0x00, 0x81 },  true,               -1.0,    1, -1.0 },
+        { { 0x81, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,                1.0,    1,  1.0 },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x81 },  true,                1.0,    1,  1.0 },
 
-        { { 0xA8, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F }, false,    1099511627775.0L,   40,  1.999999999998L  },
-        { { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8 },  true,    1099511627775.0L,   40,  1.999999999998L  },
+        { { 0xA8, 0xFF, 0xFF, 0xFF, 0xFF, 0x7F }, false,    1099511627775.0,   40,  1.999999999998L  },
+        { { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xA8 },  true,    1099511627775.0,   40,  1.999999999998L  },
     };
 
     const row test = GENERATE(
@@ -1171,6 +1171,263 @@ TEST_CASE("real48")
     CHECK(exp == test.expectedExponent);
     
     static constexpr double r48_epsilon = 1.0 / (1024.0 * 1024.0 * 1024.0 * 512.0);
-    const double mantTolerance = std::abs(std::max(test.expectedMantissa, mantissa)) * r48_epsilon;
+    const double mantTolerance = std::max(std::abs(test.expectedMantissa), std::abs(mantissa)) * r48_epsilon;
+    CHECK(std::abs(test.expectedMantissa - mantissa) <= mantTolerance);
+}
+
+
+TEST_CASE("make_ibm_fp32")
+{
+    struct row
+    {
+        double value;
+        bool littleEndian;
+
+        bool expectedSuccess;
+        std::array<std::uint8_t, 4> expectedBytes;
+    };
+
+    static const row testrows[] = {
+        //               value        LE?    OK?   output
+        {                  0.0,     false,  true, { 0x00, 0x00, 0x00, 0x00 } },
+        {                  0.0,      true,  true, { 0x00, 0x00, 0x00, 0x00 } },
+        {                 -1.0,     false,  true, { 0xC1, 0x10, 0x00, 0x00 } },
+        {                 -1.0,      true,  true, { 0x00, 0x00, 0x10, 0xC1 } },
+        {                  1.0,     false,  true, { 0x41, 0x10, 0x00, 0x00 } },
+        {                  1.0,      true,  true, { 0x00, 0x00, 0x10, 0x41 } },
+
+        // below normal range
+        {                1e-80,     false,  true, { 0x00, 0x00, 0x00, 0x00 } },
+
+        // smallest normal value
+        { std::pow(16, -65),        false,  true, { 0x00, 0x10, 0x00, 0x00 } },
+
+        // largest normal value
+        { (1 - std::pow(16, -6)) * std::pow(16, 63),
+                                    false,  true, { 0x7F, 0xFF, 0xFF, 0xFF } },
+
+        // above normal range
+        { std::pow(16, 64),         false, false, {  } },
+
+        // examples from wikipedia:
+        // https://en.wikipedia.org/wiki/IBM_hexadecimal_floating-point
+        {               -118.625,   false,  true, { 0xC2, 0x76, 0xA0, 0x00 } },
+        {               -118.625,    true,  true, { 0x00, 0xA0, 0x76, 0xC2 } },
+
+        { INFINITY, false, false, {} },
+        { -INFINITY, false, false, {} },
+        { NAN, false, false, {} },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.value, test.littleEndian);
+
+
+    std::uint8_t actual[4]{};
+
+    bool success = make_ibm_fp32(actual, test.value, test.littleEndian);
+
+    CHECK(success == test.expectedSuccess);
+
+    for (std::size_t i = 0; i < test.expectedBytes.size(); i++)
+    {
+        // promote these to ints so they print correctly on failure
+        int actualVal = actual[i];
+        int expectedVal = test.expectedBytes[i];
+        CAPTURE(i);
+        CHECK(actualVal == expectedVal);
+    }
+}
+
+TEST_CASE("ibm_fp32")
+{
+    struct row
+    {
+        std::array<std::uint8_t, 4> bytes;
+        bool littleEndian;
+
+        double expectedValue;
+        int expectedExponent;
+        long double expectedMantissa;
+    };
+
+    static const row testrows[] = {
+        //          bytes               LE?              value  expr   mant
+        { { 0x00, 0x00, 0x00, 0x00 }, false,               0.0,  -64,  0.0L },
+        { { 0x00, 0x00, 0x00, 0x00 },  true,               0.0,  -64,  0.0L },
+        { { 0xC1, 0x10, 0x00, 0x00 }, false,              -1.0,    1, -0.0625L },
+        { { 0x00, 0x00, 0x10, 0xC1 },  true,              -1.0,    1, -0.0625L },
+        { { 0x41, 0x10, 0x00, 0x00 }, false,               1.0,    1,  0.0625L },
+        { { 0x00, 0x00, 0x10, 0x41 },  true,               1.0,    1,  0.0625L },
+
+        // smallest normal value
+        { { 0x00, 0x10, 0x00, 0x00 }, false, std::pow(16, -65),  -64,  0.0625L },
+
+        // largest normal value
+        { { 0x7F, 0xFF, 0xFF, 0xFF }, false, (1 - std::pow(16, -6)) * std::pow(16, 63),
+                                                                  63,  1.0L },
+
+        // examples from wikipedia:
+        // https://en.wikipedia.org/wiki/IBM_hexadecimal_floating-point
+        { { 0xC2, 0x76, 0xA0, 0x00 },   false,        -118.625,    2, -0x0.76A000p+0L },
+        { { 0x00, 0xA0, 0x76, 0xC2 },    true,        -118.625,    2, -0x0.76A000p+0L },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.expectedValue, test.littleEndian);
+
+
+    int exp{};
+    long double mantissa{};
+    double actual = ibm_fp32(test.bytes.data(), &exp, &mantissa, test.littleEndian);
+
+    const double valTolerance = std::abs(std::min(test.expectedValue, actual)) * DBL_EPSILON;
+    CHECK(std::abs(test.expectedValue - actual) <= valTolerance);
+
+    CHECK(exp == test.expectedExponent);
+
+    static constexpr double ibm32_epsilon = 0x1.0p-24;
+    const double mantTolerance = std::max(std::abs(test.expectedMantissa), std::abs(mantissa)) * ibm32_epsilon;
+    CHECK(std::abs(test.expectedMantissa - mantissa) <= mantTolerance);
+}
+
+
+TEST_CASE("make_ibm_fp64")
+{
+    struct row
+    {
+        double value;
+        bool littleEndian;
+
+        bool expectedSuccess;
+        std::array<std::uint8_t, 8> expectedBytes;
+    };
+
+    static const row testrows[] = {
+        //               value        LE?    OK?   output
+        {                    0.0,   false,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {                    0.0,    true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {                   -1.0,   false,  true, { 0xC1, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {                   -1.0,    true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0xC1 } },
+        {                    1.0,   false,  true, { 0x41, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {                    1.0,    true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x41 } },
+
+        // below normal range
+        {                  1e-80,   false,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+
+        // smallest normal value
+        {      std::pow(16, -65),   false,  true, { 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+
+        // largest normal value that is also representable in IEEE binary64
+        // HFP64 has 56 bits of mantissa, while IEEE only has 53, so there is
+        // necessarily some imprecision in the conversion at it's extremes.
+        { 0x1.FFFFFFFFFFFFF0p+251,   false,  true, { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xF8 } },
+
+        // above normal range
+        { 0x1.FFFFFFFFFFFFF8p+251,   false, false, {  } },
+
+        // examples from wikipedia:
+        // https://en.wikipedia.org/wiki/IBM_hexadecimal_floating-point
+        {               -118.625,   false,  true, { 0xC2, 0x76, 0xA0, 0x00, 0x00, 0x00, 0x00, 0x00 } },
+        {               -118.625,    true,  true, { 0x00, 0x00, 0x00, 0x00, 0x00, 0xA0, 0x76, 0xC2 } },
+
+        { INFINITY, false, false, {} },
+        { -INFINITY, false, false, {} },
+        { NAN, false, false, {} },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.value, test.littleEndian);
+
+
+    std::uint8_t actual[8]{};
+
+    bool success = make_ibm_fp64(actual, test.value, test.littleEndian);
+
+    CHECK(success == test.expectedSuccess);
+
+    for (std::size_t i = 0; i < test.expectedBytes.size(); i++)
+    {
+        // promote these to ints so they print correctly on failure
+        int actualVal = actual[i];
+        int expectedVal = test.expectedBytes[i];
+        CAPTURE(i);
+        CHECK(actualVal == expectedVal);
+    }
+}
+
+TEST_CASE("ibm_fp64")
+{
+    struct row
+    {
+        std::array<std::uint8_t, 8> bytes;
+        bool littleEndian;
+
+        double expectedValue;
+        int expectedExponent;
+        long double expectedMantissa;
+    };
+
+    static const row testrows[] = {
+        //                       bytes                          LE?              value  expr   mant
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,               0.0,  -64,  0.0L },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },  true,               0.0,  -64,  0.0L },
+        { { 0xC1, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,              -1.0,    1, -0.0625L },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0xC1 },  true,              -1.0,    1, -0.0625L },
+        { { 0x41, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false,               1.0,    1,  0.0625L },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x41 },  true,               1.0,    1,  0.0625L },
+
+        // smallest normal value
+        { { 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, false, std::pow(16, -65),  -64,  0.0625L },
+
+        // largest normal value
+        { { 0x7F, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, false, 0x1.FFFFFFFFFFFFF0p+251,
+                                                                                          63,  1.0L },
+
+        // examples from wikipedia:
+        // https://en.wikipedia.org/wiki/IBM_hexadecimal_floating-point
+        { { 0xC2, 0x76, 0xA0, 0x00, 0x00, 0x00, 0x00, 0x00 },   false,        -118.625,    2, -0x0.76A000p+0L },
+        { { 0x00, 0x00, 0x00, 0x00, 0x00, 0xA0, 0x76, 0xC2 },    true,        -118.625,    2, -0x0.76A000p+0L },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.expectedValue, test.littleEndian, test.expectedExponent, test.expectedMantissa);
+
+
+    int exp{};
+    long double mantissa{};
+    double actual = ibm_fp64(test.bytes.data(), &exp, &mantissa, test.littleEndian);
+
+    char actualBits[64]{};
+    std::sprintf(actualBits, "%a", actual);
+    CAPTURE(actualBits);
+
+    const double valTolerance = std::abs(std::min(test.expectedValue, actual)) * DBL_EPSILON;
+    CHECK(std::abs(test.expectedValue - actual) <= valTolerance);
+
+    CHECK(exp == test.expectedExponent);
+
+    static constexpr double ibm64_epsilon = 0x1.0p-56;
+    const double mantTolerance = std::max(std::abs(test.expectedMantissa), std::abs(mantissa)) * ibm64_epsilon;
     CHECK(std::abs(test.expectedMantissa - mantissa) <= mantTolerance);
 }
