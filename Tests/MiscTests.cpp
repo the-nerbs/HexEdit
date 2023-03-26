@@ -1431,3 +1431,250 @@ TEST_CASE("ibm_fp64")
     const double mantTolerance = std::max(std::abs(test.expectedMantissa), std::abs(mantissa)) * ibm64_epsilon;
     CHECK(std::abs(test.expectedMantissa - mantissa) <= mantTolerance);
 }
+
+
+TEST_CASE("strtoi64")
+{
+    struct row
+    {
+        const char* input;
+        int radix;
+        std::int64_t expectedValue;
+        int expectedEndIndex;
+    };
+
+    static const row testrows[] = {
+        // single digit tests
+        { "0",  2,  0, 1 },
+        { "1",  2,  1, 1 },
+        { "2",  8,  2, 1 },
+        { "3",  8,  3, 1 },
+        { "4",  8,  4, 1 },
+        { "5",  8,  5, 1 },
+        { "6",  8,  6, 1 },
+        { "7",  8,  7, 1 },
+        { "8", 10,  8, 1 },
+        { "9", 10,  9, 1 },
+        { "a", 16, 10, 1 },     // Hex, lowercase
+        { "b", 16, 11, 1 },
+        { "c", 16, 12, 1 },
+        { "d", 16, 13, 1 },
+        { "e", 16, 14, 1 },
+        { "f", 16, 15, 1 },
+        { "A", 16, 10, 1 },     // Hex, uppercase
+        { "B", 16, 11, 1 },
+        { "C", 16, 12, 1 },
+        { "D", 16, 13, 1 },
+        { "E", 16, 14, 1 },
+        { "F", 16, 15, 1 },
+
+        // min value for each radix
+        //{ "0",  2,  0, 1 }, // dup row
+        { "0",  3,  0, 1 },
+        { "0",  4,  0, 1 },
+        { "0",  5,  0, 1 },
+        { "0",  6,  0, 1 },
+        { "0",  7,  0, 1 },
+        { "0",  8,  0, 1 },
+        { "0",  9,  0, 1 },
+        { "0", 10,  0, 1 },
+        { "0", 11,  0, 1 },
+        { "0", 12,  0, 1 },
+        { "0", 13,  0, 1 },
+        { "0", 14,  0, 1 },
+        { "0", 15,  0, 1 },
+        { "0", 16,  0, 1 },
+
+        // radix defaults to 10 if 0 (default value)
+        { "0",  0,  0, 1 },
+        { "9",  0,  9, 1 },
+        { "A",  0,  0, 0 },
+
+        // max value for each radix
+        {
+            "111111111111111111111111111111111111111111111111111111111111111",
+            2,
+            INT64_MAX,
+            63
+        },
+        {
+            "2021110011022210012102010021220101220221",
+            3,
+            INT64_MAX,
+            40
+        },
+        {
+            "13333333333333333333333333333333",
+            4,
+            INT64_MAX,
+            32
+        },
+        {
+            "1104332401304422434310311212",
+            5,
+            INT64_MAX,
+            28
+        },
+        {
+            "1540241003031030222122211",
+            6,
+            INT64_MAX,
+            25
+        },
+        {
+            "22341010611245052052300",
+            7,
+            INT64_MAX,
+            23
+        },
+        {
+            "777777777777777777777",
+            8,
+            INT64_MAX,
+            21
+        },
+        {
+            "67404283172107811827",
+            9,
+            INT64_MAX,
+            20
+        },
+        {
+            "9223372036854775807",
+            10,
+            INT64_MAX,
+            19
+        },
+        {
+            "1728002635214590697",
+            11,
+            INT64_MAX,
+            19
+        },
+        {
+            "41A792678515120367",
+            12,
+            INT64_MAX,
+            18
+        },
+        {
+            "10B269549075433C37",
+            13,
+            INT64_MAX,
+            18
+        },
+        {
+            "4340724C6C71DC7A7",
+            14,
+            INT64_MAX,
+            17
+        },
+        {
+            "160E2AD3246366807",
+            15,
+            INT64_MAX,
+            17
+        },
+        {
+            "7FFFFFFFFFFFFFFF",
+            16,
+            INT64_MAX,
+            16
+        },
+    
+        // digit too large - terminate parsing (no preceding digits)
+        { "2",  2, 0, 0 },
+        { "3",  3, 0, 0 },
+        { "4",  4, 0, 0 },
+        { "5",  5, 0, 0 },
+        { "6",  6, 0, 0 },
+        { "7",  7, 0, 0 },
+        { "8",  8, 0, 0 },
+        { "9",  9, 0, 0 },
+        { "A", 10, 0, 0 },
+        { "B", 11, 0, 0 },
+        { "C", 12, 0, 0 },
+        { "D", 13, 0, 0 },
+        { "E", 14, 0, 0 },
+        { "F", 15, 0, 0 },
+    
+        // digit too large - terminate parsing (yes preceding digits)
+        { "12",  2,  1, 1 },
+        { "23",  3,  2, 1 },
+        { "34",  4,  3, 1 },
+        { "45",  5,  4, 1 },
+        { "56",  6,  5, 1 },
+        { "67",  7,  6, 1 },
+        { "78",  8,  7, 1 },
+        { "89",  9,  8, 1 },
+        { "9A", 10,  9, 1 },
+        { "AB", 11, 10, 1 },
+        { "BC", 12, 11, 1 },
+        { "CD", 13, 12, 1 },
+        { "DE", 14, 13, 1 },
+        { "EF", 15, 14, 1 },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.input, test.radix, test.expectedValue, test.expectedEndIndex);
+    const char* expectedEndPtr = &(test.input[test.expectedEndIndex]);
+
+    SECTION("(string, radix)")
+    {
+        std::int64_t result = strtoi64(test.input, test.radix);
+        CAPTURE(result);
+
+        CHECK(test.expectedValue == result);
+    }
+
+    SECTION("(string, radix, endptr)")
+    {
+        const char* endptr = nullptr;
+        std::int64_t result = strtoi64(test.input, test.radix, &endptr);
+        CAPTURE(result);
+        CAPTURE(reinterpret_cast<std::uintptr_t>(endptr));
+        CAPTURE(reinterpret_cast<std::uintptr_t>(expectedEndPtr));
+
+        CHECK(test.expectedValue == result);
+        CHECK(expectedEndPtr == endptr);
+    }
+
+    SECTION("matches std::strtoll")
+    {
+        char* endptr = nullptr;
+        long long result = std::strtoll(test.input, &endptr, test.radix);
+        CAPTURE(result);
+        CAPTURE(reinterpret_cast<std::uintptr_t>(endptr));
+        CAPTURE(reinterpret_cast<std::uintptr_t>(expectedEndPtr));
+
+        CHECK(test.expectedValue == result);
+        CHECK(expectedEndPtr == endptr);
+    }
+}
+
+TEST_CASE("strtoi64 - garbage character handling")
+{
+    static constexpr const char* const input = "1-*/+;'[]\=,._2";
+
+
+    SECTION("(string, radix) - skips")
+    {
+        std::int64_t result = strtoi64(input, 10);
+        CHECK(result == 12);
+    }
+
+    SECTION("(string, radix, endptr) - ends parsing")
+    {
+        const char* endptr = nullptr;
+        std::int64_t result = strtoi64(input, 10, &endptr);
+        CHECK(result == 1);
+        CHECK(endptr == &input[1]);
+
+    }
+}
+

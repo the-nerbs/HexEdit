@@ -1376,24 +1376,33 @@ long double ibm_fp64(const unsigned char *pp, int *pexp /*=NULL*/,
 // The compiler does not provide a function for reading a 64 bit int from a string?!!
 __int64 strtoi64(const char *ss, int radix /*=0*/)
 {
-	if (radix == 0) radix = 10;
+	if (radix == 0)
+	{
+		radix = 10;
+	}
 
-	__int64 retval = 0;
+	std::int64_t retval = 0;
 
 	for (const char *src = ss; *src != '\0'; ++src)
 	{
 		// Ignore everything except valid digits
 		unsigned int digval;
+
 		if (isdigit(*src))
+		{
 			digval = *src - '0';
+		}
 		else if (isalpha(*src))
+		{
 			digval = toupper(*src) - 'A' + 10;
+		}
 		else
+		{
 			continue;                   // Ignore separators (or any other garbage)
+		}
 
 		if (digval >= radix)
 		{
-			ASSERT(0);                  // How did this happen?
 			continue;                   // Ignore invalid digits
 		}
 
@@ -1407,35 +1416,53 @@ __int64 strtoi64(const char *ss, int radix /*=0*/)
 // Slightly better version with overflow checking and returns ptr to 1st char not used
 __int64 strtoi64(const char *ss, int radix, const char **endptr)
 {
-	if (radix == 0) radix = 10;
+	if (radix == 0)
+	{
+		radix = 10;
+	}
 
-	__int64 retval = 0;
+	std::int64_t retval = 0;
 
-	unsigned __int64 maxval = _UI64_MAX / radix;
+	std::uint64_t maxval = _UI64_MAX / radix;
 
 	const char * src;
 	for (src = ss; *src != '\0'; ++src)
 	{
 		// Ignore everything except valid digits
 		unsigned int digval;
+
 		if (isdigit(*src))
+		{
 			digval = *src - '0';
+		}
 		else if (isalpha(*src))
+		{
 			digval = toupper(*src) - 'A' + 10;
+		}
 		else
+		{
 			break;   // Not a digit
+		}
 
 		if (digval >= radix)
+		{
 			break;   // Digit too large for radix
+		}
 
-		if (retval < maxval || (retval == maxval && (unsigned __int64)digval <= _UI64_MAX % radix))
+		if (retval < maxval || (retval == maxval && (std::uint64_t)digval <= _UI64_MAX % radix))
+		{
 			retval = retval * radix + digval;
+		}
 		else
+		{
 			break;  // overflow
+		}
 	}
 
-	if (endptr != NULL)
+	if (endptr)
+	{
 		*endptr = src;
+	}
 
 	return retval;
 }
