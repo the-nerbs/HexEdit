@@ -84,7 +84,6 @@ long double ibm_fp64(const unsigned char *pp, int *pexp = NULL,
 			 long double *pmant = NULL, bool little_endian = false);
 
 __int64 strtoi64(const char *, int radix = 0);
-__int64 strtoi64(const char *, int radix, const char **endptr);
 unsigned __int64 mpz_get_ui64(mpz_srcptr p);
 void mpz_set_ui64(mpz_ptr p, unsigned __int64 i);
 const char * mpz_set_bytes(mpz_ptr p, FILE_ADDRESS addr, int count);

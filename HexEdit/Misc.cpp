@@ -1373,7 +1373,6 @@ long double ibm_fp64(const unsigned char *pp, int *pexp /*=NULL*/,
 	return -(mantissa / two_pow56) * powl(2, exponent);
 }
 
-// The compiler does not provide a function for reading a 64 bit int from a string?!!
 __int64 strtoi64(const char *ss, int radix /*=0*/)
 {
 	if (radix == 0)
@@ -1381,90 +1380,35 @@ __int64 strtoi64(const char *ss, int radix /*=0*/)
 		radix = 10;
 	}
 
-	std::int64_t retval = 0;
+	// 64 bits binary with space every 4 bits is 80 chars, so just round up to next power or 2.
+	char stackBuffer[128];
+	std::unique_ptr<char[]> heapBuffer;
+	char* buffer;
+	const std::size_t len = std::strlen(ss);
 
+	if (len < sizeof(stackBuffer))
+	{
+		buffer = stackBuffer;
+	}
+	else
+	{
+		heapBuffer = std::make_unique<char[]>(len);
+		buffer = heapBuffer.get();
+	}
+
+	// copy only possibly valid digits into the buffer
+	char* pch = buffer;
 	for (const char *src = ss; *src != '\0'; ++src)
 	{
-		// Ignore everything except valid digits
-		unsigned int digval;
-
-		if (isdigit(*src))
+		if (std::isdigit(*src) || std::isalpha(*src))
 		{
-			digval = *src - '0';
-		}
-		else if (isalpha(*src))
-		{
-			digval = toupper(*src) - 'A' + 10;
-		}
-		else
-		{
-			continue;                   // Ignore separators (or any other garbage)
-		}
-
-		if (digval >= radix)
-		{
-			continue;                   // Ignore invalid digits
-		}
-
-		// Ignore overflow
-		retval = retval * radix + digval;
-	}
-
-	return retval;
-}
-
-// Slightly better version with overflow checking and returns ptr to 1st char not used
-__int64 strtoi64(const char *ss, int radix, const char **endptr)
-{
-	if (radix == 0)
-	{
-		radix = 10;
-	}
-
-	std::int64_t retval = 0;
-
-	std::uint64_t maxval = _UI64_MAX / radix;
-
-	const char * src;
-	for (src = ss; *src != '\0'; ++src)
-	{
-		// Ignore everything except valid digits
-		unsigned int digval;
-
-		if (isdigit(*src))
-		{
-			digval = *src - '0';
-		}
-		else if (isalpha(*src))
-		{
-			digval = toupper(*src) - 'A' + 10;
-		}
-		else
-		{
-			break;   // Not a digit
-		}
-
-		if (digval >= radix)
-		{
-			break;   // Digit too large for radix
-		}
-
-		if (retval < maxval || (retval == maxval && (std::uint64_t)digval <= _UI64_MAX % radix))
-		{
-			retval = retval * radix + digval;
-		}
-		else
-		{
-			break;  // overflow
+			*pch = *src;
+			pch++;
 		}
 	}
+	*pch = '\0';
 
-	if (endptr)
-	{
-		*endptr = src;
-	}
-
-	return retval;
+	return std::strtoll(buffer, nullptr, radix);
 }
 
 // Convert between big integer and 64-bit int

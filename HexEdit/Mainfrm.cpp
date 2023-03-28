@@ -5790,7 +5790,10 @@ bool CJumpExpr::LoadVars()
 		case '9':
 		case '-':
 			tmp.typ = TYPE_INT;
-			tmp.int64 = ::strtoi64(pp, 10, &pp2);
+			// note: since we generate this value programmatically (down in CJumpExpr::SaveVars),
+			// the only way to get bad inputs here is if someone goes in an changes the saved
+			// value in the registry, in which case, they're just asking for the bad read back here.
+			tmp.int64 = std::strtoll(pp, (char**)&pp2, 10);
 			break;
 
 		case 'R':

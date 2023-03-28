@@ -1624,57 +1624,30 @@ TEST_CASE("strtoi64")
     CAPTURE(test.input, test.radix, test.expectedValue, test.expectedEndIndex);
     const char* expectedEndPtr = &(test.input[test.expectedEndIndex]);
 
-    SECTION("(string, radix)")
-    {
-        std::int64_t result = strtoi64(test.input, test.radix);
-        CAPTURE(result);
+    std::int64_t result = strtoi64(test.input, test.radix);
+    CAPTURE(result);
 
-        CHECK(test.expectedValue == result);
-    }
-
-    SECTION("(string, radix, endptr)")
-    {
-        const char* endptr = nullptr;
-        std::int64_t result = strtoi64(test.input, test.radix, &endptr);
-        CAPTURE(result);
-        CAPTURE(reinterpret_cast<std::uintptr_t>(endptr));
-        CAPTURE(reinterpret_cast<std::uintptr_t>(expectedEndPtr));
-
-        CHECK(test.expectedValue == result);
-        CHECK(expectedEndPtr == endptr);
-    }
-
-    SECTION("matches std::strtoll")
-    {
-        char* endptr = nullptr;
-        long long result = std::strtoll(test.input, &endptr, test.radix);
-        CAPTURE(result);
-        CAPTURE(reinterpret_cast<std::uintptr_t>(endptr));
-        CAPTURE(reinterpret_cast<std::uintptr_t>(expectedEndPtr));
-
-        CHECK(test.expectedValue == result);
-        CHECK(expectedEndPtr == endptr);
-    }
+    CHECK(test.expectedValue == result);
 }
 
 TEST_CASE("strtoi64 - garbage character handling")
 {
-    static constexpr const char* const input = "1-*/+;'[]\=,._2";
+    // also hit the heap allocation branch
+    static constexpr const char input[] = "1"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "-*/+;'[]\=,._"
+        "2";
 
-
-    SECTION("(string, radix) - skips")
-    {
-        std::int64_t result = strtoi64(input, 10);
-        CHECK(result == 12);
-    }
-
-    SECTION("(string, radix, endptr) - ends parsing")
-    {
-        const char* endptr = nullptr;
-        std::int64_t result = strtoi64(input, 10, &endptr);
-        CHECK(result == 1);
-        CHECK(endptr == &input[1]);
-
-    }
+    std::int64_t result = strtoi64(input, 10);
+    CHECK(result == 12);
 }
 

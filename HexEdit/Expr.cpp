@@ -3975,8 +3975,10 @@ expr_eval::tok_t expr_eval::get_next()
 
 			CString ss(saved_+2, p_ - (saved_+2));      // Get digits into string
 			const char *endptr;
-			last_val_ = value_t(::strtoi64(ss, 16, &endptr));
-			if (*endptr != '\0')
+			errno = 0;
+			std::uint64_t bits = std::strtoull(ss, (char**)&endptr, 16);
+			last_val_ = value_t(static_cast<std::int64_t>(bits));
+			if (*endptr != '\0' || errno != 0)
 			{
 				sprintf(error_buf_, "Overflow: Hex integer \"%s\" too big", static_cast<const char*>(ss));
 				return TOK_NONE;
@@ -4028,8 +4030,10 @@ expr_eval::tok_t expr_eval::get_next()
 			ss.Remove(' ');                  // Remove any spaces copied (if const_sep_allowed_)
 
 			const char *endptr;
-			last_val_ = value_t(::strtoi64(ss, const_radix_, &endptr));
-			if (*endptr != '\0')
+			errno = 0;
+			std::uint64_t bits = std::strtoull(ss, (char**)&endptr, 16);
+			last_val_ = value_t(static_cast<std::int64_t>(bits));
+			if (*endptr != '\0' || errno != 0)
 			{
 				sprintf(error_buf_, "Overflow: \"%s\" too big", static_cast<const char*>(ss));
 				return TOK_NONE;
