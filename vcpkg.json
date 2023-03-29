@@ -1,14 +1,15 @@
 {
   "name": "hexedit",
   "version": "5.0.2",
+  "builtin-baseline": "dd1b57240ef5db0232e83442712574dfa6c29931",
   "dependencies": [
-      "boost-crc",
-      "boost-tuple",
-      "catch2",
-      "cryptopp",
-      "freeimage",
-      "mpir",
-      "ms-gsl",
-      "zlib"
+    "boost-crc",
+    "boost-tuple",
+    "catch2",
+    "cryptopp",
+    "freeimage",
+    "mpir",
+    "ms-gsl",
+    "zlib"
   ]
 }
