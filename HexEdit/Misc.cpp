@@ -1414,22 +1414,14 @@ __int64 strtoi64(const char *ss, int radix /*=0*/)
 // Convert between big integer and 64-bit int
 unsigned __int64 mpz_get_ui64(mpz_srcptr p)
 {
-	LARGE_INTEGER val;
-
-	val.LowPart = mpz_getlimbn(p, 0);
-	val.HighPart = mpz_getlimbn(p, 1);
-	// Any higher limbs are lost - so value is truncated
-
-	if (mpz_sgn(p) < 0)
-		return (unsigned __int64)-val.QuadPart;  // ensures correct  (2's complement) bit pattern for -ve values
-	else
-		return (unsigned __int64)val.QuadPart;
+	// note: intmax_t is guaranteed to be at least 64 bits.
+	return mpz_get_sx(p);
 }
 
 void mpz_set_ui64(mpz_ptr p, unsigned __int64 i)
 {
-	ASSERT(sizeof(mp_limb_t) == 4 && sizeof(i) == 8);
-	mpz_import(p, sizeof(i)/sizeof(mp_limb_t), -1, sizeof(mp_limb_t), -1, 0, &i);
+	// note: intmax_t is guaranteed to be at least 64 bits.
+	mpz_set_ux(p, i);
 }
 
 // Get bytes from active file and set an mpz var

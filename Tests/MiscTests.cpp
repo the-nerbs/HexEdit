@@ -1634,20 +1634,97 @@ TEST_CASE("strtoi64 - garbage character handling")
 {
     // also hit the heap allocation branch
     static constexpr const char input[] = "1"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
-        "-*/+;'[]\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
+        "-*/+;'[]\\=,._"
         "2";
 
     std::int64_t result = strtoi64(input, 10);
     CHECK(result == 12);
 }
 
+
+TEST_CASE("mpz_get_ui64")
+{
+    struct row
+    {
+        const char* strValue;
+        int inputRadix;
+        std::uint64_t expectedValue;
+    };
+
+    static const row testrows[] = {
+        // 0 and +1
+        {  "0", 10, 0ULL },
+        {  "1", 10, 1ULL },
+
+        // LLONG_MAX and +1
+        { "7fffffffffffffff", 16, 0x7fff'ffff'ffff'ffffULL },
+        { "8000000000000000", 16, 0x8000'0000'0000'0000ULL },
+        { "ffffffffffffffff", 16, 0xffff'ffff'ffff'ffffULL },
+
+        // signed values give their 2's complement bit representation
+        { "-1", 10, 0xffff'ffff'ffff'ffffULL },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+
+    mpz_t value;
+    mpz_init_set_str(value, test.strValue, test.inputRadix);
+
+    std::uint64_t actual = mpz_get_ui64(value);
+
+    CHECK(actual == test.expectedValue);
+}
+
+TEST_CASE("mpz_set_ui64")
+{
+    struct row
+    {
+        std::uint64_t value;
+        int radix;
+        const char* expectedString;
+    };
+
+    static const row testrows[] = {
+        // 0 and +/-1
+        { 0ULL, 10,  "0" },
+        { 1ULL, 10,  "1" },
+
+        // LLONG_MAX and +1
+        { 0x7fff'ffff'ffff'ffffULL, 16, "7fffffffffffffff" },
+        { 0x8000'0000'0000'0000ULL, 16, "8000000000000000" },
+
+        // ULLONG_MAX
+        { 0xffff'ffff'ffff'ffffULL, 16, "ffffffffffffffff" },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+
+    mpz_t value;
+    mpz_init(value);
+    mpz_set_ui64(value, test.value);
+
+    char buffer[256];
+    mpz_get_str(buffer, test.radix, value);
+
+    CHECK(std::strcmp(test.expectedString, buffer) == 0);
+}
