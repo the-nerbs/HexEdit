@@ -14,14 +14,18 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@1
+  displayName: Install NuGet Tooling
 
 - task: NuGetAuthenticate@0
+  displayName: Authenticate with vcpkg cache
 
 - task: NuGetCommand@2
+  displayName: Restore NuGet packages
   inputs:
     restoreSolution: '.\RestoreProjects.sln'
 
 - task: MSBuild@1
+  displayName: Build Solution
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
@@ -29,9 +33,15 @@ steps:
     msbuildArguments: '/p:RunWixToolsOutOfProc=true'
 #    msbuildArguments: '/p:Version="$(version)" /p:ContinuousIntegrationBuild="true"'
 
+- pwsh: '& Tests.exe'
+  displayName: Run Tests
+  workingDirectory: $(Build.SourcesDirectory)\artifacts\bin\Tests\Release\Win32
+
 - pwsh: Get-ChildItem -Path "artifacts\installer\Release" -Filter "*.exe" | Get-FileHash | Format-List >"artifacts\installer\Release\hash.txt"
+  displayName: Generate Hashes File
 
 - task: PublishBuildArtifacts@1
+  displayName: Publish Artifacts
   inputs:
     PathtoPublish: 'artifacts\installer\Release'
     ArtifactName: 'release'
