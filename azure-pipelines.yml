@@ -33,7 +33,7 @@ steps:
     msbuildArguments: '/p:RunWixToolsOutOfProc=true'
 #    msbuildArguments: '/p:Version="$(version)" /p:ContinuousIntegrationBuild="true"'
 
-- pwsh: '& Tests.exe'
+- pwsh: '& .\Tests.exe'
   displayName: Run Tests
   workingDirectory: $(Build.SourcesDirectory)\artifacts\bin\Tests\Release\Win32
 
