@@ -1902,7 +1902,68 @@ static std::size_t FindFirstDiff_ByteScan(
     return x - xbase;
 }
 
-TEST_CASE("FindFirstDiff - benchmarks")
+__declspec(noinline)
+static std::size_t FindFirstDiff_DwordScan(
+    const std::uint8_t* x,
+    const std::uint8_t* y,
+    std::size_t len)
+{
+    static constexpr std::size_t word_size = sizeof(std::uint32_t) - 1;
+
+    const std::uint8_t* xbase = x;
+    const std::uint8_t* xend = x + len;
+
+    const std::uint8_t* xalignedbase = xbase + (word_size - ((std::intptr_t)x % word_size));
+    const std::uint32_t* xalignedend = (const std::uint32_t*)((std::uintptr_t)xend & ~word_size);
+
+
+    // byte scan to DWORD alignment
+    while (x < xalignedbase
+        && *x == *y)
+    {
+        ++x;
+        ++y;
+    }
+
+    if (x < xend
+        && *x == *y)
+    {
+        // DWORD scan
+        auto xaligned = (const std::uint32_t*)x;
+        auto yaligned = (const std::uint32_t*)y;
+
+        while (xaligned < xalignedend
+            && *xaligned == *yaligned)
+        {
+            len -= word_size;
+            ++xaligned;
+            ++yaligned;
+        }
+
+        x = (const std::uint8_t*)xaligned;
+        y = (const std::uint8_t*)yaligned;
+
+        if (x < xend
+            && *x == *y)
+        {
+            // if there's still some bytes left, scan those too
+            if (len > 0)
+            {
+                while (len
+                    && *x == *y)
+                {
+                    --len;
+                    ++x;
+                    ++y;
+                }
+            }
+        }
+    }
+
+    return x - xbase;
+}
+
+TEST_CASE("FindFirstDiff - benchmarks", "[!benchmark]")
 {
     constexpr std::size_t buffer_size = 4096;
 
@@ -1941,5 +2002,11 @@ TEST_CASE("FindFirstDiff - benchmarks")
     BENCHMARK("byte scanning")
     {
         return FindFirstDiff_ByteScan(xptr, yptr, buffer_size);
+    };
+
+
+    BENCHMARK("DWORD scanning")
+    {
+        return FindFirstDiff_DwordScan(xptr, yptr, buffer_size);
     };
 }
