@@ -249,6 +249,11 @@ public:
             }
         }
 
+        // set default outputs for resolution failure.
+        sym_size = 0;
+        sym_address = -1;
+        sym_str.Empty();
+
         // just return an empty value to signal that the symbol was not found.
         return value_t{};
     }

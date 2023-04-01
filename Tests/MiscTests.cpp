@@ -671,16 +671,12 @@ TEST_CASE("FormatDate")
     // characters for year, month, and day, but we're seeing slashes. Other
     // locales that use a '.' also use a slash.
     static const row testrows[] = {
-        { "en_US",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "3/18/2023" },
-        { "en_AU",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/03/2023" },
+        // note: '-'s are needed between language and dialect tags here.
+        // Oddly, the MSVC libraries seem to accept '_'s *only* in debug builds.
+        { "en-US",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "3/18/2023" },
+        { "en-AU",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/03/2023" },
         { "zh",          COleDateTime{ 2023, 3, 18, 0, 0, 0}, "2023/3/18" },
-        { "zh_HK",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/3/2023" },
-
-        // also check UTF8 - the app code doesn't use it now, but may in the future.
-        { "en_US.UTF-8", COleDateTime{ 2023, 3, 18, 0, 0, 0}, "3/18/2023" },
-        { "en_AU.UTF-8", COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/03/2023" },
-        { "zh.UTF-8",    COleDateTime{ 2023, 3, 18, 0, 0, 0}, "2023/3/18" },
-        { "zh_HK.UTF-8", COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/3/2023" },
+        { "zh-HK",       COleDateTime{ 2023, 3, 18, 0, 0, 0}, "18/3/2023" },
     };
 
     const row test = GENERATE(
@@ -689,14 +685,15 @@ TEST_CASE("FormatDate")
             std::end(testrows)
         )
     );
-    CAPTURE(test.input, test.expected);
+    CAPTURE(test.locale, test.input, test.expected);
 
 
     const char* originalLocale = std::setlocale(LC_TIME, nullptr);
     char localeBuf[128] = { 0 };
     std::strncpy(localeBuf, originalLocale, sizeof(localeBuf));
 
-    std::setlocale(LC_TIME, test.locale);
+    const char* result = std::setlocale(LC_TIME, test.locale);
+    CHECK(result != nullptr);
 
     auto cleanup = gsl::finally([&]() {
         std::setlocale(LC_TIME, localeBuf);

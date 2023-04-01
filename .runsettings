@@ -1,5 +1,6 @@
 ﻿<RunSettings>
 
+  <!-- docs: https://github.com/JohnnyHendriks/TestAdapter_Catch2/blob/main/Docs/Settings.md -->
   <Catch2Adapter>
     <FilenameFilter>.*Tests</FilenameFilter>
   </Catch2Adapter>
