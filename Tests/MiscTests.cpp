@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <clocale>
 #include <cmath>
+#include <random>
 
 
 struct color_row
@@ -1727,4 +1728,221 @@ TEST_CASE("mpz_set_ui64")
     mpz_get_str(buffer, test.radix, value);
 
     CHECK(std::strcmp(test.expectedString, buffer) == 0);
+}
+
+
+TEST_CASE("FindFirstDiff")
+{
+    struct row
+    {
+        const char* caseName;
+        std::vector<std::uint8_t> x;
+        std::vector<std::uint8_t> y;
+        std::size_t len;
+        std::size_t offset;
+
+        std::size_t expectedDiffIndex;
+    };
+
+    static const row testrows[] = {
+        {
+            "length = 0",
+            { },
+            { },
+            0,
+            0,
+            0
+        },
+        {
+            "length = 1, equal",
+            { 0 },
+            { 0 },
+            1,
+            0,
+            1
+        },
+        {
+            "length = 1, not equal",
+            { 0 },
+            { 1 },
+            1,
+            0,
+            0
+        },
+        {
+            "length > 16, equal",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            17,
+            0,
+            17
+        },
+        {
+            "length > 16, not equal at start",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            17,
+            0,
+            0
+        },
+        {
+            "length > 16, not equal in middle",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 8, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            17,
+            0,
+            7
+        },
+        {
+            "length > 16, not equal at byte 15",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 16 },
+            17,
+            0,
+            15
+        },
+        {
+            "length > 16, not equal after byte 15",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 },
+            17,
+            0,
+            16
+        },
+
+        {
+            "length = 1, equal, not 16-byte aligned",
+            { 0 },
+            { 0 },
+            1,
+            3,
+            1
+        },
+        {
+            "length = 1, not equal, not 16-byte aligned",
+            { 0 },
+            { 1 },
+            1,
+            3,
+            0
+        },
+        {
+            "length > 16, equal, not 16-byte aligned",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            17,
+            3,
+            17
+        },
+        {
+            "length > 16, not equal st start, not 16-byte aligned",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            17,
+            3,
+            0
+        },
+        {
+            "length > 16, not equal st byte 15, not 16-byte aligned",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 16 },
+            17,
+            3,
+            15
+        },
+        {
+            "length > 16, not equal after byte 15, not 16-byte aligned",
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17 },
+            17,
+            3,
+            16
+        },
+    };
+
+    const row test = GENERATE(
+        Catch::Generators::from_range(
+            std::begin(testrows),
+            std::end(testrows)
+        )
+    );
+    CAPTURE(test.caseName);
+
+    
+    constexpr std::size_t alignedBufSize = 128;
+    alignas(__m128i) std::uint8_t alignedx[alignedBufSize]{};
+    alignas(__m128i) std::uint8_t alignedy[alignedBufSize]{};
+
+    assert((test.len + test.offset) < alignedBufSize);
+    memcpy(alignedx + test.offset, test.x.data(), test.len);
+    memcpy(alignedy + test.offset, test.y.data(), test.len);
+
+    std::size_t diffIndex = FindFirstDiff(
+        alignedx + test.offset,
+        alignedy + test.offset,
+        test.len
+    );
+
+    CHECK(diffIndex == test.expectedDiffIndex);
+}
+
+
+__declspec(noinline)
+static std::size_t FindFirstDiff_ByteScan(
+    const std::uint8_t* x,
+    const std::uint8_t* y,
+    std::size_t len)
+{
+    const std::uint8_t* xbase = x;
+
+    while (len && *x == *y)
+    {
+        --len;
+        ++x;
+        ++y;
+    }
+
+    return x - xbase;
+}
+
+TEST_CASE("FindFirstDiff - benchmarks")
+{
+    constexpr std::size_t buffer_size = 4096;
+
+    struct alignas(__m128i) aligned_buffer
+    {
+        std::uint8_t bytes[buffer_size];
+    };
+
+    aligned_buffer x{};
+    aligned_buffer y{};
+
+    std::mt19937 rng{ std::random_device{}() };
+
+    for (std::size_t i = 0; i < buffer_size; i++)
+    {
+        const std::uint8_t b = rng() & 0xFF;;
+        x.bytes[i] = b;
+        y.bytes[i] = b;
+    }
+
+    // place a diff in the last 16-byte block
+    int diff_index = buffer_size - 16 + (rng() % 16);
+
+    y.bytes[diff_index]++;
+
+    const std::uint8_t* xptr = x.bytes;
+    const std::uint8_t* yptr = y.bytes;
+
+
+    BENCHMARK("the function")
+    {
+        return FindFirstDiff(xptr, yptr, buffer_size);
+    };
+
+
+    BENCHMARK("byte scanning")
+    {
+        return FindFirstDiff_ByteScan(xptr, yptr, buffer_size);
+    };
 }

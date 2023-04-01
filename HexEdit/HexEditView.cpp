@@ -17632,7 +17632,7 @@ void CHexEditView::OnViewtest()
 {
 	// for testing new commands etc
 #ifdef _DEBUG
-	test_misc();
+	// nothing to do here right now.
 #endif
 }
 

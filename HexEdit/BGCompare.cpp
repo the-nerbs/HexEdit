@@ -1247,7 +1247,7 @@ UINT CHexEditDoc::RunCompThread()
 		}
 		size_t gota = 0, gotb = 0;              // Current amount of data obtained from each file (at addra, addrb)
 		FILE_ADDRESS addra = 0, addrb = 0;      // Address of byte at start of buffers (comp_bufa_, comp_bufb_)
-		FILE_ADDRESS cumulative_replace = 0;    // Keeps track of a long differrence - treated as a replacement
+		FILE_ADDRESS cumulative_replace = 0;    // Keeps track of a long difference - treated as a replacement
 
 		// Keep looping until we are finished processing blocks or we receive a command to stop etc
 		for (;;)

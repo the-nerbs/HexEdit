@@ -178,8 +178,8 @@ void decrypt(void *buffer, size_t len);
 
 // Memory manipulation
 //int next_diff(const void * buf1, const void * buf2, size_t len);
-size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, size_t buflen);
-size_t FindFirstSame(const unsigned char * buf1, const unsigned char * buf2, size_t buflen);
+std::size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, size_t buflen);
+std::size_t FindFirstSame(const unsigned char * buf1, const unsigned char * buf2, size_t buflen);
 const unsigned char * Search4(const unsigned char * buf, size_t buflen, const unsigned char * to_find, size_t back_len, size_t to_find_len, int &ret_offset, int min_match = 10);
 
 // flip_bytes is typically used to switch between big- and little-endian byte order but
@@ -235,9 +235,5 @@ struct CaseInsensitiveLess
 	}
 };
 typedef std::set<CString, CaseInsensitiveLess> CaseInsensitiveSet;
-
-#ifdef _DEBUG
-void test_misc();
-#endif
 
 #endif

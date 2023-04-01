@@ -1468,17 +1468,6 @@ const char * mpz_set_bytes(mpz_ptr p, FILE_ADDRESS addr, int count)
 	return NULL;
 }
 
-#ifdef _DEBUG
-void test_misc()
-{
-	unsigned __int64 ui64 = 0xffffFFFFffffFFFF;
-	mpz_t big;
-	mpz_init(big);
-	mpz_set_ui64(big, ui64);
-	ASSERT(mpz_get_ui64(big) == ui64);
-	mpz_clear(big);
-}
-#endif
 
 //-----------------------------------------------------------------------------
 // File handling
@@ -1703,11 +1692,11 @@ BOOL WipeFile(const char * filename, wipe_t wipe_type /*= WIPE_GOOD*/)
 	return TRUE;
 }
 
-// Given some in-mmemory compessed (zlib) data, uncompress it and write to file
+// Given some in-memory compressed (zlib) data, uncompress it and write to file
 //   filename = name of the file to write
 //   data = points to complete compressed data to be written to the file
 //   len  = length of the (compressed) data
-//   returns: true on success of falso on error
+//   returns: true on success or false on error
 bool UncompressAndWriteFile(const char *filename, const unsigned char *data, size_t len)
 {
 	z_stream zs = {0};
@@ -1791,7 +1780,7 @@ CString FileErrorMessage(const CFileException *fe, UINT mode /*=CFile::modeRead|
 
 		if (mode == CFile::modeRead)
 				retval.Format("An error occurred reading from the file \"%s\".\n", fe->m_strFileName);
-		else if (mode = CFile::modeWrite)
+		else if (mode == CFile::modeWrite)
 				retval.Format("An error occurred writing to the file \"%s\".\n", fe->m_strFileName);
 		else
 				retval.Format("An error occurred using the file \"%s\".\n", fe->m_strFileName);
@@ -2135,8 +2124,11 @@ static const int SZCHK = sizeof(__m128i);                     // Size of a chunk
 // Return value:
 //    The number of bytes up to the first difference OR
 //    buflen if both buffers are the same
-size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, size_t buflen)
+std::size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, size_t buflen)
 {
+	assert(buf1);
+	assert(buf2);
+
 	assert((int)buf1 % SZCHK == (int)buf2 % SZCHK);         // ensure same memory alignment
 
 	// Work out where to start the SSE2 compare by rounding up to next 16-byte memory chunk
@@ -2146,13 +2138,17 @@ size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, siz
 	const unsigned char * p1, * p2;
 	const unsigned char * pend = (const unsigned char *)pchunk1;
 	if (pend > buf1 + buflen)
+	{
 		pend = buf1 + buflen;
+	}
 
 	// Check up to 15 bytes before the first 16-byte aligned chunk
 	for (p1 = buf1, p2 = buf2; p1 < pend; ++p1, ++p2)
 	{
 		if (*p1 != *p2)
+		{
 			return p1 - buf1;
+		}
 	}
 
 	__m128i * pchunk2 = (__m128i *)((((int)buf2 + SZCHK-1)/SZCHK)*SZCHK);
@@ -2181,7 +2177,9 @@ size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, siz
 	for (p1 = (const unsigned char *)pchunk1, p2 = (const unsigned char *)pchunk2; p1 < pend; ++p1, ++p2)
 	{
 		if (*p1 != *p2)
+		{
 			return p1 - buf1;
+		}
 	}
 
 	return buflen;
@@ -2201,7 +2199,7 @@ size_t FindFirstDiff(const unsigned char * buf1, const unsigned char * buf2, siz
 // Return value:
 //    The number of bytes up to the first byte that is the same OR
 //    buflen if all bytes at corresponding position in both buffers are different
-size_t FindFirstSame(const unsigned char * buf1, const unsigned char * buf2, size_t buflen)
+std::size_t FindFirstSame(const unsigned char * buf1, const unsigned char * buf2, size_t buflen)
 {
 	assert((int)buf1 % SZCHK == (int)buf2 % SZCHK);         // ensure same memory alignment
 
