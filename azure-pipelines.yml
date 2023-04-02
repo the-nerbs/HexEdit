@@ -43,7 +43,7 @@ steps:
   displayName: Run Tests
   workingDirectory: $(Build.SourcesDirectory)\artifacts\bin\Tests\Release\Win32
 
-- ${{ if parameters.runBenchmarks }}
+- ${{ if parameters.runBenchmarks }}:
   - pwsh: '& .\Tests.exe [!benchmark]'
     displayName: Run Tests
     workingDirectory: $(Build.SourcesDirectory)\artifacts\bin\Tests\Release\Win32
