@@ -4,6 +4,12 @@ trigger:
 pool:
   vmImage: 'windows-2019'
 
+parameters:
+  - name: runBenchmarks
+    displayName: Run Benchmarks
+    type: boolean
+    default: false
+
 variables:
   solution: './HexEdit.sln'
   buildPlatform: 'Win32'
@@ -33,9 +39,14 @@ steps:
     msbuildArguments: '/p:RunWixToolsOutOfProc=true'
 #    msbuildArguments: '/p:Version="$(version)" /p:ContinuousIntegrationBuild="true"'
 
-- pwsh: '& .\Tests.exe'
+- pwsh: '& .\Tests.exe --no-benchmarks'
   displayName: Run Tests
   workingDirectory: $(Build.SourcesDirectory)\artifacts\bin\Tests\Release\Win32
+
+- ${{ if parameters.runBenchmarks }}
+  - pwsh: '& .\Tests.exe [!benchmark]'
+    displayName: Run Tests
+    workingDirectory: $(Build.SourcesDirectory)\artifacts\bin\Tests\Release\Win32
 
 - pwsh: Get-ChildItem -Path "artifacts\installer\Release" -Filter "*.exe" | Get-FileHash | Format-List >"artifacts\installer\Release\hash.txt"
   displayName: Generate Hashes File
